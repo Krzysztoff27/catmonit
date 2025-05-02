@@ -26,8 +26,6 @@ artifacts/
 
 ## Docker
 docker-compose.override.yml
-**/Dockerfile
-**/docker-compose*.yml
 *.container
 
 ## Others
