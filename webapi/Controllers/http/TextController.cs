@@ -1,6 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-namespace webapi.Controllers
+namespace webapi.Controllers.http
 {
     public class TextController : Controller
     {

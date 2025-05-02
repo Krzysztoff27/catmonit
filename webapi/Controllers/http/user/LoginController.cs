@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
-namespace webapi.Controllers.api_main
+namespace webapi.Controllers.http.user
 {
     [ApiController]
     [Route("api/[controller]")]
