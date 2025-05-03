@@ -1,34 +1,34 @@
-using MySql.Data.MySqlClient;
-using System.Net.WebSockets;
 using System.Text;
-using webapi.Controllers.websocket;
+using webapi.Controllers.http.user;
 using webapi.Monitoring;
-
-
-static async Task Echo(WebSocket webSocket)
-{
-    var buffer = new byte[1024 * 4];
-    WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-    while (!result.CloseStatus.HasValue)
-    {
-        string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
-        string responseMessage = $"Echo: {receivedMessage}";
-        var responseBytes = Encoding.UTF8.GetBytes(responseMessage);
-
-        await webSocket.SendAsync(new ArraySegment<byte>(responseBytes, 0, responseBytes.Length),
-                                  result.MessageType,
-                                  result.EndOfMessage,
-                                  CancellationToken.None);
-
-        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-    }
-    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-}
+using webapi.Websocket;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<StorageMonit>();
+builder.Services.AddTransient<MonitHandler>();
+
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=webapi-mysql-1;Database=catmonit;User=root;Password=mysecretpassword;";
+builder.Services.AddSingleton(new userValidator(connectionString));
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "your-issuer",
+            ValidAudience = "your-audience",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
+        };
+    });
+
 
 var app = builder.Build();
 
@@ -42,6 +42,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseWebSockets();
 
+app.Use(async (context, next) =>
+{
+    var handler = context.RequestServices.GetRequiredService<MonitHandler>();
+    await handler.HandleRequestAsync(context);
+
+    if (!context.Response.HasStarted)
+    {
+        await next();
+    }
+});
 
 
 
@@ -63,26 +73,6 @@ app.UseEndpoints(
     }
 );
 
-MonitorController.storageMonitoring.StartMonitoring();
-/*
-string connectionString = "Server=webapi-mysql-1;Database=catmonit;User=root;Password=mysecretpassword;";
-
-using (MySqlConnection conn = new MySqlConnection(connectionString))
-{
-    conn.Open();
-
-    string query = "SELECT * FROM users";
-    MySqlCommand cmd = new MySqlCommand(query, conn);
-
-    using (MySqlDataReader reader = cmd.ExecuteReader())
-    {
-        while (reader.Read())
-        {
-            string msg = reader["username"].ToString();
-        }
-    }
-}
-*/
 
 app.Run();
 

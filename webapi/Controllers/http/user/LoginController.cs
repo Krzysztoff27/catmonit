@@ -7,6 +7,12 @@ namespace webapi.Controllers.http.user
     [Route("api/[controller]")]
     public class LoginController : Controller
     {
+        private readonly userValidator userService;
+
+        public LoginController(userValidator userVal)
+        {
+            userService = userVal;
+        }
         [HttpGet]
         public JsonResult Get()
         {
@@ -16,7 +22,7 @@ namespace webapi.Controllers.http.user
         [HttpPost]
         public JsonResult Post([FromBody] UserModel user)
         {
-            var data = new { Message = "Hello, " + user.username };
+            var data = new { token = $"Hello, {user.username}, you {(userService.userExists(user.username)?"do":"don't")} exist" };
             return Json(data);
         }
     }
