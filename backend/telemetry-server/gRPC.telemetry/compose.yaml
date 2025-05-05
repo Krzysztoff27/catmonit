@@ -1,0 +1,7 @@
+﻿services:
+  grpc.telemetry.server:
+    image: grpc.telemetry.server
+    build:
+      context: .
+      dockerfile: gRPC.telemetry.Server/Dockerfile
+

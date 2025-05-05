@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRPC.telemetry";
+
+package hostname;
+
+// The service definition.
+service HostNameService {
+  // Client-stream: device pushes only its hostname.
+  rpc SendHostName (HostNameRequest) returns (HostNameReply);
+}
+
+// The request message containing the hostname.
+message HostNameRequest {
+  string hostname = 1;
+}
+
+// The response message acknowledging receipt.
+message HostNameReply {
+  string message = 1;
+}
