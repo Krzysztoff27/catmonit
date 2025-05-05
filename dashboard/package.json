@@ -11,12 +11,16 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.0",
         "@mantine/charts": "^7.17.7",
         "@mantine/code-highlight": "^7.17.7",
         "@mantine/core": "^7.17.7",
         "@mantine/form": "^7.17.7",
         "@mantine/hooks": "^7.17.7",
         "@mantine/spotlight": "^7.17.7",
+        "@mui/icons-material": "^7.0.2",
+        "@mui/material": "^7.0.2",
         "react": "^19.1.0",
         "react-dom": "^19.0.0",
         "react-router-dom": "^7.5.3",
