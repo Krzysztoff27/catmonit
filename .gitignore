@@ -1,0 +1,44 @@
+## Ignore Visual Studio temporary files, build results, and
+## user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.log
+
+## NuGet
+*.nupkg
+# The packages folder can be ignored because of PackageReference
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+## ASP.NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Docker
+docker-compose.override.yml
+**/Dockerfile
+**/docker-compose*.yml
+*.container
+
+## Others
+*.swp
+*.bak
+*.tmp
+*.tmp.*
+*.cache
+*.DS_Store
+Thumbs.db
+
+## Rider
+.idea/
+*.sln.iml
