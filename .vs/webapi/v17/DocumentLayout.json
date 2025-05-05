@@ -1,0 +1,141 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\websocket\\monithandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\websocket\\monithandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\controllers\\http\\user\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\controllers\\http\\user\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|c:\\users\\natal\\documents\\fin\\catmonit\\webapi\\webapi\\monitoring\\subscriber.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF6F0465-DD48-466F-96FB-45B28CEF59A2}|webapi\\webapi.csproj|solutionrelative:webapi\\monitoring\\subscriber.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\appsettings.json",
+              "RelativeDocumentMoniker": "webapi\\appsettings.json",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\appsettings.json",
+              "RelativeToolTip": "webapi\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-05-03T10:27:33.045Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserModel.cs",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Models\\UserModel.cs",
+              "RelativeDocumentMoniker": "webapi\\Models\\UserModel.cs",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Models\\UserModel.cs",
+              "RelativeToolTip": "webapi\\Models\\UserModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T10:26:19.013Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginController.cs",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Controllers\\http\\user\\LoginController.cs",
+              "RelativeDocumentMoniker": "webapi\\Controllers\\http\\user\\LoginController.cs",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Controllers\\http\\user\\LoginController.cs",
+              "RelativeToolTip": "webapi\\Controllers\\http\\user\\LoginController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T09:28:21.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MonitHandler.cs",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Websocket\\MonitHandler.cs",
+              "RelativeDocumentMoniker": "webapi\\Websocket\\MonitHandler.cs",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Websocket\\MonitHandler.cs",
+              "RelativeToolTip": "webapi\\Websocket\\MonitHandler.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAUwBYAAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T08:32:24.252Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Subscriber.cs",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Monitoring\\Subscriber.cs",
+              "RelativeDocumentMoniker": "webapi\\Monitoring\\Subscriber.cs",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Monitoring\\Subscriber.cs",
+              "RelativeToolTip": "webapi\\Monitoring\\Subscriber.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T08:20:49.21Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Program.cs",
+              "RelativeDocumentMoniker": "webapi\\Program.cs",
+              "ToolTip": "C:\\Users\\Natal\\Documents\\fin\\catmonit\\webapi\\webapi\\Program.cs",
+              "RelativeToolTip": "webapi\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-02T10:40:08.106Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{68487888-204a-11d3-87eb-00c04f7971a5}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
