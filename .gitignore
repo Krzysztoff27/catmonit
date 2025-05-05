@@ -25,7 +25,6 @@ project.fragment.lock.json
 artifacts/
 
 ## Docker
-docker-compose.override.yml
 *.container
 
 ## Others
