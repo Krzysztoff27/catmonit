@@ -1,4 +1,8 @@
-﻿using System.Net.WebSockets;
+﻿using JWT.Algorithms;
+using JWT.Exceptions;
+using JWT.Serializers;
+using JWT;
+using System.Net.WebSockets;
 using System.Text;
 using webapi.Monitoring;
 
@@ -16,25 +20,56 @@ namespace webapi.Websocket
 
         public async Task HandleRequestAsync(HttpContext context)
         {
-            var tokenHeader = context.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(tokenHeader))
+            var token = context.Request.Query["token"].ToString();
+            if (context.WebSockets.IsWebSocketRequest)
             {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Authorization header missing.");
-                return;
-            }
-            if (context.Request.Path.StartsWithSegments("/ws"))
-            {
-                if (context.WebSockets.IsWebSocketRequest)
+                if (!string.IsNullOrEmpty(token))
                 {
-                    using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                    await AddWebSocket(tokenHeader, webSocket);
+
+                    try
+                    {
+                        // Create instances of necessary classes
+                        var jsonSerializer = new JsonNetSerializer();
+                        var urlEncoder = new JwtBase64UrlEncoder();
+                        var dateTimeProvider = new UtcDateTimeProvider(); // Create a date-time provider
+                        var validator = new JwtValidator(jsonSerializer, dateTimeProvider); // Use the correct constructor
+                        var algorithm = new HMACSHA256Algorithm();
+                        var decoder = new JwtDecoder(jsonSerializer, validator, urlEncoder, algorithm);
+
+                        // Decode and validate the token
+                        var payload = decoder.DecodeToObject(token, Config.CM_JWT_SECRET, verify: true);
+
+                        // If it reaches here, the token is valid
+                        Console.WriteLine("Decoded JWT Payload:");
+                        Console.WriteLine(payload);
+                        
+                        using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes((String)payload["sub"])), WebSocketMessageType.Text, true, CancellationToken.None);
+                        await AddWebSocket(token, webSocket);
+                    }
+                    catch (TokenExpiredException)
+                    {
+                        Console.WriteLine("Token is expired.");
+                    }
+                    catch (SignatureVerificationException)
+                    {
+                        Console.WriteLine("Invalid signature.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error: " + ex.Message);
+                    }
                 }
                 else
                 {
-                    context.Response.StatusCode = 400;
-                    await context.Response.WriteAsync("Expected WebSocket request.");
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized.");
                 }
+            }
+            else
+            {
+                context.Response.StatusCode = 40;
+                await context.Response.WriteAsync("Expected WebSocket request.");
             }
         }
 

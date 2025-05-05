@@ -1,6 +1,9 @@
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Test;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System.Text;
 using webapi.Controllers.http.user;
+using webapi.Helpers;
 using webapi.Monitoring;
 using webapi.Websocket;
 
@@ -12,7 +15,7 @@ builder.Services.AddSingleton<StorageMonit>();
 builder.Services.AddTransient<MonitHandler>();
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=webapi-mysql-1;Database=catmonit;User=root;Password=mysecretpassword;";
+    ?? $"Server={Config.CM_SQLSERVER};Database=catmonit;User=root;Password={Config.CM_SQL_PASSWORD};";
 builder.Services.AddSingleton(new userValidator(connectionString));
 
 
@@ -27,13 +30,14 @@ if (!app.Environment.IsDevelopment())
 
 
 app.UseWebSockets();
-
 app.Use(async (context, next) =>
 {
-    var handler = context.RequestServices.GetRequiredService<MonitHandler>();
-    await handler.HandleRequestAsync(context);
-
-    if (!context.Response.HasStarted)
+    if (context.WebSockets.IsWebSocketRequest)
+    {
+        var handler = context.RequestServices.GetRequiredService<MonitHandler>();
+        await handler.HandleRequestAsync(context);
+    }
+    else
     {
         await next();
     }
