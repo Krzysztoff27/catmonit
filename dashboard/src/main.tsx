@@ -5,6 +5,7 @@ import { MantineProvider } from "@mantine/core";
 import App from "./App.tsx";
 import theme from "./config/theme.config.ts";
 
+import "./styles/main.css";
 import "@mantine/core/styles.css";
 import "@mantine/code-highlight/styles.css";
 

@@ -3,9 +3,10 @@ import Main from "./pages/Main/Main";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route>
-            <Route path="/" element={<Main />}/>
-        </Route>
+        <Route
+            path="/"
+            element={<Main />}
+        />
     )
 );
 
