@@ -44,8 +44,8 @@ Thumbs.db
 *.sln.iml
 
 ## pyinstaller build results
-*/build/
-*/dist/
+build/
+dist/
 
 ## custom exclusion
 */ssl/
