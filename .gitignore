@@ -42,3 +42,12 @@ Thumbs.db
 ## Rider
 .idea/
 *.sln.iml
+
+## pyinstaller build results
+*/build/
+*/dist/
+
+## custom exclusion
+*/ssl/
+
+
