@@ -23,3 +23,7 @@
     --background-color-8: var(--mantine-color-gray-1);
     --background-color-9: var(--mantine-color-gray-0);
 }
+
+:root, #root {
+    background-color: var(--background-color-9);
+}

@@ -21,7 +21,7 @@ function DeviceDisksWidget({ device }: DeviceDisksWidgetProps) {
         <Paper
             h="300px"
             w="260px"
-            bg="var(--background-color-9)"
+            bg="var(--background-color-6)"
         >
             <Stack
                 p="xs"
