@@ -47,7 +47,6 @@ Thumbs.db
 build/
 dist/
 
-## custom exclusion
-*/ssl/
-
+## custom exclusionssl/
+ssl/
 
