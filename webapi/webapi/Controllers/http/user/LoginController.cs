@@ -26,24 +26,23 @@ namespace webapi.Controllers.http.user
         [HttpPost]
         public JsonResult Post([FromBody] UserModel user)
         {
-            var userId = userService.userAuth(user.username, user.password);
-            if (userId != 0)
+            var loginInfo = userService.userAuth(user.username, user.password);
+            if (loginInfo.status == userAuthStatus.Success)
             {
-                // user exists and password is correct
-                var payload = new
+                // Create the JWT token
+                var payload = new TokenPayload
                 {
-                    sub = $"{userId}",// user id
+                    id = loginInfo.userID,
                     iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds(), // Issued at time
                     exp = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds() // Expiration time
                 };
 
-                // Create the JWT token
                 string token = JwtBuilder.Create()
                     .WithAlgorithm(new HMACSHA256Algorithm())
                     .WithSecret(Config.CM_JWT_SECRET)
                     .AddClaim("exp", payload.exp) 
                     .AddClaim("iat", payload.iat) 
-                    .AddClaim("sub", payload.sub) 
+                    .AddClaim("id", payload.id) 
                     .Encode();
 
                 var data = new { token = $"{token}" };
@@ -51,8 +50,12 @@ namespace webapi.Controllers.http.user
             }
             else
             {
-                // user does not exist or password is incorrect
-                // handle the error accordingly
+                if (loginInfo.status == userAuthStatus.InternalServerError)
+                {
+                    var data0 = new { message = "internal server error" };
+                    return Json(data0);
+
+                }
                 var data = new { message = "user doesn't exist or password is incorrect" };
                 return Json(data);
             }

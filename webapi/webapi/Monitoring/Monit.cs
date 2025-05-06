@@ -15,19 +15,19 @@ namespace webapi.Monitoring
     {
 
         public int requestTimeout;
-        public readonly ConcurrentDictionary<string, Subscriber> subscribers = new ConcurrentDictionary<string, Subscriber>();
+        public readonly ConcurrentDictionary<uint, Subscriber> subscribers = new ConcurrentDictionary<uint, Subscriber>();
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
         public CancellationTokenSource cancellationTokenSource;
         public Task monitorTask;
 
         public void Subscribe(Subscriber sub)
         {
-            subscribers.TryAdd(sub.Token, sub);
+            subscribers.TryAdd(sub.userID, sub);
         }
 
         public void Unsubscribe(Subscriber sub)
         {
-            subscribers.TryRemove(sub.Token, out _);
+            subscribers.TryRemove(sub.userID, out _);
         }
 
         public void StartMonitoring(int timeout = 1000)

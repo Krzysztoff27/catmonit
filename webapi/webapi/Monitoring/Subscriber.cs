@@ -4,25 +4,12 @@ namespace webapi.Monitoring
 {
     public class Subscriber
     {
-        static int SubInc = 0;
-        public string Token { get; set; }
+        public uint userID { get; set; }
         public WebSocket WebSocket { get; set; }
-        public Subscriber(string token, WebSocket webSocket)
+        public Subscriber(uint userId, WebSocket webSocket)
         {
-            Token = token;
-            
+            userID = userId;
             WebSocket = webSocket;
-        }
-    }
-    public class SubscriberValidator
-    {
-        public static Subscriber? createSubscriber(string token) {
-            if (token == null || token.Length == 0)
-            {
-                return null;
-            }
-
-            return null;
         }
     }
 }

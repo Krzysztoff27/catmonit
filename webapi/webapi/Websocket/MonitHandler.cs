@@ -5,6 +5,7 @@ using JWT;
 using System.Net.WebSockets;
 using System.Text;
 using webapi.Monitoring;
+using webapi.Models;
 
 namespace webapi.Websocket
 {
@@ -28,36 +29,34 @@ namespace webapi.Websocket
 
                     try
                     {
-                        // Create instances of necessary classes
                         var jsonSerializer = new JsonNetSerializer();
                         var urlEncoder = new JwtBase64UrlEncoder();
-                        var dateTimeProvider = new UtcDateTimeProvider(); // Create a date-time provider
-                        var validator = new JwtValidator(jsonSerializer, dateTimeProvider); // Use the correct constructor
+                        var dateTimeProvider = new UtcDateTimeProvider();
+                        var validator = new JwtValidator(jsonSerializer, dateTimeProvider);
                         var algorithm = new HMACSHA256Algorithm();
                         var decoder = new JwtDecoder(jsonSerializer, validator, urlEncoder, algorithm);
 
-                        // Decode and validate the token
-                        var payload = decoder.DecodeToObject(token, Config.CM_JWT_SECRET, verify: true);
+                        var payload = decoder.DecodeToObject<TokenPayload>(token, Config.CM_JWT_SECRET, verify: true);
 
-                        // If it reaches here, the token is valid
-                        Console.WriteLine("Decoded JWT Payload:");
-                        Console.WriteLine(payload);
                         
                         using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes((String)payload["sub"])), WebSocketMessageType.Text, true, CancellationToken.None);
-                        await AddWebSocket(token, webSocket);
+                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes((String)$"user id: {payload.id}")), WebSocketMessageType.Text, true, CancellationToken.None);
+                        await AddWebSocket(new Subscriber(payload.id, webSocket));
                     }
                     catch (TokenExpiredException)
                     {
-                        Console.WriteLine("Token is expired.");
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync("Unauthorized.");
                     }
                     catch (SignatureVerificationException)
                     {
-                        Console.WriteLine("Invalid signature.");
+                        context.Response.StatusCode = 401;
+                        await context.Response.WriteAsync("Unauthorized.");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Error: " + ex.Message);
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("Internal server error.");
                     }
                 }
                 else
@@ -68,17 +67,16 @@ namespace webapi.Websocket
             }
             else
             {
-                context.Response.StatusCode = 40;
+                context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("Expected WebSocket request.");
             }
         }
 
-        private async Task AddWebSocket(string token, WebSocket webSocket)
+        private async Task AddWebSocket(Subscriber potentialSubscriber)
         {
             var buffer = new byte[1024 * 4];
-            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var result = await potentialSubscriber.WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
-            var subscriber = new Subscriber(token, webSocket);
 
             while (!result.CloseStatus.HasValue)
             {
@@ -86,18 +84,18 @@ namespace webapi.Websocket
 
                 if (message == "start")
                 {
-                    _storageMonitoring.Subscribe(subscriber);
+                    _storageMonitoring.Subscribe(potentialSubscriber);
                 }
                 else if (message == "stop")
                 {
-                    _storageMonitoring.Unsubscribe(subscriber);
+                    _storageMonitoring.Unsubscribe(potentialSubscriber);
                 }
 
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                result = await potentialSubscriber.WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
 
-            _storageMonitoring.Unsubscribe(subscriber);
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+            _storageMonitoring.Unsubscribe(potentialSubscriber);
+            await potentialSubscriber.WebSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
     }
 }

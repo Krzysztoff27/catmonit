@@ -6,6 +6,19 @@ using Org.BouncyCastle.Crypto.Generators;
 
 namespace webapi.Helpers
 {
+    public enum userAuthStatus
+    {
+        Success,
+        IncorrectPassword,
+        UserDoesntExist,
+        InternalServerError
+    }
+    public enum userCreateStatus
+    {
+        Success,
+        UserAlreadyExists,
+        InternalServerError
+    }
     public class userValidator
     {
 
@@ -33,21 +46,27 @@ namespace webapi.Helpers
                     Console.WriteLine($"Error connecting to database: {ex.Message}");
                     return false;
                 }
-                string query = $"SELECT id FROM users where username = \"{username}\";";
+                string query = $"SELECT count(id) FROM users where username = @username;";
                 var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@username", username);
 
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        return true;
+                        int count = reader.GetInt32(0);
+                        if (count != 0)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
             return false;
         }
-
-        public uint userAuth(string username, string password) // returns user id (starting from 1)
+        // returns user id (starting from 1)
+        // 0 is reserved for user not found / incorrect password
+        public (userAuthStatus status, uint userID) userAuth(string username, string password) 
         {
 
             using (var conn = new MySqlConnection(connectionString))
@@ -59,7 +78,7 @@ namespace webapi.Helpers
                 catch (MySqlException ex)
                 {
                     Console.WriteLine($"Error connecting to database: {ex.Message}");
-                    return 0;
+                    return (userAuthStatus.InternalServerError, 0);
                 }
                 string query = "SELECT id, password_hash, salt FROM users WHERE username = @username";
                 using (var cmd = new MySqlCommand(query, conn))
@@ -75,24 +94,23 @@ namespace webapi.Helpers
 
                             if (passwordHelper.VerifyPassword(password, salt, storedHash))
                             {
-                                return (uint)((int)reader["id"]);
+                                return (userAuthStatus.Success, (uint)((int)reader["id"]));
                             }
                             else
                             {
-                                return 0;
+                                return (userAuthStatus.IncorrectPassword, 0);
                             };
                         }
                         else
                         {
-                            return 0;
+                            return (userAuthStatus.UserDoesntExist, 0);
                         }
                     }
                 }
             }
-            return 0;
         }
 
-        public string createUser(string username, string password)
+        public userCreateStatus createUser(string username, string password)
         {
 
             using (var conn = new MySqlConnection(connectionString))
@@ -103,9 +121,28 @@ namespace webapi.Helpers
                 }
                 catch (Exception ex)
                 {
-                    return "cannot add user";
+                    return userCreateStatus.InternalServerError;
                 }
-                    string query = "insert into users (username, password_hash, salt) values (@username, @hash, @salt);";
+
+                // check if user exists
+                string query0 = $"SELECT count(id) FROM users where username = @username;";
+                var cmd0 = new MySqlCommand(query0, conn);
+                cmd0.Parameters.AddWithValue("@username", username);
+
+                using (var reader = cmd0.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        int count = reader.GetInt32(0);
+                        if (count != 0)
+                        {
+                            return userCreateStatus.UserAlreadyExists;
+                        }
+                    }
+                }
+
+                // add user
+                string query = "insert into users (username, password_hash, salt) values (@username, @hash, @salt);";
                 using (var cmd = new MySqlCommand(query, conn))
                 {
                     byte[] salt = passwordHelper.GenerateSalt();
@@ -113,10 +150,10 @@ namespace webapi.Helpers
                     cmd.Parameters.AddWithValue("@hash", passwordHelper.HashPassword(password, salt));
                     cmd.Parameters.AddWithValue("@salt", salt);
 
-                    cmd.ExecuteNonQuery();
+                    Utils.assert(cmd.ExecuteNonQuery() != 0);
                 }
             }
-            return "success";
+            return userCreateStatus.Success;
         }
     }
 }

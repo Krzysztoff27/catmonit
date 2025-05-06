@@ -20,7 +20,23 @@ namespace webapi.Controllers.http.user
         [HttpPost]
         public JsonResult Post([FromBody] UserModel user)
         {
-            var data = new { result = userService.createUser(user.username, user.password) };
+            string message;
+            switch (userService.createUser(user.username, user.password))
+            {
+                case userCreateStatus.Success:
+                    message = "User created successfully";
+                    break;
+                case userCreateStatus.UserAlreadyExists:
+                    message = "User already exists";
+                    break;
+                case userCreateStatus.InternalServerError:
+                    message = "Internal server error";
+                    break;
+                default:
+                    message = "Unknown error";
+                    break;
+            }
+            var data = new { result = message };
             return Json(data);
            
         }
