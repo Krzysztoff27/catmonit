@@ -55,6 +55,7 @@ namespace webapi.Monitoring
                     try
                     {
                         FetchData();
+                        sendData();
                     }
                     finally
                     {
@@ -65,6 +66,8 @@ namespace webapi.Monitoring
                 await Task.Delay((int)requestTimeout, token);
             }
         }
+
+        public virtual void sendData() { }
 
         public virtual void FetchData() { }
     }

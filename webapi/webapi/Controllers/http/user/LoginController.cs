@@ -4,18 +4,13 @@ using JWT.Builder;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Helpers;
 using webapi.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace webapi.Controllers.http.user
 {
     [ApiController]
     [Route("api/[controller]")]
     public class LoginController : Controller
     {
-        private readonly userValidator userService;
-
-        public LoginController(userValidator userVal)
-        {
-            userService = userVal;
-        }
         [HttpGet]
         [Route("meowmeow")]
         public JsonResult Get()
@@ -24,9 +19,9 @@ namespace webapi.Controllers.http.user
             return Json(data);
         }
         [HttpPost]
-        public JsonResult Post([FromBody] UserModel user)
+        public IActionResult Post([FromBody] UserModel user)
         {
-            var loginInfo = userService.userAuth(user.username, user.password);
+            var loginInfo = userHelper.userAuth(user.username, user.password);
             if (loginInfo.status == userAuthStatus.Success)
             {
                 // Create the JWT token
@@ -52,12 +47,12 @@ namespace webapi.Controllers.http.user
             {
                 if (loginInfo.status == userAuthStatus.InternalServerError)
                 {
-                    var data0 = new { message = "internal server error" };
-                    return Json(data0);
+                    var data0 = new { message = "error connecting to database" };
+                    return StatusCode(500, data0);
 
                 }
                 var data = new { message = "user doesn't exist or password is incorrect" };
-                return Json(data);
+                return StatusCode(401, data);
             }
         }
     }

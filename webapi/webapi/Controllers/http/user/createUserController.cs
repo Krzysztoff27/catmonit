@@ -10,34 +10,24 @@ namespace webapi.Controllers.http.user
     [Route("api/[controller]")]
     public class createUserController : Controller
     {
-
-        private readonly userValidator userService;
-
-        public createUserController(userValidator userVal)
-        {
-            userService = userVal;
-        }
         [HttpPost]
-        public JsonResult Post([FromBody] UserModel user)
+        public IActionResult Post([FromBody] UserModel user)
         {
-            string message;
-            switch (userService.createUser(user.username, user.password))
+            switch (userHelper.createUser(user.username, user.password))
             {
                 case userCreateStatus.Success:
-                    message = "User created successfully";
-                    break;
+                    var data0 = new { message = "User created successfully" };
+                    return Json(data0);
                 case userCreateStatus.UserAlreadyExists:
-                    message = "User already exists";
-                    break;
+                    var data1 = new { message = "User already exists" };
+                    return StatusCode(409, data1);
                 case userCreateStatus.InternalServerError:
-                    message = "Internal server error";
-                    break;
+                    var data2 = new { message = "Internal server error" };
+                    return StatusCode(500, data2);
                 default:
-                    message = "Unknown error";
-                    break;
+                    var data3 = new { message = "Unknown error" };
+                    return StatusCode(501, data3);
             }
-            var data = new { result = message };
-            return Json(data);
            
         }
 }

@@ -19,23 +19,17 @@ namespace webapi.Helpers
         UserAlreadyExists,
         InternalServerError
     }
-    public class userValidator
+
+    public class userHelper
     {
 
-        private readonly string connectionString;
-
-        public userValidator(string connectionStringArg)
-        {
-            connectionString = connectionStringArg;
-        }
-
-        public bool userExists(string username)
+        public static bool userExists(string username)
         {
             if (string.IsNullOrEmpty(username))
             {
                 return false;
             }
-            using (var conn = new MySqlConnection(connectionString))
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
             {
                 try
                 {
@@ -66,10 +60,10 @@ namespace webapi.Helpers
         }
         // returns user id (starting from 1)
         // 0 is reserved for user not found / incorrect password
-        public (userAuthStatus status, uint userID) userAuth(string username, string password) 
+        public static (userAuthStatus status, uint userID) userAuth(string username, string password) 
         {
 
-            using (var conn = new MySqlConnection(connectionString))
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
             {
                 try
                 {
@@ -109,11 +103,11 @@ namespace webapi.Helpers
                 }
             }
         }
-
-        public userCreateStatus createUser(string username, string password)
+        
+        public static userCreateStatus createUser(string username, string password)
         {
 
-            using (var conn = new MySqlConnection(connectionString))
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
             {
                 try
                 {
@@ -154,6 +148,33 @@ namespace webapi.Helpers
                 }
             }
             return userCreateStatus.Success;
+        }
+
+        public static List<uint> getDevices(uint userID)
+        {
+            List<uint> devices = new List<uint>();
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (MySqlException ex)
+                {
+                    return devices;
+                }
+                string query = $"SELECT device_id FROM users_devices where user_id = @userID;";
+                var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userID", userID);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        devices.Add((uint)((int)reader["device_id"]));
+                    }
+                }
+            }
+            return devices;
         }
     }
 }

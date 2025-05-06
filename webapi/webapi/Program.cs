@@ -14,10 +14,6 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<StorageMonit>();
 builder.Services.AddTransient<MonitHandler>();
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? $"Server={Config.CM_SQLSERVER};Database=catmonit;User=root;Password={Config.CM_SQL_PASSWORD};";
-builder.Services.AddSingleton(new userValidator(connectionString));
-
 
 
 var app = builder.Build();

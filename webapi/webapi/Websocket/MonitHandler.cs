@@ -6,6 +6,8 @@ using System.Net.WebSockets;
 using System.Text;
 using webapi.Monitoring;
 using webapi.Models;
+using webapi.Helpers;
+using System.Text.Json;
 
 namespace webapi.Websocket
 {
@@ -40,8 +42,12 @@ namespace webapi.Websocket
 
                         
                         using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes((String)$"user id: {payload.id}")), WebSocketMessageType.Text, true, CancellationToken.None);
-                        await AddWebSocket(new Subscriber(payload.id, webSocket));
+                        Subscriber sub = subscriberHelper.createSubscriber(payload.id, webSocket);
+                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(sub.monitoredDevicesIndexes.ToArray()))), WebSocketMessageType.Text, true, CancellationToken.None);
+
+
+
+                        await AddWebSocket(sub);
                     }
                     catch (TokenExpiredException)
                     {
