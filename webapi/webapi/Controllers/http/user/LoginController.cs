@@ -22,7 +22,7 @@ namespace webapi.Controllers.http.user
                 if (statNpayload.status == tokenStatus.valid)
                 {
                     string? un = userHelper.getUsername(statNpayload.payload.id);
-                    return (un == null ? StatusCode(500, "Internal server error") : Json(un));
+                    return (un == null ? StatusCode(500, "Internal server error") : Json(new { username = un }));
                 }
                 else
                 {

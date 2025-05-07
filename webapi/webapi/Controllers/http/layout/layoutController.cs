@@ -9,6 +9,10 @@ namespace webapi.Controllers.http.layout
     [Route("[controller]")]
     public class layoutController : Controller
     {
+        public static bool isCorrect(string name)
+        {
+            return true;
+        }
 
         [HttpGet]
         [Route("layouts")]
@@ -68,6 +72,7 @@ namespace webapi.Controllers.http.layout
         [Route("update/{layoutName}")]
         public async Task<IActionResult> UpdateOrCreate(string layoutName)
         {
+            if (!isCorrect(layoutName)) return StatusCode(400, new { message = "incorrect layout name"});
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
@@ -93,7 +98,7 @@ namespace webapi.Controllers.http.layout
                             var data = new { Message = "error updating layout" };
                             return StatusCode(500, data);
                         };
-                        
+
                     }
                 }
                 else
@@ -107,6 +112,35 @@ namespace webapi.Controllers.http.layout
             else
             {
                 var data = new { Message = "token not found" };
+                return StatusCode(401, data);
+            }
+        }
+        [HttpPut]
+        [Route("rename/{layoutName}")]
+        public IActionResult RenameLayout(string layoutName)
+        {
+            string newName = Request.Query["new_name"].ToString();
+            if (!isCorrect(layoutName) || (!isCorrect(newName))) return StatusCode(400, new { message = "incorrect layout name" });
+
+            if (Request.Headers.TryGetValue("Authentication", out var authHeader))
+            {
+                var token = authHeader.ToString();
+                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
+                if (statNpayload.status == tokenStatus.valid)
+                {
+                    return (userHelper.renameLayout(statNpayload.payload.id, layoutName, newName) == null ? StatusCode(500, "internal server error"): Json(new { message = "updated successfuly" }));
+                }
+                else
+                {
+                    var response = tokenValidator.getReturnValue(statNpayload.status);
+
+                    var data = new { Message = response.message };
+                    return StatusCode(response.statusCode, data);
+                }
+            }
+            else
+            {
+                var data = new { message = "token not found" };
                 return StatusCode(401, data);
             }
         }

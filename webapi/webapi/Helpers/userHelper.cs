@@ -190,14 +190,34 @@ namespace webapi.Helpers
                 {
                     return null;
                 }
-                string query = $"SELECT username FROM users where user_id = @userID;";
+                string query = $"SELECT username FROM users where id = @userID;";
                 var cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@userID", userID);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Utils.assert(reader.Read());
-                    return reader["username"].ToString();
+                    return (reader.Read() ? reader["username"].ToString() : null);
                 }
+            }
+        }
+        public static bool? renameLayout(uint userID, string layoutname, string newLayoutName)
+        {
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (MySqlException)
+                {
+                    return null;
+                }
+                string query = $"UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;";
+                var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userID", userID);
+                cmd.Parameters.AddWithValue("@lName", layoutname);
+                cmd.Parameters.AddWithValue("@newName", newLayoutName);
+                cmd.ExecuteNonQuery();
+                return true;
             }
         }
     }
