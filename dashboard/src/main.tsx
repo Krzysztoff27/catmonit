@@ -7,12 +7,14 @@ import theme from "./config/theme.config.ts";
 
 import "@mantine/core/styles.css";
 import "@mantine/code-highlight/styles.css";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 import "./styles/main.css";
 
 createRoot(document.getElementById("root")!).render(
     <MantineProvider
-    theme={theme}
-    defaultColorScheme="dark"
+        theme={theme}
+        defaultColorScheme="dark"
     >
         <StrictMode>
             <App />
