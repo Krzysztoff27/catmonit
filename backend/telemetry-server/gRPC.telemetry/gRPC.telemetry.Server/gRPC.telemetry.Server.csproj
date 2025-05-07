@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <CETCompat>false</CETCompat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,7 +13,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Protobuf Include="Protos/hostname.proto" GrpcServices="Server" />
+        <Protobuf Include="../../../telemetry-protos/telemetry.proto" GrpcServices="Server" />
     </ItemGroup>
 
     <ItemGroup>

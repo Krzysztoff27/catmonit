@@ -1,0 +1,1 @@
+﻿python -m grpc_tools.protoc -I../../telemetry-protos --python_out=./protocol_buffers/telemetry --grpc_python_out=./protocol_buffers/telemetry ../../telemetry-protos/telemetry.proto
