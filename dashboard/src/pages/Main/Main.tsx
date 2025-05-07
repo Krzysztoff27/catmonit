@@ -1,4 +1,4 @@
-import { useMantineColorScheme, Button } from "@mantine/core";
+import { useMantineColorScheme, Button, Flex } from "@mantine/core";
 import WidgetLayout from "../../components/WidgetLayout/WidgetLayout";
 import { useState } from "react";
 
@@ -18,14 +18,17 @@ function Main() {
     ]);
 
     return (
-        <>
+        <Flex
+            flex={1}
+            h="100vh"
+        >
             <Button onClick={() => setColorScheme("light")}>Light</Button>
             <Button onClick={() => setColorScheme("dark")}>Dark</Button>
             <WidgetLayout
                 setWidgets={setWidgets}
                 widgets={widgets}
             />
-        </>
+        </Flex>
     );
 }
 

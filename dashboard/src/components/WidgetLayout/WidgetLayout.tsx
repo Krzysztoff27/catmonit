@@ -55,11 +55,11 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
         <GridLayout
             className="layout"
             layout={layout}
-            cols={Math.floor(width / GRID_SIZE_PX)}
-            rowHeight={GRID_SIZE_PX}
-            width={width}
-            measureBeforeMount
             onLayoutChange={updateLayout}
+            cols={Math.floor(width / GRID_SIZE_PX)}
+            width={width}
+            rowHeight={GRID_SIZE_PX}
+            measureBeforeMount
             draggableHandle=".drag-handle"
         >
             {widgets.map((widget: WidgetData, i) => {
