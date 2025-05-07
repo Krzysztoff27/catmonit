@@ -16,3 +16,10 @@
 .react-grid-placeholder {
     background-color: var(--background-color-5) !important;
 }
+
+.react-grid-item {
+    transition: none !important;
+}
+.react-grid-item.cssTransforms {
+    transition: none !important;
+}

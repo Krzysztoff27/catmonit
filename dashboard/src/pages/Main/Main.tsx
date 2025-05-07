@@ -17,8 +17,6 @@ function Main() {
         },
     ]);
 
-    console.log(widgets);
-
     return (
         <>
             <Button onClick={() => setColorScheme("light")}>Light</Button>

@@ -49,7 +49,7 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== widgetNumber));
     };
 
-    if (!width) return;
+    if (!width || !layout) return;
 
     return (
         <GridLayout
@@ -74,7 +74,6 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
                             c="var(--background-color-2)"
                             onClick={event => {
                                 event.stopPropagation();
-                                console.log("a");
                                 onDelete(i);
                             }}
                         >
