@@ -1,4 +1,5 @@
 import { ComponentType } from "react";
+import { WidgetComponent } from "./components.types";
 
 export interface UrlNode {
     api_requests: string;
@@ -14,7 +15,7 @@ export interface UrlConfig {
 }
 
 export interface WidgetConfig {
-    component: ComponentType<{ data: any; [key: string]: any }>;
+    component: WidgetComponent;
     limits: {
         minH: number;
         minW: number;

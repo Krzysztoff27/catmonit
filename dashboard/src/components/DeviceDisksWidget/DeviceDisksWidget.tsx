@@ -1,8 +1,9 @@
-import { Paper, PaperProps, Progress, Stack } from "@mantine/core";
+import { Paper, Stack } from "@mantine/core";
 import { useState } from "react";
 import DeviceTitle from "../DeviceTitle/DeviceTitle";
-import { Device, Disk } from "../../types/api.types";
+import { Disk } from "../../types/api.types";
 import DiskProgress from "../DiskProgress/DiskProgress";
+import { WidgetComponentProps } from "../../types/components.types";
 
 const DUMMY_DISKS = [
     { path: "/dev/sdc", storageCurrent: 720, storageLimit: 2048 },
@@ -10,16 +11,11 @@ const DUMMY_DISKS = [
     { path: "/dev/sdb", storageCurrent: 2000, storageLimit: 2048 },
 ];
 
-interface DeviceDisksWidgetProps extends PaperProps {
-    data: Device;
-}
-
-function DeviceDisksWidget({ data, ...props }: DeviceDisksWidgetProps) {
+function DeviceDisksWidget({ data, settings, ...props }: WidgetComponentProps) {
     const [disksData, setDisksData] = useState<Disk[]>(DUMMY_DISKS);
 
     return (
         <Paper
-            w="100%"
             flex="1"
             bg="var(--background-color-6)"
             {...props}

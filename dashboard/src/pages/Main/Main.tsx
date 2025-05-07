@@ -1,7 +1,5 @@
-import DeviceDisksWidget from "../../components/DeviceDisksWidget/DeviceDisksWidget";
 import { useMantineColorScheme, Button } from "@mantine/core";
 import WidgetLayout from "../../components/WidgetLayout/WidgetLayout";
-import config from "../../config/widgets.config";
 
 function Main() {
     const { setColorScheme, clearColorScheme } = useMantineColorScheme();
@@ -11,6 +9,7 @@ function Main() {
             <Button onClick={() => setColorScheme("light")}>Light</Button>
             <Button onClick={() => setColorScheme("dark")}>Dark</Button>
             <WidgetLayout
+                onUpdate={layout => console.log(layout)}
                 widgets={[
                     {
                         type: "DEVICE_DISKS",

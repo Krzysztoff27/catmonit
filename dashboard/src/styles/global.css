@@ -1,0 +1,18 @@
+:root,
+#root {
+    overflow-x: hidden;
+}
+
+.react-resizable-handle {
+    background-image: none;
+}
+
+.react-grid-item > .react-resizable-handle::after {
+    border-right: 2px solid var(--background-color-3);
+    border-bottom: 2px solid var(--background-color-3);
+    margin: 0 2px 2px 0;
+}
+
+.react-grid-placeholder {
+    background-color: var(--background-color-5) !important;
+}

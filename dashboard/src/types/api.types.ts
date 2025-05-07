@@ -9,3 +9,14 @@ export interface Disk {
     storageLimit: number;
     storageCurrent: number;
 }
+
+export interface WidgetData {
+    type: string;
+    rect: {
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+    };
+    data: any;
+}

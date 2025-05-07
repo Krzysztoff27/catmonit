@@ -4,7 +4,7 @@ import { Disk } from "../../types/api.types";
 
 function DiskProgress({ path, storageCurrent, storageLimit }: Disk) {
     const value = (storageCurrent / storageLimit) * 100;
-    const color = value > 90 ? "red" : value > 75 ? "yellow" : "gray.4";
+    const color = value > 90 ? "red" : value > 75 ? "yellow" : "var(--mantine-color-text)";
 
     return (
         <Stack
@@ -23,7 +23,7 @@ function DiskProgress({ path, storageCurrent, storageLimit }: Disk) {
                     value={value}
                     color={color}
                     flex="1"
-                    size="xs"
+                    size="sm"
                 />
                 <Text
                     fz="sm"
