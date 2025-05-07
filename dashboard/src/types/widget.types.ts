@@ -1,3 +1,5 @@
+import { Component, ComponentType } from "react";
+
 export interface WidgetData {
     type: string;
     rect: {
