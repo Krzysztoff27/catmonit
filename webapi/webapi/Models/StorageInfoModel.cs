@@ -8,12 +8,9 @@ namespace webapi.Models
         public ConcurrentDictionary<uint, storageDeviceInfo> monitoredDevices = new ConcurrentDictionary<uint, storageDeviceInfo>();
         public string information { get; set; }
         public uint warningsCount { get; set; }
-        public string toString() { return information; }
     }
     public class storageDeviceInfo
     {
-        public string hostname;
-        public string IPadress;
-        public int numUpdated;
+        public int numUpdated = 0;
     }
 }

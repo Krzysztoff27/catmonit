@@ -15,19 +15,21 @@ namespace webapi.Monitoring
     {
 
         public int requestTimeout;
-        public readonly ConcurrentDictionary<uint, Subscriber> subscribers = new ConcurrentDictionary<uint, Subscriber>();
+        public readonly ConcurrentDictionary<uint, Subscriber> subscribers = new ConcurrentDictionary<uint, Subscriber>(); // index is id in db (and in token)
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
         public CancellationTokenSource cancellationTokenSource;
         public Task monitorTask;
 
         public void Subscribe(Subscriber sub)
-        {
+        { 
             subscribers.TryAdd(sub.userID, sub);
+            onSubscribe(sub);
         }
 
         public void Unsubscribe(Subscriber sub)
         {
             subscribers.TryRemove(sub.userID, out _);
+            onUnsubscribe(sub);
         }
 
         public void StartMonitoring(int timeout = 1000)
@@ -68,7 +70,8 @@ namespace webapi.Monitoring
         }
 
         public virtual void sendData() { }
-
         public virtual void FetchData() { }
+        public virtual void onSubscribe(Subscriber subber) { }
+        public virtual void onUnsubscribe(Subscriber subber) { }
     }
 }

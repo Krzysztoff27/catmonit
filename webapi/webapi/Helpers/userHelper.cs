@@ -113,7 +113,7 @@ namespace webapi.Helpers
                 {
                     conn.Open();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return userCreateStatus.InternalServerError;
                 }
@@ -150,9 +150,9 @@ namespace webapi.Helpers
             return userCreateStatus.Success;
         }
 
-        public static List<uint> getDevices(uint userID)
+        public static List<deviceIdentifier> getDevices(uint userID)
         {
-            List<uint> devices = new List<uint>();
+            List<deviceIdentifier> devices = new List<deviceIdentifier>();
             using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
             {
                 try
@@ -170,11 +170,35 @@ namespace webapi.Helpers
                 {
                     while (reader.Read())
                     {
-                        devices.Add((uint)((int)reader["device_id"]));
+                        devices.Add(
+                            new deviceIdentifier { ID = (uint)((int)reader["device_id"]) }
+                        );
                     }
                 }
             }
             return devices;
+        }
+        public static string? getUsername(uint userID)
+        {
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (MySqlException)
+                {
+                    return null;
+                }
+                string query = $"SELECT username FROM users where user_id = @userID;";
+                var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userID", userID);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    Utils.assert(reader.Read());
+                    return reader["username"].ToString();
+                }
+            }
         }
     }
 }

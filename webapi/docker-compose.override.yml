@@ -10,3 +10,10 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    networks:
+        webapi_backend:
+
+networks:
+        webapi_backend:
+            name: webapi_backend
+            external: true

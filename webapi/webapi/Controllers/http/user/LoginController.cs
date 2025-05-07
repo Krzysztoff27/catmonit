@@ -12,11 +12,31 @@ namespace webapi.Controllers.http.user
     public class LoginController : Controller
     {
         [HttpGet]
-        [Route("meowmeow")]
-        public JsonResult Get()
+        [Route("userCheck")]
+        public IActionResult Get()
         {
-            var data = new { Message = "login sigma" };
-            return Json(data);
+            if (Request.Headers.TryGetValue("Authentication", out var authHeader))
+            {
+                var token = authHeader.ToString();
+                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
+                if (statNpayload.status == tokenStatus.valid)
+                {
+                    string? un = userHelper.getUsername(statNpayload.payload.id);
+                    return (un == null ? StatusCode(500, "Internal server error") : Json(un));
+                }
+                else
+                {
+                    var response = tokenValidator.getReturnValue(statNpayload.status);
+
+                    var data0 = new { Message = response.message };
+                    return StatusCode(response.statusCode, data0);
+                }
+            }
+            else
+            {
+                var data1 = new { Message = "token not found" };
+                return StatusCode(401, data1);
+            }
         }
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)

@@ -6,25 +6,13 @@ namespace webapi.Controllers.http.user
 {
     namespace webapi.Controllers.http.user
     {
-        public class RequestModel
-        {
-            public string Token { get; set; }
-            public List<int> Resources { get; set; }
-        }
         
         [ApiController]
-        [Route("api/[controller]")]
+        [Route("admin/[controller]")]
         public class addAccessController : Controller
         {
-
-            private readonly userHelper userService;
-
-            public addAccessController(userHelper userVal)
-            {
-                userService = userVal;
-            }
             [HttpPost]
-            public IActionResult Post([FromBody] RequestModel user)
+            public IActionResult Post([FromBody] addAccessRequestModel user)
             {
                 return Ok(user);
             }

@@ -7,7 +7,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace webapi.Controllers.http.user
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("admin/[controller]")]
     public class createUserController : Controller
     {
         [HttpPost]

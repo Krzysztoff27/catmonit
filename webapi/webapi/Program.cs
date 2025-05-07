@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<StorageMonit>();
-builder.Services.AddTransient<MonitHandler>();
+builder.Services.AddTransient<StorageMonitHandler>();
 
 
 
@@ -30,8 +30,23 @@ app.Use(async (context, next) =>
 {
     if (context.WebSockets.IsWebSocketRequest)
     {
-        var handler = context.RequestServices.GetRequiredService<MonitHandler>();
-        await handler.HandleRequestAsync(context);
+        var path = context.Request.Path.ToString();
+
+        if (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase))
+        {
+            var handler = context.RequestServices.GetRequiredService<StorageMonitHandler>();
+            await handler.HandleRequestAsync(context);
+        }
+        else if (path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase))
+        {
+            var handler = context.RequestServices.GetRequiredService<StorageMonitHandler>();
+            await handler.HandleRequestAsync(context);
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync("Unsupported WebSocket route.");
+        }
     }
     else
     {

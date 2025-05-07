@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using webapi.Helpers;
 
 namespace webapi.Monitoring
 {
@@ -6,8 +7,8 @@ namespace webapi.Monitoring
     {
         public uint userID { get; set; }
         public WebSocket WebSocket { get; set; }
-        public List<uint> monitoredDevicesIndexes; // TODO: CONCURENCY!!!!!
-        public Subscriber(uint userId, WebSocket webSocket, List<uint> monitoredDevicesIndexes)
+        public List<deviceIdentifier> monitoredDevicesIndexes; // TODO: CONCURENCY!!!!!
+        public Subscriber(uint userId, WebSocket webSocket, List<deviceIdentifier> monitoredDevicesIndexes)
         {
             this.userID = userId;
             this.WebSocket = webSocket;
