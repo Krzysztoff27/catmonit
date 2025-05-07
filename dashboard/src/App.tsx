@@ -1,12 +1,22 @@
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
 import Main from "./pages/Main/Main";
+import LoginPage from "./pages/Login/Login";
+import AuthenticationWrapper from "./components/AuthenticationWrapper/AuthenticationWrapper";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route
-            path="/"
-            element={<Main />}
-        />
+        <Route>
+            <Route element={<AuthenticationWrapper />}>
+                <Route
+                    path="/"
+                    element={<Main />}
+                />
+            </Route>
+            <Route
+                path="/login"
+                element={<LoginPage />}
+            />
+        </Route>
     )
 );
 

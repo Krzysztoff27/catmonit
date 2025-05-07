@@ -11,5 +11,5 @@ export type WidgetComponent = ComponentType<WidgetComponentProps>;
 
 export interface WidgetLayoutProps {
     widgets: WidgetData[];
-    onUpdate: (layout: any[]) => void;
+    setWidgets: (callback: (widgets: WidgetData[]) => WidgetData[]) => void;
 }

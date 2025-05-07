@@ -1,9 +1,7 @@
-import useErrorHandler from "./useErrorHandler.ts";
-import { ErrorCallbackFunction, useApiReturn } from "../types/hooks.types.ts";
 import urlConfig from "../config/url.config.ts";
 import useAuth from "./useAuth.ts";
 
-const responseOnNoResponse = new Response(`{"detail": No response from server}`, {
+const responseOnNoResponse = new Response(JSON.stringify({ detail: "No response from server" }), {
     status: 503,
     headers: { "Content-Type": "text/plain" },
 });
@@ -45,12 +43,13 @@ const handleFetch = async (
 
 export const useApiRequests = () => {
     const API_URL: string = urlConfig.api_requests;
-    const { parseAndHandleError } = useErrorHandler();
     const { authOptions, refreshOptions, setAccessToken, setRefreshToken } = useAuth();
 
     const normalizePath = (path = "") => (path.startsWith("/") ? path : `/${path}`);
 
     const getPath = (path: string): string => (API_URL ? `${API_URL}${normalizePath(path)}` : "");
+
+    const parseAndHandleError = (response, body) => console.error(response, body);
 
     const refreshTokens = async () => {
         return fetch(getPath("refresh"), refreshOptions)
@@ -71,7 +70,7 @@ export const useApiRequests = () => {
         method: string = "GET",
         options: RequestInit = {},
         body: BodyInit | undefined = undefined,
-        errorCallback: () => void
+        errorCallback: (response: Response, body: { [key: string]: any }) => void = parseAndHandleError
     ): Promise<any> =>
         await handleFetch(
             getPath(path),

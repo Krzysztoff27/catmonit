@@ -10,7 +10,7 @@
 .react-grid-item > .react-resizable-handle::after {
     border-right: 2px solid var(--background-color-3);
     border-bottom: 2px solid var(--background-color-3);
-    margin: 0 2px 2px 0;
+    margin: 0 4px 4px 0;
 }
 
 .react-grid-placeholder {

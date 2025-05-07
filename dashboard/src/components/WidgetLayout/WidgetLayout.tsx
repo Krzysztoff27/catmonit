@@ -1,52 +1,55 @@
-import { Flex } from "@mantine/core";
+import { ActionIcon, Flex } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
 import GridLayout from "react-grid-layout";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../config/widgets.config";
 import { WidgetData } from "../../types/api.types";
 import { WidgetLayoutProps } from "../../types/components.types";
-import { useState } from "react";
+import { IconX } from "@tabler/icons-react";
 
-function WidgetLayout({ widgets, onUpdate }: WidgetLayoutProps) {
+function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
     const { width } = useViewportSize();
 
     const getLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
     const getComponent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].component;
-    const getDataFromWidgets = () => widgets.map(widget => widget.data);
-    const getLayoutFromWidgets = () =>
-        widgets.map((widget: WidgetData, i) => ({
-            i: `${i}`,
-            ...widget.rect,
-            ...getLimits(widget),
-        }));
 
     const widgetTypes = widgets.map(widget => widget.type);
-    const [widgetData, setWidgetData] = useState(getDataFromWidgets());
-    const [layout, setLayout] = useState(getLayoutFromWidgets());
+    const layout = widgets.map((widget: WidgetData, i) => ({
+        i: `${i}`,
+        ...widget.rect,
+        ...getLimits(widget),
+    }));
 
-    if (!width) return;
+    const updateLayout = newLayout => {
+        setWidgets((prev: WidgetData[]) =>
+            prev.map((widget: WidgetData, i) => {
+                const { x, y, w, h } = newLayout[i];
 
-    const getWidgetsFromLayout = (layout_): WidgetData[] =>
-        layout_.map(
-            ({ i, ...rect }) =>
-                ({
-                    data: widgetData[i],
+                return {
+                    data: widget.data,
+                    rect: {
+                        x,
+                        y,
+                        w,
+                        h,
+                    },
                     type: widgetTypes[i],
-                    rect: rect,
-                } as WidgetData)
+                } as WidgetData;
+            })
         );
-
-    const onLayoutChange = newLayout => {
-        setLayout(newLayout);
-        onUpdate(getWidgetsFromLayout(newLayout));
     };
 
     const updateWidgetData = (widgetNumber, newData) => {
-        setWidgetData(prev => {
-            prev[widgetNumber] = newData;
+        setWidgets((prev: WidgetData[]) => {
+            prev[widgetNumber].data = newData;
             return prev;
         });
-        onUpdate(getWidgetsFromLayout(layout));
     };
+
+    const onDelete = widgetNumber => {
+        setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== widgetNumber));
+    };
+
+    if (!width) return;
 
     return (
         <GridLayout
@@ -56,14 +59,29 @@ function WidgetLayout({ widgets, onUpdate }: WidgetLayoutProps) {
             rowHeight={GRID_SIZE_PX}
             width={width}
             measureBeforeMount
-            onLayoutChange={onLayoutChange}
+            onLayoutChange={updateLayout}
+            draggableHandle=".drag-handle"
         >
             {widgets.map((widget: WidgetData, i) => {
                 const WidgetComponent = getComponent(widget);
 
                 return (
                     <Flex key={i}>
+                        <ActionIcon
+                            pos="absolute"
+                            right={0}
+                            variant="transparent"
+                            c="var(--background-color-2)"
+                            onClick={event => {
+                                event.stopPropagation();
+                                console.log("a");
+                                onDelete(i);
+                            }}
+                        >
+                            <IconX size={18} />
+                        </ActionIcon>
                         <WidgetComponent
+                            className="drag-handle"
                             data={widget.data}
                             updateData={data => updateWidgetData(i, data)}
                             style={{ cursor: "pointer" }}

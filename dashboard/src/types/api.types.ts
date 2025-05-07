@@ -1,3 +1,8 @@
+export interface TokenRequestForm {
+    username: string;
+    password: string;
+}
+
 export interface Device {
     uuid: string;
     hostname: string;
