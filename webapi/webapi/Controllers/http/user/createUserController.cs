@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
-using webapi.Helpers;
+using webapi.Helpers.DBconnection;
 using webapi.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -19,14 +19,11 @@ namespace webapi.Controllers.http.user
                     var data0 = new { message = "User created successfully" };
                     return Json(data0);
                 case userCreateStatus.UserAlreadyExists:
-                    var data1 = new { message = "User already exists" };
-                    return StatusCode(409, data1);
+                    return Utils.returnVal(409, "User already exists");
                 case userCreateStatus.InternalServerError:
-                    var data2 = new { message = "Internal server error" };
-                    return StatusCode(500, data2);
+                    return Utils.returnVal(500);
                 default:
-                    var data3 = new { message = "Unknown error" };
-                    return StatusCode(501, data3);
+                    return Utils.returnVal(501);
             }
            
         }

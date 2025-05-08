@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Crypto.Generators;
 
 
-namespace webapi.Helpers
+namespace webapi.Helpers.DBconnection
 {
     public enum userAuthStatus
     {
@@ -58,9 +58,11 @@ namespace webapi.Helpers
             }
             return false;
         }
+
+
         // returns user id (starting from 1)
         // 0 is reserved for user not found / incorrect password
-        public static (userAuthStatus status, uint userID) userAuth(string username, string password) 
+        public static (userAuthStatus status, uint userID) userAuth(string username, string password)
         {
 
             using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
@@ -88,7 +90,7 @@ namespace webapi.Helpers
 
                             if (passwordHelper.VerifyPassword(password, salt, storedHash))
                             {
-                                return (userAuthStatus.Success, (uint)((int)reader["id"]));
+                                return (userAuthStatus.Success, (uint)(int)reader["id"]);
                             }
                             else
                             {
@@ -103,7 +105,7 @@ namespace webapi.Helpers
                 }
             }
         }
-        
+
         public static userCreateStatus createUser(string username, string password)
         {
 
@@ -171,7 +173,7 @@ namespace webapi.Helpers
                     while (reader.Read())
                     {
                         devices.Add(
-                            new deviceIdentifier { ID = (uint)((int)reader["device_id"]) }
+                            new deviceIdentifier { ID = (uint)(int)reader["device_id"] }
                         );
                     }
                 }
@@ -195,29 +197,8 @@ namespace webapi.Helpers
                 cmd.Parameters.AddWithValue("@userID", userID);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    return (reader.Read() ? reader["username"].ToString() : null);
+                    return reader.Read() ? reader["username"].ToString() : null;
                 }
-            }
-        }
-        public static bool? renameLayout(uint userID, string layoutname, string newLayoutName)
-        {
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
-            {
-                try
-                {
-                    conn.Open();
-                }
-                catch (MySqlException)
-                {
-                    return null;
-                }
-                string query = $"UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;";
-                var cmd = new MySqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@userID", userID);
-                cmd.Parameters.AddWithValue("@lName", layoutname);
-                cmd.Parameters.AddWithValue("@newName", newLayoutName);
-                cmd.ExecuteNonQuery();
-                return true;
             }
         }
     }

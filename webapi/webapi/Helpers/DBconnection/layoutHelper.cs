@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
+using System.Text.Json;
 
-namespace webapi.Helpers
+namespace webapi.Helpers.DBconnection
 {
     public class layoutHelper
     {
@@ -17,7 +18,7 @@ namespace webapi.Helpers
                 {
                     conn.Open();
                 }
-                catch (MySqlException ex)
+                catch (MySqlException)
                 {
                     return null;
                 }
@@ -97,7 +98,7 @@ namespace webapi.Helpers
 
             return layoutNames;
         }
-        public static string? getLayout(uint userID, string name)
+        public static (int errorCode, JsonElement? json) getLayout(uint userID, string name)
         {
             using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
             {
@@ -107,7 +108,7 @@ namespace webapi.Helpers
                 }
                 catch (MySqlException)
                 {
-                    return null; 
+                    return (500, null);
                 }
 
                 string query = $"SELECT layout_body FROM dashboard_layouts WHERE user_id = @userID and layout_name = @layoutName;";
@@ -118,10 +119,50 @@ namespace webapi.Helpers
 
                     using (var reader = cmd.ExecuteReader())
                     {
-                        reader.Read();
-                        return reader.GetString("layout_body");
+                        return reader.Read() ? (200, JsonSerializer.Deserialize<JsonElement>(reader.GetString("layout_body"))) : (400, null);
                     }
                 }
+            }
+        }
+        public static bool? renameLayout(uint userID, string layoutname, string newLayoutName)
+        {
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (MySqlException)
+                {
+                    return null;
+                }
+                string query = $"UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;";
+                var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userID", userID);
+                cmd.Parameters.AddWithValue("@lName", layoutname);
+                cmd.Parameters.AddWithValue("@newName", newLayoutName);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+        }
+        public static bool? deleteLayout(uint userID, string layoutname)
+        {
+            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (MySqlException)
+                {
+                    return null;
+                }
+                string query = $"DELETE FROM dashboard_layouts where user_id = @userID AND layout_name = @lName;";
+                var cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userID", userID);
+                cmd.Parameters.AddWithValue("@lName", layoutname);
+                int rowsAffected = cmd.ExecuteNonQuery();
+                return rowsAffected != 0;
             }
         }
     }

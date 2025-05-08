@@ -96,15 +96,12 @@ namespace webapi.Helpers
                 else
                 {
                     var response = tokenValidator.getReturnValue(statNpayload.status);
-        
-                    var data = new { Message = response.message };
-                    return StatusCode(response.statusCode, data);
+                    return Utils.returnVal(response.statusCode, response.message);
                 }
             }
             else
             {
-                var data = new { Message = "token not found" };
-                return StatusCode(401, data);
+                return Utils.returnVal(401, "token not found");
             }
          */
     }

@@ -3,6 +3,7 @@ using JWT.Algorithms;
 using JWT.Builder;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Helpers;
+using webapi.Helpers.DBconnection;
 using webapi.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace webapi.Controllers.http.user
@@ -22,20 +23,17 @@ namespace webapi.Controllers.http.user
                 if (statNpayload.status == tokenStatus.valid)
                 {
                     string? un = userHelper.getUsername(statNpayload.payload.id);
-                    return (un == null ? StatusCode(500, "Internal server error") : Json(new { username = un }));
+                    return (un == null ? Utils.returnVal(500) : Json(new { username = un }));
                 }
                 else
                 {
                     var response = tokenValidator.getReturnValue(statNpayload.status);
-
-                    var data0 = new { Message = response.message };
-                    return StatusCode(response.statusCode, data0);
+                    return Utils.returnVal(response.statusCode, response.message);
                 }
             }
             else
             {
-                var data1 = new { Message = "token not found" };
-                return StatusCode(401, data1);
+                return Utils.returnVal(401, "token not found");
             }
         }
         [HttpPost]
@@ -67,12 +65,10 @@ namespace webapi.Controllers.http.user
             {
                 if (loginInfo.status == userAuthStatus.InternalServerError)
                 {
-                    var data0 = new { message = "error connecting to database" };
-                    return StatusCode(500, data0);
+                    return Utils.returnVal(500, "Cannot connect to database");
 
                 }
-                var data = new { message = "user doesn't exist or password is incorrect" };
-                return StatusCode(401, data);
+                return Utils.returnVal(401, "user doesn't exist or password is incorrect");
             }
         }
     }
