@@ -61,6 +61,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         {
                             shares.Add(new
                             {
+                                
                                 share_path = share.SharePath,
                                 usage = share.Usage,
                                 capacity = share.Capacity,
