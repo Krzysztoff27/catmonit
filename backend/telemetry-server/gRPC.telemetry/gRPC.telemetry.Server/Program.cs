@@ -1,3 +1,5 @@
+#define CM_RUN_ALL
+
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using webapi.Monitoring;
 using webapi.Websocket;
@@ -5,10 +7,13 @@ using webapi.Websocket;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
+
+#if CM_RUN_ALL
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<StorageMonit>();
 builder.Services.AddTransient<StorageMonitHandler>();
+#endif
 builder.Services.AddGrpc();
 
 // Configure Kestrel to listen on two HTTPS ports
@@ -24,13 +29,14 @@ builder.WebHost.ConfigureKestrel(options =>
     // gRPC on 5001 (HTTPS)
     options.ListenAnyIP(5001, listenOptions =>
     {
-        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+        listenOptions.Protocols = HttpProtocols.Http2;
         listenOptions.UseHttps("../../../ssl/server.pfx", "");
     });
 });
 
 var app = builder.Build();
 
+#if CM_RUN_ALL
 // Enable WebSockets
 app.UseWebSockets();
 app.Use(async (context, next) =>
@@ -78,6 +84,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
+#endif
 // Map gRPC only if the request comes via gRPC endpoint (port 5001)
 app.MapGrpcService<TelemetryService>();
 

@@ -1,6 +1,9 @@
 using System.Text.Json;
 using Grpc.Core;
 using gRPC.telemetry;
+using gRPC.telemetry.Server.Models;
+using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.VisualBasic.CompilerServices;
 
 public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryServiceBase
 {
@@ -8,28 +11,28 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         IAsyncStreamReader<TelemetryRequest> requestStream,
         ServerCallContext context)
     {
-        var output = new List<object>();
+        var output = new List<ResponseModel>();
 
         try
         {
             await foreach (var request in requestStream.ReadAllAsync())
             {
-                var entry = new Dictionary<string, object>
+                var entry = new ResponseModel
                 {
-                    ["timestamp"] = DateTime.UtcNow,
-                    ["hostname"] = request.Hostname,
-                    ["ip_address"] = request.IpAddress,
-                    ["uuid"] = request.Uuid,
-                    ["os"] = request.OperatingSystem,
-                    ["payload_type"] = request.PayloadCase.ToString(),
-                    ["payload"] = null
+                    timestamp = DateTime.UtcNow,
+                    hostname = request.Hostname,
+                    ip_address = request.IpAddress,
+                    uuid = request.Uuid,
+                    os = request.OperatingSystem,
+                    payload_type = request.PayloadCase,
+                    payload = null
                 };
 
                 switch (request.PayloadCase)
                 {
                     case TelemetryRequest.PayloadOneofCase.Network:
                         var net = request.Network;
-                        entry["payload"] = new
+                        entry.payload = new
                         {
                             interface_name = net.InterfaceName,
                             rx_mbps = net.RxMbps,
@@ -42,15 +45,14 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         var disks = new List<object>();
                         foreach (var disk in request.Disks.Entries)
                         {
-                            disks.Add(new
+                            disks.Add(new payloadDisks
                             {
                                 mount_point = disk.MountPoint,
                                 usage = disk.Usage,
-                                capacity = disk.Capacity,
-                                usage_percent = disk.Capacity > 0 ? (100.0 * disk.Usage / disk.Capacity) : 0
+                                capacity = disk.Capacity
                             });
                         }
-                        entry["payload"] = disks;
+                        entry.payload = disks;
                         break;
 
                     case TelemetryRequest.PayloadOneofCase.Shares:
@@ -62,26 +64,30 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                                 share_path = share.SharePath,
                                 usage = share.Usage,
                                 capacity = share.Capacity,
-                                usage_percent = share.Capacity > 0 ? (100.0 * share.Usage / share.Capacity) : 0
                             });
                         }
-                        entry["payload"] = shares;
+                        entry.payload = shares;
                         break;
 
                     case TelemetryRequest.PayloadOneofCase.None:
                     default:
-                        entry["error"] = "No valid payload received.";
+                        throw new ArgumentOutOfRangeException();
+                        //entry["error"] = "No valid payload received.";
                         break;
                 }
 
                 output.Add(entry);
             }
-
+            
+            
+            
             var json = JsonSerializer.Serialize(new
             {
                 status = "ok",
-                received = output
+                received = JsonSerializer.Serialize(output)
             }, new JsonSerializerOptions { WriteIndented = false });
+            
+            
             
             Console.WriteLine(json); //For debug purposes 
             return new TelemetryResponse { Status = json };
