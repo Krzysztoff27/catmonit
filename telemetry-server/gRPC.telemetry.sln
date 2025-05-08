@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPC.telemetry.Server", "gRPC.telemetry.Server\gRPC.telemetry.Server.csproj", "{FF29CF06-8295-4C14-AE10-E58C7AE418F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A8A5B4F-371A-4854-B3CD-C09E95C13D6E}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF29CF06-8295-4C14-AE10-E58C7AE418F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF29CF06-8295-4C14-AE10-E58C7AE418F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF29CF06-8295-4C14-AE10-E58C7AE418F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF29CF06-8295-4C14-AE10-E58C7AE418F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

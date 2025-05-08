@@ -26,7 +26,7 @@ artifacts/
 
 ## Docker
 docker-compose.override.yml
-**/Dockerfile
+#**/Dockerfile
 **/docker-compose*.yml
 *.container
 
@@ -42,3 +42,11 @@ Thumbs.db
 ## Rider
 .idea/
 *.sln.iml
+
+## pyinstaller build results
+build/
+dist/
+*.spec
+
+## custom exclusionssl/
+ssl/
