@@ -4,6 +4,7 @@ import { useState } from "react";
 import WidgetDrawer from "../../components/WidgetDrawer/WidgetDrawer";
 import { useDisclosure } from "@mantine/hooks";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
+import WIDGETS_CONFIG from "../../config/widgets.config";
 
 function Main() {
     const { setColorScheme, clearColorScheme } = useMantineColorScheme();
@@ -22,25 +23,28 @@ function Main() {
 
     const [widgetDrawerOpened, setWidgetDrawerOpened] = useState(false);
     const [selected, setSelected] = useState<string | null>(null);
-
+    
     const closeWidgetDrawer = () => {
         setWidgetDrawerOpened(false);
         setSelected(null);
     };
-
+    
     let clicked = false;
-
+    
     const onDragStart = () => {
         clicked = true;
         setTimeout(() => (clicked = false), 500);
     };
-
+    
     const onDragStop = (_: Layout, before: LayoutItem, after: LayoutItem) => {
         if (!clicked || JSON.stringify(before) !== JSON.stringify(after)) return;
         setSelected(after.i);
         setWidgetDrawerOpened(true);
     };
 
+    const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : <></>;
+    console.log(DrawerComponent)
+    
     return (
         <>
             <Flex
@@ -53,7 +57,9 @@ function Main() {
                     overlayProps={{ backgroundOpacity: 0 }}
                     opened={widgetDrawerOpened}
                     onClose={closeWidgetDrawer}
-                ></WidgetDrawer>
+                >
+                <DrawerComponent/>
+                </WidgetDrawer>
                 <WidgetLayout
                     selected={selected}
                     setWidgets={setWidgets}

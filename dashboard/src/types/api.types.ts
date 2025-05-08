@@ -7,12 +7,17 @@ export interface Device {
     uuid: string;
     hostname: string;
     ip: string;
+    mask: string;
 }
 
 export interface Disk {
     path: string;
     storageLimit: number;
     storageCurrent: number;
+}
+
+export interface DeviceDiskData extends Device {
+    disks: Disk[];
 }
 
 export interface WidgetData {
