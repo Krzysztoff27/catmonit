@@ -1,0 +1,2 @@
+﻿server_address: "127.0.0.1:5172"
+cert_path: "/ssl/server.crt"
