@@ -8,6 +8,7 @@ import time
 import psutil
 import yaml
 import asyncio
+from pathlib import Path
 from protocol_buffers.telemetry import telemetry_pb2_grpc
 from protocol_buffers.telemetry import telemetry_pb2
 
@@ -20,12 +21,15 @@ def get_base_path():
     else:
         # Running from script
         return os.path.dirname(os.path.abspath(__file__))
-from pathlib import Path
 
 def load_config():
     base_path = Path(get_base_path())
-    grandparent_dir = base_path.parent.parent  # Two levels up
+    print("base path" + str(base_path))
+    grandparent_dir = base_path.parent.parent
+    print ("grandparent dir" + str(grandparent_dir))
+    great_grandparent_dir = base_path.parent.parent.parent
     config_path = grandparent_dir / "config" / "config.yaml"
+    print ("config path" + str(config_path))
 
     if not config_path.exists():
         raise FileNotFoundError(f"Config file not found at {config_path}")
@@ -84,7 +88,10 @@ def telemetry_stream():
 
 async def main():
     print(load_config()['cert_path'])
-    with open(load_config()['cert_path'], 'rb') as cert_file:
+    base_path = Path(get_base_path())
+    great_grandparent_path = base_path.parent.parent.parent
+    full_cert_path = str(great_grandparent_path)+str(load_config()['cert_path'])
+    with open(full_cert_path, 'rb') as cert_file:
         trusted_certs = cert_file.read()
 
     credentials = grpc.ssl_channel_credentials(root_certificates=trusted_certs)
