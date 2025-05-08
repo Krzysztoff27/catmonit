@@ -1,7 +1,6 @@
-using System;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Grpc.Core;
-using gRPC.telemetry; // Make sure this matches `option csharp_namespace`
+using gRPC.telemetry;
 
 public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryServiceBase
 {
@@ -9,50 +8,95 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         IAsyncStreamReader<TelemetryRequest> requestStream,
         ServerCallContext context)
     {
-        await foreach (var request in requestStream.ReadAllAsync())
-        {
-            Console.WriteLine($"[{DateTime.UtcNow}] Telemetry from {request.Hostname} ({request.IpAddress}) [{request.OperatingSystem}] UUID: {request.Uuid}");
+        var output = new List<object>();
 
-            switch (request.PayloadCase)
+        try
+        {
+            await foreach (var request in requestStream.ReadAllAsync())
             {
-                case TelemetryRequest.PayloadOneofCase.Network:
-                    var net = request.Network;
-                    Console.WriteLine($"  Network Interface: {net.InterfaceName}");
-                    Console.WriteLine($"    RX: {net.RxMbps} Mbps, TX: {net.TxMbps} Mbps");
-                    if (net.InterfaceRoleCase == NetworkStats.InterfaceRoleOneofCase.IsMain && net.IsMain)
-                    {
-                        Console.WriteLine("    This is the main interface.");
-                    }
-                    break;
+                var entry = new Dictionary<string, object>
+                {
+                    ["timestamp"] = DateTime.UtcNow,
+                    ["hostname"] = request.Hostname,
+                    ["ip_address"] = request.IpAddress,
+                    ["uuid"] = request.Uuid,
+                    ["os"] = request.OperatingSystem,
+                    ["payload_type"] = request.PayloadCase.ToString(),
+                    ["payload"] = null
+                };
 
-                case TelemetryRequest.PayloadOneofCase.Disks:
-                    foreach (var disk in request.Disks.Entries)
-                    {
-                        Console.WriteLine($"  Disk: {disk.MountPoint}");
-                        Console.WriteLine($"    Usage: {disk.Usage} / {disk.Capacity} bytes ({(disk.Capacity > 0 ? (100.0 * disk.Usage / disk.Capacity).ToString("F2") : "N/A")}%)");
-                    }
-                    break;
+                switch (request.PayloadCase)
+                {
+                    case TelemetryRequest.PayloadOneofCase.Network:
+                        var net = request.Network;
+                        entry["payload"] = new
+                        {
+                            interface_name = net.InterfaceName,
+                            rx_mbps = net.RxMbps,
+                            tx_mbps = net.TxMbps,
+                            is_main = net.InterfaceRoleCase == NetworkStats.InterfaceRoleOneofCase.IsMain && net.IsMain
+                        };
+                        break;
 
-                case TelemetryRequest.PayloadOneofCase.Shares:
-                    foreach (var share in request.Shares.Entries)
-                    {
-                        Console.WriteLine($"  File Share: {share.SharePath}");
-                        Console.WriteLine($"    Usage: {share.Usage} / {share.Capacity} bytes ({(share.Capacity > 0 ? (100.0 * share.Usage / share.Capacity).ToString("F2") : "N/A")}%)");
-                    }
-                    break;
+                    case TelemetryRequest.PayloadOneofCase.Disks:
+                        var disks = new List<object>();
+                        foreach (var disk in request.Disks.Entries)
+                        {
+                            disks.Add(new
+                            {
+                                mount_point = disk.MountPoint,
+                                usage = disk.Usage,
+                                capacity = disk.Capacity,
+                                usage_percent = disk.Capacity > 0 ? (100.0 * disk.Usage / disk.Capacity) : 0
+                            });
+                        }
+                        entry["payload"] = disks;
+                        break;
 
-                case TelemetryRequest.PayloadOneofCase.None:
-                default:
-                    Console.WriteLine("No valid payload received in this message.");
-                    break;
+                    case TelemetryRequest.PayloadOneofCase.Shares:
+                        var shares = new List<object>();
+                        foreach (var share in request.Shares.Entries)
+                        {
+                            shares.Add(new
+                            {
+                                share_path = share.SharePath,
+                                usage = share.Usage,
+                                capacity = share.Capacity,
+                                usage_percent = share.Capacity > 0 ? (100.0 * share.Usage / share.Capacity) : 0
+                            });
+                        }
+                        entry["payload"] = shares;
+                        break;
+
+                    case TelemetryRequest.PayloadOneofCase.None:
+                    default:
+                        entry["error"] = "No valid payload received.";
+                        break;
+                }
+
+                output.Add(entry);
             }
-        }
 
-        return new TelemetryResponse
+            var json = JsonSerializer.Serialize(new
+            {
+                status = "ok",
+                received = output
+            }, new JsonSerializerOptions { WriteIndented = false });
+            
+            Console.WriteLine(json); //For debug purposes 
+            return new TelemetryResponse { Status = json };
+        }
+        catch (Exception ex)
         {
-            Status = "Stream received successfully."
-        };
+            var errorJson = JsonSerializer.Serialize(new
+            {
+                status = "error",
+                message = ex.Message,
+                stackTrace = ex.StackTrace
+            });
+
+            Console.WriteLine(errorJson); //For debug purposes
+            return new TelemetryResponse { Status = errorJson };
+        }
     }
 }
-
-
