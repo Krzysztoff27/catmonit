@@ -7,10 +7,7 @@ function DiskProgress({ path, storageCurrent, storageLimit }: Disk) {
     const color = value > 90 ? "red" : value > 75 ? "yellow" : "var(--mantine-color-text)";
 
     return (
-        <Stack
-            flex={1}
-            gap={0}
-        >
+        <Stack gap={0}>
             <Text
                 fz="xs"
                 fw="500"

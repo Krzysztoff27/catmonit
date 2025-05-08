@@ -52,7 +52,10 @@ export default function LoginPage() {
 
     return (
         <Center h={"100vh"}>
-            <Fieldset w="400">
+            <Fieldset
+                w="400"
+                bd="none"
+            >
                 <form onSubmit={form.onSubmit(authenticate)}>
                     <Group
                         align="flex -end"
@@ -75,6 +78,7 @@ export default function LoginPage() {
                         withAsterisk
                         key={form.key("username")}
                         {...form.getInputProps("username")}
+                        variant="filled"
                     />
                     <Space h="sm" />
                     <PasswordInput
@@ -84,6 +88,7 @@ export default function LoginPage() {
                         withAsterisk
                         key={form.key("password")}
                         {...form.getInputProps("password")}
+                        variant="filled"
                     />
                     <Group
                         justify="space-between"

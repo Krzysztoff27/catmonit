@@ -1,0 +1,13 @@
+.navlink {
+    height: 50px !important;
+    font-weight: 400 !important;
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--background-color-6) !important;
+    border-top: 1px solid var(--background-color-6) !important;
+    color: var(--mantine-color-text) !important;
+    justify-content: space-between !important;
+}
+
+.navlink:hover {
+    background-color: var(--background-color-6) !important;
+}

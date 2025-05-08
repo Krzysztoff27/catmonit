@@ -4,8 +4,10 @@ import { useState } from "react";
 import WidgetDrawer from "../../components/WidgetDrawer/WidgetDrawer";
 import { useDisclosure } from "@mantine/hooks";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
+import { useParams } from "react-router-dom";
 
-function Main() {
+function Editor() {
+    const { layoutName } = useParams();
     const { setColorScheme, clearColorScheme } = useMantineColorScheme();
     const [widgets, setWidgets] = useState([
         {
@@ -66,4 +68,4 @@ function Main() {
     );
 }
 
-export default Main;
+export default Editor;
