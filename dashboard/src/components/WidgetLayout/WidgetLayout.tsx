@@ -5,21 +5,25 @@ import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../config/widgets.config";
 import { WidgetData } from "../../types/api.types";
 import { WidgetLayoutProps } from "../../types/components.types";
 import { IconX } from "@tabler/icons-react";
+import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 
-function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
+function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop }: WidgetLayoutProps) {
     const { width } = useViewportSize();
 
     const getLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
     const getComponent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].component;
 
     const widgetTypes = widgets.map(widget => widget.type);
-    const layout = widgets.map((widget: WidgetData, i) => ({
-        i: `${i}`,
-        ...widget.rect,
-        ...getLimits(widget),
-    }));
+    const layout: Layout = widgets.map(
+        (widget: WidgetData, i) =>
+            ({
+                i: `${i}`,
+                ...widget.rect,
+                ...getLimits(widget),
+            } as LayoutItem)
+    );
 
-    const updateLayout = newLayout => {
+    const updateLayout = (newLayout: Layout) => {
         setWidgets((prev: WidgetData[]) =>
             prev.map((widget: WidgetData, i) => {
                 const { x, y, w, h } = newLayout[i];
@@ -61,6 +65,11 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
+            onDragStart={onDragStart}
+            onDrag={onDrag}
+            onDragStop={onDragStop}
+            onResize={onResize}
+            onResizeStop={onResizeStop}
         >
             {widgets.map((widget: WidgetData, i) => {
                 const WidgetComponent = getComponent(widget);
@@ -69,7 +78,8 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
                     <Flex key={i}>
                         <ActionIcon
                             pos="absolute"
-                            right={0}
+                            right={2}
+                            top={8}
                             variant="transparent"
                             c="var(--background-color-2)"
                             onClick={event => {
@@ -83,7 +93,7 @@ function WidgetLayout({ widgets, setWidgets }: WidgetLayoutProps) {
                             className="drag-handle"
                             data={widget.data}
                             updateData={data => updateWidgetData(i, data)}
-                            style={{ cursor: "pointer" }}
+                            style={{ cursor: "pointer", backgroundColor: selected === `${i}` ? "var(--background-color-6)" : "" }}
                         />
                     </Flex>
                 );

@@ -5,12 +5,16 @@
 
 .react-resizable-handle {
     background-image: none;
+    width: 40px !important;
+    height: 40px !important;
 }
 
 .react-grid-item > .react-resizable-handle::after {
     border-right: 2px solid var(--background-color-3);
     border-bottom: 2px solid var(--background-color-3);
-    margin: 0 4px 4px 0;
+    margin: 0 6px 6px 0;
+    width: 10px !important;
+    height: 10px !important;
 }
 
 .react-grid-placeholder {

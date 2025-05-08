@@ -1,9 +1,10 @@
-import { Paper, Stack } from "@mantine/core";
+import { Paper, Stack, Title } from "@mantine/core";
 import { useState } from "react";
 import DeviceTitle from "../DeviceTitle/DeviceTitle";
 import { Disk } from "../../types/api.types";
 import DiskProgress from "../DiskProgress/DiskProgress";
 import { WidgetComponentProps } from "../../types/components.types";
+import DeviceTitleSmall from "../DeviceTitle/DeviceTitleSmall";
 
 const DUMMY_DISKS = [
     { path: "/dev/sdc", storageCurrent: 720, storageLimit: 2048 },
@@ -21,10 +22,16 @@ function DeviceDisksWidget({ data, settings, ...props }: WidgetComponentProps) {
             {...props}
         >
             <Stack
-                p="xs"
+                p="md"
                 gap="xs"
             >
-                <DeviceTitle
+                <Title
+                    order={3}
+                    fw="600"
+                >
+                    Storage
+                </Title>
+                <DeviceTitleSmall
                     name={data.hostname}
                     address={data.ip}
                     mb="lg"
