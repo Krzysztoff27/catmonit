@@ -16,13 +16,17 @@
     </ItemGroup>
     
     <ItemGroup>
-        <Protobuf Include="../../../telemetry-protos/telemetry.proto" GrpcServices="Server" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="./Protos/telemetry.proto" GrpcServices="Server" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Folder Include="SSL\" />
     </ItemGroup>
 
 </Project>
