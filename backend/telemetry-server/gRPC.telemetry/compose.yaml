@@ -4,4 +4,5 @@
     build:
       context: .
       dockerfile: gRPC.telemetry.Server/Dockerfile
+  
 
