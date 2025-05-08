@@ -17,7 +17,7 @@ namespace webapi.Controllers.http.layout
             if (string.IsNullOrEmpty(name))
                 return false;
 
-            return Regex.IsMatch(name, @"^[A-Za-z ]+$");
+            return Regex.IsMatch(name, @"^[A-Za-z0-9 ]+$");
         }
 
         [HttpGet]
