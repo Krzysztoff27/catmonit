@@ -1,13 +1,13 @@
-import { useMantineColorScheme, Button, Flex } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import WidgetLayout from "../../components/WidgetLayout/WidgetLayout";
 import { useState } from "react";
 import WidgetDrawer from "../../components/WidgetDrawer/WidgetDrawer";
-import { useDisclosure } from "@mantine/hooks";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
+import { useParams } from "react-router-dom";
 
-function Main() {
-    const { setColorScheme, clearColorScheme } = useMantineColorScheme();
+function Editor() {
+    const { layoutName } = useParams();
     const [widgets, setWidgets] = useState([
         {
             type: "DEVICE_DISKS",
@@ -43,7 +43,6 @@ function Main() {
     };
 
     const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : <></>;
-    console.log(DrawerComponent)
     
     return (
         <>
@@ -72,4 +71,4 @@ function Main() {
     );
 }
 
-export default Main;
+export default Editor;

@@ -9,11 +9,13 @@ import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 
 function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop }: WidgetLayoutProps) {
     const { width } = useViewportSize();
+    const cols = Math.floor(width / GRID_SIZE_PX);
+    const layoutWidth = cols * GRID_SIZE_PX;
 
     const getLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
     const getComponent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].component;
 
-    const widgetTypes = widgets.map(widget => widget.type);
+    const widgetTypes = widgets.map((widget) => widget.type);
     const layout: Layout = widgets.map(
         (widget: WidgetData, i) =>
             ({
@@ -49,7 +51,7 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
         });
     };
 
-    const onDelete = widgetNumber => {
+    const onDelete = (widgetNumber) => {
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== widgetNumber));
     };
 
@@ -60,14 +62,15 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
             className="layout"
             layout={layout}
             onLayoutChange={updateLayout}
-            cols={Math.floor(width / GRID_SIZE_PX)}
-            width={width}
+            cols={cols}
+            width={layoutWidth}
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
             onDragStart={onDragStart}
             onDrag={onDrag}
             onDragStop={onDragStop}
+            onResizeStart={onResizeStart}
             onResize={onResize}
             onResizeStop={onResizeStop}
         >
@@ -82,7 +85,7 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
                             top={8}
                             variant="transparent"
                             c="var(--background-color-2)"
-                            onClick={event => {
+                            onClick={(event) => {
                                 event.stopPropagation();
                                 onDelete(i);
                             }}
@@ -92,7 +95,7 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
                         <WidgetComponent
                             className="drag-handle"
                             data={widget.data}
-                            updateData={data => updateWidgetData(i, data)}
+                            updateData={(data) => updateWidgetData(i, data)}
                             style={{ cursor: "pointer", backgroundColor: selected === `${i}` ? "var(--background-color-6)" : "" }}
                         />
                     </Flex>

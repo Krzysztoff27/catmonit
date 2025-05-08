@@ -1,0 +1,29 @@
+.navbar {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: all ease 200ms;
+    background-color: var(--background-color-7);
+    padding: var(--mantine-spacing-md) 0;
+    overflow: hidden;
+}
+
+.buttonGroup {
+    width: 100%;
+    gap: var(--mantine-spacing-xs) !important;
+    justify-content: end !important;
+    padding: 0 var(--mantine-spacing-md);
+}
+
+.layoutScrollArea {
+    margin-bottom: var(--mantine-spacing-md) !important;
+    width: 100%;
+    min-width: 240px;
+    scrollbar-width: 0.6rem;
+    padding: 0 4px;
+}
+
+.navlinkStack {
+    gap: 0 !important;
+    height: 100%;
+}
