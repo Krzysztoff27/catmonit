@@ -1,4 +1,4 @@
-import { Flex } from "@mantine/core";
+import { Box, Flex } from "@mantine/core";
 import WidgetLayout from "../../components/WidgetLayout/WidgetLayout";
 import { useState } from "react";
 import WidgetDrawer from "../../components/WidgetDrawer/WidgetDrawer";
@@ -23,27 +23,27 @@ function Editor() {
 
     const [widgetDrawerOpened, setWidgetDrawerOpened] = useState(false);
     const [selected, setSelected] = useState<string | null>(null);
-    
+
     const closeWidgetDrawer = () => {
         setWidgetDrawerOpened(false);
         setSelected(null);
     };
-    
+
     let clicked = false;
-    
+
     const onDragStart = () => {
         clicked = true;
         setTimeout(() => (clicked = false), 500);
     };
-    
+
     const onDragStop = (_: Layout, before: LayoutItem, after: LayoutItem) => {
         if (!clicked || JSON.stringify(before) !== JSON.stringify(after)) return;
         setSelected(after.i);
         setWidgetDrawerOpened(true);
     };
 
-    const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : <></>;
-    
+    const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : Box;
+
     return (
         <>
             <Flex
@@ -57,7 +57,7 @@ function Editor() {
                     opened={widgetDrawerOpened}
                     onClose={closeWidgetDrawer}
                 >
-                <DrawerComponent/>
+                    <DrawerComponent />
                 </WidgetDrawer>
                 <WidgetLayout
                     selected={selected}
