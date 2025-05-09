@@ -105,6 +105,7 @@ function DeviceDiskDrawer() {
                 Widget properties
             </Title>
             <Grid
+                fz="sm"
                 justify="center"
                 align="center"
                 columns={4}
@@ -194,20 +195,19 @@ function DeviceDiskDrawer() {
                         gap="sm"
                         w="100%"
                     >
-                        <Flex
+                        <Flex 
                             justify="space-between"
                             align="center"
                             w="100%"
-                            // mb="0"
                             px="xl"
                         >
-                            <Text w="55%">Path</Text>
+                            <Text w="55%" fz="sm" pb={0} >Path</Text>
                             <Flex
                                 w="55%"
                                 justify="space-between"
                             >
-                                <Text w="40%">Warn</Text>
-                                <Text w="40%">Error</Text>
+                                <Text w="40%" fz="sm" pb={0}>Warning</Text>
+                                <Text w="40%" fz="sm" pb={0}>Critical</Text>
                             </Flex>
                         </Flex>
 
@@ -235,7 +235,7 @@ function DeviceDiskDrawer() {
                                             px="10"
                                             py="6"
                                         >
-                                            <Text fz="sm">{disk.path}</Text>
+                                            <Text fz="xs">{disk.path}</Text>
                                         </Group>
                                     </Paper>
 
