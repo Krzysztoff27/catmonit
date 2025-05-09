@@ -2,7 +2,8 @@ import { Title, Paper, Text, Select, SelectProps, Group, Flex, Stack, Button, Nu
 import { IconCheck, IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
 import { useState } from "react";
 import { DeviceDiskData } from "../../types/api.types";
-
+import DeviceSelect from "../DeviceSelect/DeviceSelect";
+//! @TODO theres DevicediskDrawer and DeviceDiskSWidget with S
 const devices: DeviceDiskData[] = [
     {
         uuid: "1234",
@@ -57,11 +58,13 @@ const customRenderOption: SelectProps["renderOption"] = ({ option, checked }) =>
     const device = devices.find((device) => device.uuid === option.value);
     return (
         <Flex
-            align="center"
             justify="space-between"
             w="100%"
         >
-            <Flex gap="xs" align="center" >
+            <Flex
+                gap="xs"
+                align="center"
+            >
                 {checked && <IconCheck size={16} />}
                 <Text>{device?.hostname}</Text>
             </Flex>
@@ -124,13 +127,13 @@ function DeviceDiskDrawer() {
                     span={1}
                     py="0"
                 >
-                    X
+                    X position
                 </Grid.Col>
                 <Grid.Col
                     span={1}
                     py="0"
                 >
-                    Y
+                    Y position
                 </Grid.Col>
 
                 <Grid.Col span={1}>
@@ -158,21 +161,12 @@ function DeviceDiskDrawer() {
                     />
                 </Grid.Col>
             </Grid>
-
-            <Title
-                order={4}
-                mb="sm"
-            >
-                Target
-            </Title>
-            <Select
+            <DeviceSelect
                 placeholder="Choose device"
-                data={selectDeviceData}
+                data={devices}
                 value={selectedDevice}
                 onChange={handleDeviceChange}
-                renderOption={customRenderOption}
             />
-
             {selectedDevice && selectedDeviceData && (
                 <>
                     <Title
@@ -182,7 +176,41 @@ function DeviceDiskDrawer() {
                     >
                         Displayed disks and limits
                     </Title>
-                    <Stack gap="sm">
+                    {/* <Grid justify="flex-end" gutter={0}>
+                        <Grid.Col span="content">
+                            <Text w={22}>Warn</Text>
+                        </Grid.Col>
+                        <Grid.Col span="content">
+                            <Text w={22}>Error</Text>
+                        </Grid.Col>
+                    </Grid> */}
+
+                    {/* <Group gap="xl">
+                        <Text w={22}>Warn</Text>
+                        <Text w={22}>Error</Text>
+                    </Group> */}
+
+                    <Stack
+                        gap="sm"
+                        w="100%"
+                    >
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            w="100%"
+                            // mb="0"
+                            px="xl"
+                        >
+                            <Text w="55%">Path</Text>
+                            <Flex
+                                w="55%"
+                                justify="space-between"
+                            >
+                                <Text w="40%">Warn</Text>
+                                <Text w="40%">Error</Text>
+                            </Flex>
+                        </Flex>
+
                         {selectedDeviceData.disks.map((disk) => {
                             const key = `${selectedDeviceData.uuid}-${disk.path}`;
                             const isVisible = visibilityState[key];
@@ -218,11 +246,11 @@ function DeviceDiskDrawer() {
                                         bd="1px solid var(--background-color-5)"
                                     >
                                         <NumberInput
-                                        defaultValue={75}
-                                        min={0}
-                                        max={100}
-                                        step={1}
-                                        suffix="%"
+                                            defaultValue={75}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            suffix="%"
                                         />
                                     </Paper>
 
@@ -233,11 +261,11 @@ function DeviceDiskDrawer() {
                                         bd="1px solid var(--background-color-5)"
                                     >
                                         <NumberInput
-                                        defaultValue={90}
-                                        min={0}
-                                        max={100}
-                                        step={1}
-                                        suffix="%"
+                                            defaultValue={90}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            suffix="%"
                                         />
                                     </Paper>
 

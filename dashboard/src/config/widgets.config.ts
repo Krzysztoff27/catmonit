@@ -1,12 +1,11 @@
 import DeviceDisksWidget from "../components/DeviceDisksWidget/DeviceDisksWidget";
-import DeviceDiskDrawer from "../components/DeviceDiskDrawer/DeviceDiskDrawer";
+import DeviceStorageDrawer from "../components/DeviceStorageDrawer/DeviceStorageDrawer";
 
 export const GRID_SIZE_PX = 128;
 
-const WIDGETS_CONFIG = {
+const WIDGETS_CONFIG = { 
     DEVICE_DISKS: {
         component: DeviceDisksWidget,
-        drawer: DeviceDiskDrawer,
         limits: {
             minH: 2,
             maxH: 5,
