@@ -8,7 +8,7 @@ import { LayoutLinkButton } from "../LayoutLinkButton/LayoutLinkButton";
 import { LayoutLinkActionIcon } from "../LayoutLinkActionIcon/LayoutLinkActionIcon";
 
 const Navbar = ({ expanded, toggle }): React.JSX.Element => {
-    const [names, setNames] = useState(Array.from({ length: 8 }).map((_, i) => `New Layout ${i}`));
+    const [names, setNames] = useState(Array.from({ length: 24 }).map((_, i) => `New Layout ${i}`));
 
     return (
         <Stack
@@ -31,33 +31,43 @@ const Navbar = ({ expanded, toggle }): React.JSX.Element => {
             </Group>
             <ScrollArea
                 className={classes.layoutScrollArea}
-                offsetScrollbars
-                display={!expanded ? "none" : undefined}
+                scrollbarSize={expanded ? "0.6rem" : "0.5rem"}
             >
-                <Stack className={classes.navlinkStack}>
-                    {Array.from({ length: 8 }).map((_, i) =>
+                <Stack
+                    className={classes.navlinkStack}
+                    align="center"
+                    gap={!expanded ? "8" : "0"}
+                >
+                    {Array.from({ length: 24 }).map((_, i) =>
                         expanded ? (
                             <LayoutLinkButton
                                 key={i}
                                 name={names[i]}
+                                className={classes.navlink}
                             />
                         ) : (
-                            <LayoutLinkActionIcon name={names[i]} />
+                            <LayoutLinkActionIcon
+                                key={i}
+                                name={names[i]}
+                                index={i + 1}
+                            />
                         )
                     )}
                     {expanded ? (
-                        <LayoutLinkButton
+                        <Button
+                            className={classes.navlink}
                             onClick={() => {}}
-                            nameEditable={false}
                             leftSection={<IconPlus size={18} />}
                         >
                             Create new layout
-                        </LayoutLinkButton>
+                        </Button>
                     ) : (
                         <ActionIcon
                             variant="default"
-                            size="lg"
+                            size="xl"
                             aria-label="Create new layout"
+                            bd="none"
+                            mt="8"
                         >
                             <IconPlus />
                         </ActionIcon>
