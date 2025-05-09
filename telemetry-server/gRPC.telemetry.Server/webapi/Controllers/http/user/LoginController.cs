@@ -17,25 +17,13 @@ namespace webapi.Controllers.http.user
         [Route("userCheck")]
         public IActionResult Get()
         {
-            if (Request.Headers.TryGetValue("Authentication", out var authHeader))
+            authResult auth = Utils.Authenticate(Request);
+            if (auth.res != null)
             {
-                var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
-                {
-                    string? un = userHelper.getUsername(statNpayload.payload.id);
-                    return (un == null ? Utils.returnVal(500) : Json(new { username = un }));
-                }
-                else
-                {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
-                    return Utils.returnVal(response.statusCode, response.message);
-                }
+                return auth.res;
             }
-            else
-            {
-                return Utils.returnVal(401, "token not found");
-            }
+            string? un = userHelper.getUsername(auth.payload.id);
+            return (un == null ? Utils.returnVal(500) : Json(new { username = un }));
         }
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)

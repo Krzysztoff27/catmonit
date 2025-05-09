@@ -5,10 +5,10 @@ namespace webapi.Monitoring
 {
     public class Subscriber
     {
-        public uint userID { get; set; }
+        public int userID { get; set; }
         public WebSocket WebSocket { get; set; }
-        public List<deviceIdentifier> monitoredDevicesIndexes; // TODO: CONCURENCY!!!!!
-        public Subscriber(uint userId, WebSocket webSocket, List<deviceIdentifier> monitoredDevicesIndexes)
+        public List<DeviceIdentifier> monitoredDevicesIndexes; // TODO: CONCURENCY!!!!!
+        public Subscriber(int userId, WebSocket webSocket, List<DeviceIdentifier> monitoredDevicesIndexes)
         {
             this.userID = userId;
             this.WebSocket = webSocket;

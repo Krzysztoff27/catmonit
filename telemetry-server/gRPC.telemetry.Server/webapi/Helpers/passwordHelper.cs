@@ -4,7 +4,7 @@ using System.Text;
 
 namespace webapi.Helpers
 {
-    public class passwordHelper
+    public class PasswordHelper
     {
     public static byte[] GenerateSalt()
         {

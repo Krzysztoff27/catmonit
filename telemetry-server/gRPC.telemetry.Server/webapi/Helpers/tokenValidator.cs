@@ -9,28 +9,28 @@ using webapi.Monitoring;
 
 namespace webapi.Helpers
 {
-    public class tokenStatusAndPayload
+    public class TokenStatusAndPayload
     {
-        public tokenStatus status { get; set; }
+        public TokenStatus status { get; set; }
         public TokenPayload payload { get; set; }
     }
-    public class tokenStatusAndMessage
+    public class TokenStatusAndMessage
     {
         public int statusCode { get; set; }
         public string message { get; set; }
     }
-    public enum tokenStatus
+    public enum TokenStatus
     {
         undefined = 0,
         valid = 1,
         expired = 2,
         invalid = 3
     }
-    public class tokenValidator
+    public class TokenValidator
     {
-        public static tokenStatusAndPayload validate(string token)
+        public static TokenStatusAndPayload validate(string token)
         {
-            tokenStatusAndPayload returnVal = new tokenStatusAndPayload { };
+            TokenStatusAndPayload returnVal = new TokenStatusAndPayload { };
             if (!string.IsNullOrEmpty(token))
                 {
 
@@ -45,18 +45,18 @@ namespace webapi.Helpers
 
                         var payload = decoder.DecodeToObject<TokenPayload>(token, Config.CM_JWT_SECRET, verify: true);
 
-                        returnVal.status = tokenStatus.valid;
+                        returnVal.status = TokenStatus.valid;
                         returnVal.payload = payload;
                         return returnVal;
                     }
                     catch (TokenExpiredException)
                     {
-                        returnVal.status = tokenStatus.expired;
+                        returnVal.status = TokenStatus.expired;
                         return returnVal;
                     }
                     catch (SignatureVerificationException)
                     {
-                        returnVal.status = tokenStatus.invalid;
+                        returnVal.status = TokenStatus.invalid;
                         return returnVal;
                     }
                     catch (Exception)
@@ -69,40 +69,20 @@ namespace webapi.Helpers
                     return returnVal;
                 }
         }
-        public static tokenStatusAndMessage getReturnValue(tokenStatus status)
+        public static TokenStatusAndMessage getReturnValue(TokenStatus status)
         {
             switch (status)
             {
-                case tokenStatus.valid:
-                    return new tokenStatusAndMessage { statusCode = 200, message = "valid token" };
-                case tokenStatus.expired:
-                    return new tokenStatusAndMessage { statusCode = 401, message = "token expired" };
-                case tokenStatus.invalid:
-                    return new tokenStatusAndMessage { statusCode = 401, message = "token invalid" };
+                case TokenStatus.valid:
+                    return new TokenStatusAndMessage { statusCode = 200, message = "valid token" };
+                case TokenStatus.expired:
+                    return new TokenStatusAndMessage { statusCode = 401, message = "token expired" };
+                case TokenStatus.invalid:
+                    return new TokenStatusAndMessage { statusCode = 401, message = "token invalid" };
                 default:
-                    return new tokenStatusAndMessage { statusCode = 400, message = "token undefined" };
+                    return new TokenStatusAndMessage { statusCode = 400, message = "token undefined" };
             }
         }
 
-        /*
-            if (Request.Headers.TryGetValue("Authentication", out var authHeader))
-            {
-                var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
-                {
-
-                }
-                else
-                {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
-                    return Utils.returnVal(response.statusCode, response.message);
-                }
-            }
-            else
-            {
-                return Utils.returnVal(401, "token not found");
-            }
-         */
     }
 }

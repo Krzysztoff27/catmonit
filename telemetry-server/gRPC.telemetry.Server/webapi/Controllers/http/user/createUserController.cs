@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
 using webapi.Helpers.DBconnection;
 using webapi.Models;
 using webapi.webapi;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace webapi.Controllers.http.user
 {

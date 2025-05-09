@@ -5,9 +5,9 @@ using webapi.Helpers.DBconnection;
 
 namespace webapi.Helpers
 {
-    public class subscriberHelper
+    public class SubscriberHelper
     {
-        public static Subscriber createSubscriber(uint userId, WebSocket webSocket)
+        public static Subscriber createSubscriber(int userId, WebSocket webSocket)
         {
             return new Subscriber(userId, webSocket, userHelper.getDevices(userId));
         }
