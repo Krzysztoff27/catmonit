@@ -2,19 +2,41 @@
 
 public class ResponseModel
 {
-    public DateTime timestamp;
-    public string hostname;
-    public string ip_address;
-    public string uuid;
-    public string os;
-    public TelemetryRequest.PayloadOneofCase payload_type;
-    public object payload;
+    public DateTime Timestamp { get; set; }
+    public string Hostname { get; set; }
+    public string IpAddress { get; set; }
+    public string Uuid { get; set; }
+    public string Os { get; set; }
+    public PayloadType PayloadType { get; set; }
+    public object Payload { get; set; }
 }
 
-
-public class payloadDisks
+public class NetworkPayload
 {
-    public string mount_point;
-    public long usage;
-    public long capacity;
+    public string InterfaceName { get; set; }
+    public double RxMbps { get; set; }
+    public double TxMbps { get; set; }
+    public bool? IsMain { get; set; }
+}
+
+public class DiskPayload
+{
+    public string MountPoint { get; set; }
+    public long Usage { get; set; }
+    public long Capacity { get; set; }
+}
+
+public class SharePayload
+{
+    public string SharePath { get; set; }
+    public long Usage { get; set; }
+    public long Capacity { get; set; }
+}
+
+public enum PayloadType
+{
+    Network,
+    Disks,
+    Shares,
+    None
 }
