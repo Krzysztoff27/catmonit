@@ -52,7 +52,7 @@ function Editor() {
             >
                 <WidgetDrawer
                     position="right"
-                    size="xs"
+                    size="sm"
                     overlayProps={{ backgroundOpacity: 0 }}
                     opened={widgetDrawerOpened}
                     onClose={closeWidgetDrawer}
