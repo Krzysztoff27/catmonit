@@ -1,5 +1,4 @@
 import { Paper, Stack, Title } from "@mantine/core";
-import { useState } from "react";
 import { Disk } from "../../types/api.types";
 import DiskProgress from "../DiskProgress/DiskProgress";
 import { WidgetComponentProps } from "../../types/components.types";
@@ -31,7 +30,7 @@ const DUMMY_DISKS = [
 ];
 
 function DeviceDisksWidget({ data, className, ...props }: WidgetComponentProps) {
-    const { height, ref } = useElementSize();
+    let { height, ref } = useElementSize();
     const disksData = DUMMY_DISKS.slice(0, Math.floor((height - 118) / 44));
 
     return (
@@ -52,7 +51,7 @@ function DeviceDisksWidget({ data, className, ...props }: WidgetComponentProps) 
                     address={data.ip}
                     mb="6"
                 />
-                <Stack className={className.progressBarStack}>
+                <Stack className={classes.progressBarStack}>
                     {disksData.map((disk: Disk, i) => (
                         <DiskProgress
                             key={i}
