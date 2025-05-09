@@ -1,5 +1,6 @@
 import { ComponentType } from "react";
 import { WidgetComponent } from "./components.types";
+import { TablerIcon } from "@tabler/icons-react";
 
 export interface UrlNode {
     api_requests: string;
@@ -15,7 +16,9 @@ export interface UrlConfig {
 }
 
 export interface WidgetConfig {
+    icon: TablerIcon;
     component: WidgetComponent;
+    drawer: ComponentType<any>; // TODO specify the props
     limits: {
         minH: number;
         minW: number;

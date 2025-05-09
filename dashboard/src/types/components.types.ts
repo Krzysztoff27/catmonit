@@ -1,6 +1,6 @@
 import { ComponentType } from "react";
 import { WidgetData } from "./api.types";
-import { ItemCallback } from "./reactGridLayout.types";
+import { ItemCallback, Layout, LayoutItem } from "./reactGridLayout.types";
 
 export interface WidgetComponentProps {
     data: any;
@@ -20,4 +20,6 @@ export interface WidgetLayoutProps {
     onResizeStart?: ItemCallback;
     onResize?: ItemCallback;
     onResizeStop?: ItemCallback;
+    onDrop?: (layout: Layout, item: LayoutItem, e: Event) => void;
+    droppingItem?: { i: string; w: number; h: number };
 }

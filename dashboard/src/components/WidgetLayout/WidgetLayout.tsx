@@ -1,5 +1,5 @@
 import { ActionIcon, Flex } from "@mantine/core";
-import { useViewportSize } from "@mantine/hooks";
+import { useElementSize, useViewportSize } from "@mantine/hooks";
 import GridLayout from "react-grid-layout";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../config/widgets.config";
 import { WidgetData } from "../../types/api.types";
@@ -7,7 +7,19 @@ import { WidgetLayoutProps } from "../../types/components.types";
 import { IconX } from "@tabler/icons-react";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 
-function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop }: WidgetLayoutProps) {
+function WidgetLayout({
+    widgets,
+    setWidgets,
+    selected,
+    onDragStart,
+    onDrag,
+    onDragStop,
+    onResizeStart,
+    onResize,
+    onResizeStop,
+    onDrop,
+    droppingItem,
+}: WidgetLayoutProps) {
     const { width } = useViewportSize();
     const cols = Math.floor(width / GRID_SIZE_PX);
     const layoutWidth = cols * GRID_SIZE_PX;
@@ -64,6 +76,7 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
             onLayoutChange={updateLayout}
             cols={cols}
             width={layoutWidth}
+            style={{ minHeight: "100vh", minWidth: "100vw" }}
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
@@ -73,6 +86,9 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
             onResizeStart={onResizeStart}
             onResize={onResize}
             onResizeStop={onResizeStop}
+            onDrop={onDrop}
+            isDroppable={true}
+            droppingItem={droppingItem}
         >
             {widgets.map((widget: WidgetData, i) => {
                 const WidgetComponent = getComponent(widget);
@@ -83,6 +99,7 @@ function WidgetLayout({ widgets, setWidgets, selected, onDragStart, onDrag, onDr
                             pos="absolute"
                             right={2}
                             top={8}
+                            style={{ zIndex: 100 }}
                             variant="transparent"
                             c="var(--background-color-2)"
                             onClick={(event) => {
