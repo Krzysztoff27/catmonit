@@ -1,10 +1,10 @@
 ﻿namespace webapi.Helpers
 {
-    public class deviceIdentifier
+    public class DeviceIdentifier
     {
-        public uint ID { get; set; }
+        public int ID { get; set; }
     }
-    public class deviceHelper
+    public class DeviceHelper
     {
     }
 }

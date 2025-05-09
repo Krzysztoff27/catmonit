@@ -23,14 +23,14 @@ namespace webapi.Websocket
 
         public async Task HandleRequestAsync(HttpContext context)
         {
-            var token = context.Request.Query["token"].ToString();
+            var token = context.Request.Query["Authentication"].ToString();
             if (context.WebSockets.IsWebSocketRequest)
             {
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
                     using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                    Subscriber sub = subscriberHelper.createSubscriber(statNpayload.payload.id, webSocket);
+                    Subscriber sub = SubscriberHelper.createSubscriber(statNpayload.payload.id, webSocket);
 
                     await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(sub.monitoredDevicesIndexes.ToArray()))), WebSocketMessageType.Text, true, CancellationToken.None);
 
@@ -40,7 +40,7 @@ namespace webapi.Websocket
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
                     context.Response.StatusCode = response.statusCode;
                     await context.Response.WriteAsJsonAsync(response.message);
                 }

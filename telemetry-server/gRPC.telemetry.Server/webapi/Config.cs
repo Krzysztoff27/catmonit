@@ -1,9 +1,10 @@
 ﻿public static class Config
 {
-    public const string CM_HTTPS_SERVER_ADDRESS = "https://localhost:5001";
-    public const string CM_WS_SERVER_ADDRESS = "wss://localhost:5001";
-    public const string CM_SQL_PASSWORD = "mysecretpassword";
-    public const string CM_SQLSERVER = "webapi-mysql-1";
     public const string CM_JWT_SECRET = "0b13822dac0211d86f4ca04d435025d73e3c1754e9234d63725ea7d71b53f576";
-    public const string CM_CONNECTION_STRING = $"Server={Config.CM_SQLSERVER};Database=catmonit;User=root;Password={Config.CM_SQL_PASSWORD};";
+
+    public const string CM_POSTGRES_SERVER = "172.22.0.2";
+    public const string CM_POSTGRES_USER = "user";
+    public const string CM_POSTGRES_PASSWORD = "password";
+    public const string CM_POSTGRES_DBNAME = "catmonit_base";
+    public const string CM_POSTGRES_CONNECTION_STRING = $"Host={Config.CM_POSTGRES_SERVER};Database={Config.CM_POSTGRES_DBNAME};Username={Config.CM_POSTGRES_USER};Password={Config.CM_POSTGRES_PASSWORD};";
 }

@@ -1,0 +1,22 @@
+services:
+  database:
+    container_name: catmonit-db
+    restart: always
+    image: postgres
+    environment:
+      - POSTGRES_USER=${USER}
+      - POSTGRES_DB=${DATABASE}
+      - POSTGRES_PASSWORD=${PASSWORD}
+    volumes:
+      - dbvolume:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d/:ro
+    networks:
+        - catmonit-network
+
+networks:
+  catmonit-network:
+    name: catmonit-network
+    external: false
+    
+volumes:
+    dbvolume: {}

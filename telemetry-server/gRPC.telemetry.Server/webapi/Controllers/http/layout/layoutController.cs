@@ -9,7 +9,7 @@ namespace webapi.Controllers.http.layout
 {
     [ApiController]
     [Route("[controller]")]
-    public class layoutController : Controller
+    public class LayoutController : Controller
     {
         public static bool isCorrect(string name)
         {
@@ -26,15 +26,15 @@ namespace webapi.Controllers.http.layout
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
-                    List<string>? layoutNames = layoutHelper.getLayoutNames(statNpayload.payload.id);
+                    List<string>? layoutNames = LayoutHelper.getLayoutNames(statNpayload.payload.id);
                     return (layoutNames == null ? Utils.returnVal(500) : Json(layoutNames));
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
 
                     var data = new { Message = response.message };
                     return Utils.returnVal(response.statusCode, response.message);
@@ -52,15 +52,15 @@ namespace webapi.Controllers.http.layout
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
-                    (int errCode, JsonElement? json) layout = layoutHelper.getLayout(statNpayload.payload.id, name);
+                    (int errCode, JsonElement? json) layout = LayoutHelper.getLayout(statNpayload.payload.id, name);
                     return (layout.json == null ? Utils.returnVal(layout.errCode, ((layout.errCode == 400) ? "layout doesn't exist" : "")):Json(layout.json));
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
                     return Utils.returnVal(response.statusCode, response.message);
                 }
             }
@@ -78,14 +78,14 @@ namespace webapi.Controllers.http.layout
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
 
                     using (var reader = new StreamReader(Request.Body))
                     {
                         var layoutJson = await reader.ReadToEndAsync();
-                        bool? res = layoutHelper.addOrUpdateLayout(statNpayload.payload.id, layoutName, layoutJson);
+                        bool? res = LayoutHelper.addOrUpdateLayout(statNpayload.payload.id, layoutName, layoutJson);
                         if (res == true)
                         {
                             var data = new { Message = "layout created" };
@@ -105,7 +105,7 @@ namespace webapi.Controllers.http.layout
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
                     return Utils.returnVal(response.statusCode, response.message);
                 }
             }
@@ -124,14 +124,14 @@ namespace webapi.Controllers.http.layout
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
-                    return (layoutHelper.renameLayout(statNpayload.payload.id, layoutName, newName) == null ? Utils.returnVal(500) : Json(new { message = "updated successfuly" }));
+                    return (LayoutHelper.renameLayout(statNpayload.payload.id, layoutName, newName) == null ? Utils.returnVal(500) : Json(new { message = "updated successfuly" }));
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
                     return Utils.returnVal(response.statusCode, response.message);
                 }
             }
@@ -149,15 +149,15 @@ namespace webapi.Controllers.http.layout
             if (Request.Headers.TryGetValue("Authentication", out var authHeader))
             {
                 var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
+                TokenStatusAndPayload statNpayload = TokenValidator.validate(token);
+                if (statNpayload.status == TokenStatus.valid)
                 {
-                    bool? res = layoutHelper.deleteLayout(statNpayload.payload.id, layoutName);
+                    bool? res = LayoutHelper.deleteLayout(statNpayload.payload.id, layoutName);
                     return (res == null ? Utils.returnVal(500) : ((res.Value)?Json( new { message = "removed successfuly" }): Utils.returnVal(400, "layout doesn't exist")));
                 }
                 else
                 {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
+                    var response = TokenValidator.getReturnValue(statNpayload.status);
                     return Utils.returnVal(response.statusCode, response.message);
                 }
             }

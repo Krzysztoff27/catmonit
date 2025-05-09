@@ -1,12 +1,4 @@
-﻿using MySqlX.XDevAPI.Common;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using ZstdSharp.Unsafe;
+﻿using System.Collections.Concurrent;
 
 namespace webapi.Monitoring
 {
@@ -15,7 +7,7 @@ namespace webapi.Monitoring
     {
 
         public int requestTimeout;
-        public readonly ConcurrentDictionary<uint, Subscriber> subscribers = new ConcurrentDictionary<uint, Subscriber>(); // index is id in db (and in token)
+        public readonly ConcurrentDictionary<int, Subscriber> subscribers = new ConcurrentDictionary<int, Subscriber>(); // index is id in db (and in token)
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
         public CancellationTokenSource cancellationTokenSource;
         public Task monitorTask;

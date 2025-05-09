@@ -13,9 +13,9 @@ namespace webapi.Monitoring
         StorageInfoModel lastStorageInfo = new StorageInfoModel();
 
 
-        public void addDevicesToMonit(List<uint> devices_id)
+        public void addDevicesToMonit(List<int> devices_id)
         {
-            foreach (uint deviceID in devices_id)
+            foreach (int deviceID in devices_id)
             {
                 if (!lastStorageInfo.monitoredDevices.ContainsKey(deviceID))
                 {
@@ -39,7 +39,7 @@ namespace webapi.Monitoring
         public string subscriberUpdateMessage(Subscriber subber)
         {
             string msg = "{ numberUpdates:[";
-            foreach(deviceIdentifier deviceID in subber.monitoredDevicesIndexes)
+            foreach(DeviceIdentifier deviceID in subber.monitoredDevicesIndexes)
             {
                 msg+= $"{{{deviceID}:{lastStorageInfo.monitoredDevices[deviceID.ID]}}},";
             }

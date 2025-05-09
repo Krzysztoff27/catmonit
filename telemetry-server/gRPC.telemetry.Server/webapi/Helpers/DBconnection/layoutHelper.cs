@@ -1,169 +1,61 @@
-﻿using MySql.Data.MySqlClient;
+﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using System.Data;
 using System.Text.Json;
 
 namespace webapi.Helpers.DBconnection
 {
-    public class layoutHelper
+    public class LayoutHelper
     {
-        public static bool? addOrUpdateLayout(uint userID, string layoutName, string layoutData)
+        public static bool? addOrUpdateLayout(int userID, string layoutName, string layoutData)
         {
             if (string.IsNullOrEmpty(layoutName) || string.IsNullOrEmpty(layoutData))
             {
                 return null;
             }
-
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            int? count = ConHelper.execCountQuery(
+                    $"SELECT count(layout_id) FROM dashboard_layouts WHERE user_id = @userID AND layout_name = @layoutName;",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName } });
+            if (count == null) return null;
+            if (count == 0)
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (MySqlException)
-                {
-                    return null;
-                }
-
-                int count = 0;
-                // Check if the layout exists
-                string query0 = $"SELECT count(layout_id) FROM dashboard_layouts WHERE user_id = @userID AND layout_name = @layoutName;";
-                using (var cmd0 = new MySqlCommand(query0, conn))
-                {
-                    cmd0.Parameters.AddWithValue("@userID", userID);
-                    cmd0.Parameters.AddWithValue("@layoutName", layoutName);
-
-                    using (var reader = cmd0.ExecuteReader())
-                    {
-                        reader.Read();
-                        count = reader.GetInt32(0);
-
-                    }
-                }
-
-                if (count == 0)
-                {
-                    string query = $"INSERT INTO dashboard_layouts (user_id, layout_name, layout_body) VALUES (@userID, @layoutName, @layoutData);";
-                    using (var cmd = new MySqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@userID", userID);
-                        cmd.Parameters.AddWithValue("@layoutName", layoutName);
-                        cmd.Parameters.AddWithValue("@layoutData", layoutData);
-                        cmd.ExecuteNonQuery();
-                    }
-                    return true;
-                }
-                else
-                {
-                    string query = $"UPDATE dashboard_layouts SET layout_body = @newLayout WHERE user_id = @userID AND layout_name = @layoutName;";
-                    using (var cmd = new MySqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@userID", userID);
-                        cmd.Parameters.AddWithValue("@layoutName", layoutName);
-                        cmd.Parameters.AddWithValue("@newLayout", layoutData);
-                        cmd.ExecuteNonQuery();
-                    }
-                    return false;
-                }
+                return ((ConHelper.execNonQuery(
+                    $"INSERT INTO dashboard_layouts (user_id, layout_name, layout_body) VALUES (@userID, @layoutName, @layoutData);",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@layoutData", layoutData } }) == null) ? null : true);
+            }
+            else
+            {
+                return ((ConHelper.execNonQuery(
+                    $"UPDATE dashboard_layouts SET layout_body = @newLayout WHERE user_id = @userID AND layout_name = @layoutName;",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@layoutData", layoutData } }) == null) ? null : false);
             }
         }
-        public static List<string>? getLayoutNames(uint userID)
+        public static List<string>? getLayoutNames(int userID)
         {
-
             List<string> layoutNames = new List<string>();
-
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
+            using (var reader = ConHelper.ExecuteReader("SELECT layout_name FROM dashboard_layouts WHERE user_id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
             {
-                try
+                if (reader == null) return layoutNames;
+                while (reader.Read())
                 {
-                    conn.Open();
+                    layoutNames.Add(reader.GetString("layout_name"));
                 }
-                catch (MySqlException)
-                {
-                    return null;
-                }
-
-                string query = $"SELECT layout_name FROM dashboard_layouts WHERE user_id = @userID;";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@userID", userID);
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            layoutNames.Add(reader.GetString("layout_name"));
-                        }
-                    }
-                }
-            }
-
-            return layoutNames;
-        }
-        public static (int errorCode, JsonElement? json) getLayout(uint userID, string name)
-        {
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
-            {
-                try
-                {
-                    conn.Open();
-                }
-                catch (MySqlException)
-                {
-                    return (500, null);
-                }
-
-                string query = $"SELECT layout_body FROM dashboard_layouts WHERE user_id = @userID and layout_name = @layoutName;";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@userID", userID);
-                    cmd.Parameters.AddWithValue("@layoutName", name);
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        return reader.Read() ? (200, JsonSerializer.Deserialize<JsonElement>(reader.GetString("layout_body"))) : (400, null);
-                    }
-                }
+                return layoutNames;
             }
         }
-        public static bool? renameLayout(uint userID, string layoutname, string newLayoutName)
+        public static (int errorCode, JsonElement? json) getLayout(int userID, string name)
         {
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
-            {
-                try
-                {
-                    conn.Open();
-                }
-                catch (MySqlException)
-                {
-                    return null;
-                }
-                string query = $"UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;";
-                var cmd = new MySqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@userID", userID);
-                cmd.Parameters.AddWithValue("@lName", layoutname);
-                cmd.Parameters.AddWithValue("@newName", newLayoutName);
-                cmd.ExecuteNonQuery();
-                return true;
+            using (var reader = ConHelper.ExecuteReader("SELECT layout_body FROM dashboard_layouts WHERE user_id = @userID and layout_name = @layoutName;", new Dictionary<string, object>{{ "@userID", userID }, {"@layoutName", name} })){
+                if (reader == null) return (500, null);
+                return reader.Read() ? (200, JsonSerializer.Deserialize<JsonElement>(reader.GetString("layout_body"))) : (400, null);
             }
         }
-        public static bool? deleteLayout(uint userID, string layoutname)
+        public static bool? renameLayout(int userID, string layoutname, string newLayoutName)
         {
-            using (var conn = new MySqlConnection(Config.CM_CONNECTION_STRING))
-            {
-                try
-                {
-                    conn.Open();
-                }
-                catch (MySqlException)
-                {
-                    return null;
-                }
-                string query = $"DELETE FROM dashboard_layouts where user_id = @userID AND layout_name = @lName;";
-                var cmd = new MySqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@userID", userID);
-                cmd.Parameters.AddWithValue("@lName", layoutname);
-                int rowsAffected = cmd.ExecuteNonQuery();
-                return rowsAffected != 0;
-            }
+            return ConHelper.execNonQuery("UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname }, { "@newName", newLayoutName } });
+        }
+        public static bool? deleteLayout(int userID, string layoutname)
+        {
+            return ConHelper.execNonQuery("DELETE FROM dashboard_layouts where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname } });
         }
     }
 }
