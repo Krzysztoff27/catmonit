@@ -15,7 +15,7 @@ message TelemetryRequest {
   string operating_system = 4;
 
   oneof payload {
-    NetworkStats network = 5;
+    NetworkStatsList network = 5;
     DiskStatsList disks = 6;
     FileShareList shares = 7;
   }
