@@ -84,25 +84,5 @@ namespace webapi.Helpers
             }
         }
 
-        /*
-            if (Request.Headers.TryGetValue("Authentication", out var authHeader))
-            {
-                var token = authHeader.ToString();
-                tokenStatusAndPayload statNpayload = tokenValidator.validate(token);
-                if (statNpayload.status == tokenStatus.valid)
-                {
-
-                }
-                else
-                {
-                    var response = tokenValidator.getReturnValue(statNpayload.status);
-                    return Utils.returnVal(response.statusCode, response.message);
-                }
-            }
-            else
-            {
-                return Utils.returnVal(401, "token not found");
-            }
-         */
     }
 }

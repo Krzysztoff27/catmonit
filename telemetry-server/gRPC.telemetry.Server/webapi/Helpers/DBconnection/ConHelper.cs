@@ -27,15 +27,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
-                        {
-                            count = reader.GetInt32(0);
-                            return count;
-                        }
-                        else
-                        {
-                            return 0; // no rows returned
-                        }
+                        reader.Read();
+                        count = reader.GetInt32(0);
+                        return count;
                     }
                 }
             }

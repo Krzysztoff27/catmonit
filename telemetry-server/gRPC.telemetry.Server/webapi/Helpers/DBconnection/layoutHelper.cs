@@ -1,6 +1,8 @@
 ﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Text.Json;
+using webapi.webapi;
 
 namespace webapi.Helpers.DBconnection
 {
@@ -19,14 +21,14 @@ namespace webapi.Helpers.DBconnection
             if (count == 0)
             {
                 return ((ConHelper.execNonQuery(
-                    $"INSERT INTO dashboard_layouts (user_id, layout_name, layout_body) VALUES (@userID, @layoutName, @layoutData);",
-                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@layoutData", layoutData } }) == null) ? null : true);
+                    $"INSERT INTO dashboard_layouts (user_id, layout_name, layout_body) VALUES (@userID, @layoutName, @layoutData::json);",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@layoutData", (layoutData) } }) == null) ? null : true);
             }
             else
             {
                 return ((ConHelper.execNonQuery(
-                    $"UPDATE dashboard_layouts SET layout_body = @newLayout WHERE user_id = @userID AND layout_name = @layoutName;",
-                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@layoutData", layoutData } }) == null) ? null : false);
+                    $"UPDATE dashboard_layouts SET layout_body = @newLayout::json WHERE user_id = @userID AND layout_name = @layoutName;",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@newLayout", layoutData } }) == null) ? null : false);
             }
         }
         public static List<string>? getLayoutNames(int userID)
@@ -49,9 +51,11 @@ namespace webapi.Helpers.DBconnection
                 return reader.Read() ? (200, JsonSerializer.Deserialize<JsonElement>(reader.GetString("layout_body"))) : (400, null);
             }
         }
-        public static bool? renameLayout(int userID, string layoutname, string newLayoutName)
+        public static IActionResult renameLayout(int userID, string layoutname, string newLayoutName)
         {
-            return ConHelper.execNonQuery("UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname }, { "@newName", newLayoutName } });
+            if (ConHelper.execCountQuery("SELECT count(layout_id) from dashboard_layouts where user_id = @userID AND layout_name = @newName;", new Dictionary<string, object> { { "@userID", userID }, { "@newName", newLayoutName } }) > 0)
+                return Utils.returnVal(409, "layout with that name already exists");
+            return (ConHelper.execNonQuery("UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname }, { "@newName", newLayoutName } })==null) ? Utils.returnVal(500) : Utils.returnVal(200, "updated successfuly" );
         }
         public static bool? deleteLayout(int userID, string layoutname)
         {
