@@ -1,8 +1,9 @@
-import { Title, Text, Select, SelectProps, Group, Table, Flex, Stack, Button } from "@mantine/core";
-import { IconCheck, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { Title, Paper, Text, Select, SelectProps, Group, Flex, Stack, Button, NumberInput, Grid } from "@mantine/core";
+import { IconCheck, IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
 import { useState } from "react";
-import { Device, DeviceDiskData, Disk, WidgetData } from "../../types/api.types";
-
+import { DeviceDiskData } from "../../types/api.types";
+import DeviceSelect from "../DeviceSelect/DeviceSelect";
+//! @TODO theres DevicediskDrawer and DeviceDiskSWidget with S
 const devices: DeviceDiskData[] = [
     {
         uuid: "1234",
@@ -47,18 +48,16 @@ const selectDeviceData = devices.map((device) => ({
 const getVisibility = () => {
     const storedVisibility = localStorage.getItem("visibilityState");
     return storedVisibility ? JSON.parse(storedVisibility) : {};
-  };
-  
-  const saveVisibility = (visibility: any) => {
+};
+
+const saveVisibility = (visibility: any) => {
     localStorage.setItem("visibilityState", JSON.stringify(visibility));
-  };
-  
+};
 
 const customRenderOption: SelectProps["renderOption"] = ({ option, checked }) => {
     const device = devices.find((device) => device.uuid === option.value);
     return (
         <Flex
-            align="center"
             justify="space-between"
             w="100%"
         >
@@ -88,13 +87,12 @@ function DeviceDiskDrawer() {
     };
 
     const handleToggleVisibility = (uuid: string, path: string) => {
-        const newVisibilityState = {...visibilityState};
+        const newVisibilityState = { ...visibilityState };
         const key = `${uuid}-${path}`;
-
-        newVisibilityState[key] = !newVisibilityState;
+        newVisibilityState[key] = !newVisibilityState[key];
         setVisibilityState(newVisibilityState);
         saveVisibility(newVisibilityState);
-    }
+    };
 
     const selectedDeviceData = devices.find((device) => device.uuid === selectedDevice);
 
@@ -102,53 +100,189 @@ function DeviceDiskDrawer() {
         <>
             <Title
                 order={4}
-                mb="sm"
+                mb="md"
             >
-                Choose device to display:
+                Widget properties
             </Title>
-            <Select
+            <Grid
+                justify="center"
+                align="center"
+                columns={4}
+                gutter="xs"
+                mb="lg"
+            >
+                <Grid.Col
+                    span={1}
+                    py="0"
+                >
+                    Width
+                </Grid.Col>
+                <Grid.Col
+                    span={1}
+                    py="0"
+                >
+                    Height
+                </Grid.Col>
+                <Grid.Col
+                    span={1}
+                    py="0"
+                >
+                    X position
+                </Grid.Col>
+                <Grid.Col
+                    span={1}
+                    py="0"
+                >
+                    Y position
+                </Grid.Col>
+
+                <Grid.Col span={1}>
+                    <NumberInput
+                        min={2}
+                        max={4}
+                    />
+                </Grid.Col>
+                <Grid.Col span={1}>
+                    <NumberInput
+                        min={2}
+                        max={4}
+                    />
+                </Grid.Col>
+                <Grid.Col span={1}>
+                    <NumberInput
+                        min={1}
+                        max={100}
+                    />
+                </Grid.Col>
+                <Grid.Col span={1}>
+                    <NumberInput
+                        min={1}
+                        max={100}
+                    />
+                </Grid.Col>
+            </Grid>
+            <DeviceSelect
                 placeholder="Choose device"
-                data={selectDeviceData}
+                data={devices}
                 value={selectedDevice}
                 onChange={handleDeviceChange}
-                renderOption={customRenderOption}
             />
-
             {selectedDevice && selectedDeviceData && (
                 <>
                     <Title
                         order={5}
-                        mt="md"
+                        mt="lg"
                         mb="sm"
                     >
-                        Disks for {selectedDeviceData.hostname}:
+                        Displayed disks and limits
                     </Title>
-                    <Stack gap="sm">
-                        {selectedDeviceData.disks.map((disk) => (
-                            <Flex
-                                key={disk.path}
-                                align="center"
-                                justify="space-between"
-                                w="100%"
-                            >
-                                <Text>{disk.path}</Text>
-                                <Text
-                                    c="var(--background-color-3)"
-                                    style={{ fontFamily: "monospace" }}
-                                >
-                                    {disk.storageCurrent} GB / {disk.storageLimit} GB
-                                </Text>
-                                {/* <Button
-                                    variant="outline"
-                                    onClick={() => handleToggleVisibility(selectedDeviceData.uuid, disk.path)}
-                                    color={isVisible ? "blue" : "gray"}
-                                    leftIcon={isVisible ? <IconEye size={16} /> : <IconEyeOff size={16} />}
-                                >
-                                    {isVisible ? "Hide" : "Show"}
-                                </Button> */}
+                    {/* <Grid justify="flex-end" gutter={0}>
+                        <Grid.Col span="content">
+                            <Text w={22}>Warn</Text>
+                        </Grid.Col>
+                        <Grid.Col span="content">
+                            <Text w={22}>Error</Text>
+                        </Grid.Col>
+                    </Grid> */}
 
+                    {/* <Group gap="xl">
+                        <Text w={22}>Warn</Text>
+                        <Text w={22}>Error</Text>
+                    </Group> */}
+
+                    <Stack
+                        gap="sm"
+                        w="100%"
+                    >
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            w="100%"
+                            // mb="0"
+                            px="xl"
+                        >
+                            <Text w="55%">Path</Text>
+                            <Flex
+                                w="55%"
+                                justify="space-between"
+                            >
+                                <Text w="40%">Warn</Text>
+                                <Text w="40%">Error</Text>
                             </Flex>
-                        ))}
+                        </Flex>
+
+                        {selectedDeviceData.disks.map((disk) => {
+                            const key = `${selectedDeviceData.uuid}-${disk.path}`;
+                            const isVisible = visibilityState[key];
+
+                            return (
+                                <Flex
+                                    key={disk.path}
+                                    align="center"
+                                    justify="space-between"
+                                    w="100%"
+                                >
+                                    <IconGripVertical color="var(--background-color-3)" />
+
+                                    <Paper
+                                        w="40%"
+                                        bg="var(--background-color-6)"
+                                        radius="8"
+                                        bd="1px solid var(--background-color-5)"
+                                    >
+                                        <Group
+                                            gap="0"
+                                            px="10"
+                                            py="6"
+                                        >
+                                            <Text fz="sm">{disk.path}</Text>
+                                        </Group>
+                                    </Paper>
+
+                                    <Paper
+                                        w="22%"
+                                        bg="var(--background-color-6)"
+                                        radius="8"
+                                        bd="1px solid var(--background-color-5)"
+                                    >
+                                        <NumberInput
+                                            defaultValue={75}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            suffix="%"
+                                        />
+                                    </Paper>
+
+                                    <Paper
+                                        w="22%"
+                                        bg="var(--background-color-6)"
+                                        radius="8"
+                                        bd="1px solid var(--background-color-5)"
+                                    >
+                                        <NumberInput
+                                            defaultValue={90}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            suffix="%"
+                                        />
+                                    </Paper>
+
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleToggleVisibility(selectedDeviceData.uuid, disk.path)}
+                                        color={isVisible ? "var(--background-color-0)" : "var(--background-color-3)"}
+                                        bd="0"
+                                        w="fit-content"
+                                        h="fit-content"
+                                        p="0"
+                                    >
+                                        {isVisible ? <IconEye size={16} /> : <IconEyeOff size={16} />}
+                                    </Button>
+                                </Flex>
+                            );
+                        })}
                     </Stack>
                 </>
             )}
@@ -157,3 +291,4 @@ function DeviceDiskDrawer() {
 }
 
 export default DeviceDiskDrawer;
+// ! @TODO napisac ile dyskow sie wywietli przy tym rozmiarze

@@ -1,5 +1,6 @@
 import DeviceDisksWidget from "../components/DeviceDisksWidget/DeviceDisksWidget";
 import DeviceDiskDrawer from "../components/DeviceDiskDrawer/DeviceDiskDrawer";
+import DeviceStorageDrawer from "../components/DeviceStorageDrawer/DeviceStorageDrawer";
 import { WidgetsConfig } from "../types/config.types";
 import { IconDatabase } from "@tabler/icons-react";
 
