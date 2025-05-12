@@ -1,14 +1,14 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
-import LoginPage from "./pages/Login/Login";
-import AuthenticationWrapper from "./components/AuthenticationWrapper/AuthenticationWrapper";
-import DashboardLayout from "./components/DashboardLayout/DashboardLayout";
+import EditorTemplate from "./components/templates/EditorTemplate/EditorTemplate";
+import AuthenticationWrapper from "./components/wrappers/AuthenticationWrapper/AuthenticationWrapper";
 import Editor from "./pages/Editor/Editor";
+import LoginPage from "./pages/Login/Login";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
             <Route element={<AuthenticationWrapper />}>
-                <Route element={<DashboardLayout />}>
+                <Route element={<EditorTemplate />}>
                     <Route
                         path="/"
                         element={<Navigate to={"/editor/TOBEREMOVED"} />}

@@ -1,12 +1,12 @@
 import { Box, Flex } from "@mantine/core";
-import WidgetLayout from "../../components/WidgetLayout/WidgetLayout";
 import { useMemo, useState } from "react";
-import WidgetDrawer from "../../components/WidgetDrawer/WidgetDrawer";
-import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
-import WIDGETS_CONFIG from "../../config/widgets.config";
 import { useParams } from "react-router-dom";
-import WidgetMenu from "../../components/WidgetMenu/WidgetMenu";
+import WidgetBoard from "../../components/layout/WidgetBoard/WidgetBoard";
+import WidgetDrawer from "../../components/layout/WidgetDrawer/WidgetDrawer";
+import WidgetMenu from "../../components/layout/WidgetMenu/WidgetMenu";
+import WIDGETS_CONFIG from "../../config/widgets.config";
 import { WidgetData } from "../../types/api.types";
+import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 
 function Editor() {
     const { layoutName } = useParams();
@@ -90,7 +90,7 @@ function Editor() {
                     currentDropType={currentDropType}
                     setCurrentDropType={setCurrentDropType}
                 />
-                <WidgetLayout
+                <WidgetBoard
                     selected={selected}
                     setWidgets={setWidgets}
                     widgets={widgets}
