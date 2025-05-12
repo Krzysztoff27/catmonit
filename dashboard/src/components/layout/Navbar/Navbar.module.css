@@ -1,0 +1,48 @@
+.navbar {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: all ease 200ms;
+    background-color: var(--background-color-7);
+    padding: var(--mantine-spacing-md) 0;
+    overflow: hidden;
+}
+
+.buttonGroup {
+    width: 100%;
+    gap: var(--mantine-spacing-xs) !important;
+    justify-content: end !important;
+    padding: 0 var(--mantine-spacing-md);
+}
+
+.layoutScrollArea {
+    width: 100%;
+}
+
+.navlinkStack {
+    height: 100%;
+}
+
+.navlink {
+    width: 100% !important;
+    height: 50px !important;
+    font-weight: 400 !important;
+    background-color: var(--background-color-6) !important;
+    border: 1px var(--background-color-5) solid !important;
+    border-bottom: 0 !important;
+    border-radius: 0 !important;
+    color: var(--mantine-color-text) !important;
+    justify-content: space-between !important;
+}
+
+.navlink:first-child {
+    border-radius: var(--mantine-radius-md) var(--mantine-radius-md) 0 0 !important;
+}
+.navlink:last-child {
+    border-bottom: 1px var(--background-color-5) solid !important;
+    border-radius: 0 0 var(--mantine-radius-md) var(--mantine-radius-md) !important;
+}
+
+.navlink:hover {
+    background-color: var(--background-color-6) !important;
+}

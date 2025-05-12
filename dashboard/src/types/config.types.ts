@@ -16,6 +16,7 @@ export interface UrlConfig {
 }
 
 export interface WidgetConfig {
+    name: string;
     icon: TablerIcon;
     component: WidgetComponent;
     drawer: ComponentType<any>; // TODO specify the props

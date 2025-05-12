@@ -1,17 +1,16 @@
-import DeviceDiskDrawer from "../components/DeviceDiskDrawer/DeviceDiskDrawer";
-import DeviceDisksWidget from "../components/DeviceDisksWidget/DeviceDisksWidget";
-import DeviceDiskDrawer from "../components/DeviceDiskDrawer/DeviceDiskDrawer";
-import DeviceStorageDrawer from "../components/DeviceStorageDrawer/DeviceStorageDrawer";
-import { WidgetsConfig } from "../types/config.types";
 import { IconDatabase } from "@tabler/icons-react";
+import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
+import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
+import { WidgetsConfig } from "../types/config.types";
 
 export const GRID_SIZE_PX = 128;
 
 const WIDGETS_CONFIG: WidgetsConfig = {
     DEVICE_DISKS: {
+        name: "device's disks state",
         icon: IconDatabase,
-        component: DeviceDisksWidget,
-        drawer: DeviceDiskDrawer,
+        component: DetailedDeviceStorageWidget,
+        drawer: DetailedDeviceStorageDrawer,
         limits: {
             minH: 2,
             maxH: 5,
