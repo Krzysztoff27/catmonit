@@ -6,6 +6,7 @@ import { WidgetData } from "../../types/api.types";
 import { WidgetLayoutProps } from "../../types/components.types";
 import { IconX } from "@tabler/icons-react";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
+import { isEmpty } from "lodash";
 
 function WidgetLayout({
     widgets,
@@ -20,7 +21,9 @@ function WidgetLayout({
     onDrop,
     droppingItem,
 }: WidgetLayoutProps) {
-    const { width } = useViewportSize();
+    const { width, ref } = useElementSize();
+    console.log(width, ref);
+
     const cols = Math.floor(width / GRID_SIZE_PX);
     const layoutWidth = cols * GRID_SIZE_PX;
 
@@ -37,9 +40,13 @@ function WidgetLayout({
             } as LayoutItem)
     );
 
+    if (!layout) return;
+
     const updateLayout = (newLayout: Layout) => {
+        if (isEmpty(newLayout)) return;
         setWidgets((prev: WidgetData[]) =>
             prev.map((widget: WidgetData, i) => {
+                console.log(newLayout, widget);
                 const { x, y, w, h } = newLayout[i];
 
                 return {
@@ -67,16 +74,13 @@ function WidgetLayout({
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== widgetNumber));
     };
 
-    if (!width || !layout) return;
-
     return (
         <GridLayout
             className="layout"
-            layout={layout}
             onLayoutChange={updateLayout}
             cols={cols}
             width={layoutWidth}
-            style={{ minHeight: "100vh", minWidth: "100vw" }}
+            style={{ minHeight: "100vh", flex: 1 }}
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
@@ -89,35 +93,46 @@ function WidgetLayout({
             onDrop={onDrop}
             isDroppable={true}
             droppingItem={droppingItem}
+            innerRef={ref}
         >
-            {widgets.map((widget: WidgetData, i) => {
-                const WidgetComponent = getComponent(widget);
+            {/* !!! important to have the width check here */}
+            {/* it prevents widgets having assigned unexpected positions due to ref being assigned late*/}
+            {/* had it been higher, the GridLayout would never expand horizontally*/}
+            {width && layout ? (
+                widgets.map((widget: WidgetData, i) => {
+                    const WidgetComponent = getComponent(widget);
 
-                return (
-                    <Flex key={i}>
-                        <ActionIcon
-                            pos="absolute"
-                            right={2}
-                            top={8}
-                            style={{ zIndex: 100 }}
-                            variant="transparent"
-                            c="var(--background-color-2)"
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                onDelete(i);
-                            }}
+                    return (
+                        <Flex
+                            key={i}
+                            data-grid={layout[i]}
                         >
-                            <IconX size={18} />
-                        </ActionIcon>
-                        <WidgetComponent
-                            className="drag-handle"
-                            data={widget.data}
-                            updateData={(data) => updateWidgetData(i, data)}
-                            style={{ cursor: "pointer", backgroundColor: selected === `${i}` ? "var(--background-color-6)" : "" }}
-                        />
-                    </Flex>
-                );
-            })}
+                            <ActionIcon
+                                pos="absolute"
+                                right={2}
+                                top={8}
+                                style={{ zIndex: 100 }}
+                                variant="transparent"
+                                c="var(--background-color-2)"
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    onDelete(i);
+                                }}
+                            >
+                                <IconX size={18} />
+                            </ActionIcon>
+                            <WidgetComponent
+                                className="drag-handle"
+                                data={widget.data}
+                                updateData={(data) => updateWidgetData(i, data)}
+                                style={{ cursor: "pointer", backgroundColor: selected === `${i}` ? "var(--background-color-6)" : "" }}
+                            />
+                        </Flex>
+                    );
+                })
+            ) : (
+                <></>
+            )}
         </GridLayout>
     );
 }

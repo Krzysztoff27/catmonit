@@ -52,12 +52,13 @@ function DeviceDisksWidget({ data, className, ...props }: WidgetComponentProps) 
                     mb="6"
                 />
                 <Stack className={classes.progressBarStack}>
-                    {disksData.map((disk: Disk, i) => (
-                        <DiskProgress
-                            key={i}
-                            {...disk}
-                        />
-                    ))}
+                    {height &&
+                        disksData.map((disk: Disk, i) => (
+                            <DiskProgress
+                                key={i}
+                                {...disk}
+                            />
+                        ))}
                 </Stack>
             </Stack>
         </Paper>

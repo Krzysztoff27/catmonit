@@ -2,7 +2,6 @@ import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Outlet } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
-import WidgetMenu from "../WidgetMenu/WidgetMenu";
 
 const DashboardLayout = (): React.JSX.Element => {
     const [navbarExpanded, { toggle }] = useDisclosure(true);

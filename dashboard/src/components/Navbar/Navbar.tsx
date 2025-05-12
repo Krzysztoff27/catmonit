@@ -24,7 +24,6 @@ const Navbar = ({ expanded, toggle }): React.JSX.Element => {
                     className={classes.toggleButton}
                     variant="default"
                     size="xl"
-                    bd="none"
                 >
                     {expanded ? <IconChevronLeft size={22} /> : <IconChevronRight size={22} />}
                 </ActionIcon>
@@ -66,7 +65,6 @@ const Navbar = ({ expanded, toggle }): React.JSX.Element => {
                             variant="default"
                             size="xl"
                             aria-label="Create new layout"
-                            bd="none"
                             mt="8"
                         >
                             <IconPlus />
@@ -80,8 +78,8 @@ const Navbar = ({ expanded, toggle }): React.JSX.Element => {
                 mt="auto"
                 miw={240}
             >
-                <ColorSchemeToggle bd="none" />
-                <LogoutButton bd="none" />
+                <ColorSchemeToggle />
+                <LogoutButton />
             </Flex>
         </Stack>
     );

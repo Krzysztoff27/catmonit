@@ -18,7 +18,6 @@ export function LayoutLinkActionIcon({ name, index, ...props }: LayoutLinkProps)
             size="xl"
             aria-label={`Open ${name}`}
             title={name}
-            bd="none"
             {...props}
         >
             {index}

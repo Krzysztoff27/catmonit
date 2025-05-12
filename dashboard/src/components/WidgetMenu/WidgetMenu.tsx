@@ -1,8 +1,10 @@
-import { Box, Center, Group, Paper, PaperProps } from "@mantine/core";
+import { Box, Center, Group, Paper, PaperProps, Tooltip } from "@mantine/core";
 import classes from "./WidgetMenu.module.css";
 import { useRef, useState } from "react";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../config/widgets.config";
-import { safeObjectEntries } from "../../utils/object";
+import { safeObjectValues } from "../../utils/object";
+import { WidgetConfig } from "../../types/config.types";
+import { capitalize } from "lodash";
 
 interface WidgetMenuProps extends PaperProps {
     currentDropType: string | null;
@@ -52,27 +54,35 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
                     className={classes.ghost}
                 />
             )}
-            <Paper
-                {...props}
-                className={`${className} ${classes.container}`}
-                withBorder
-                bg="var(--background-color-4)"
-            >
-                <Group>
-                    {safeObjectEntries(WIDGETS_CONFIG).map(([type, config]) => (
-                        <Center
-                            draggable={true}
-                            unselectable="on"
-                            onDragStart={onDragStart}
-                            onDrag={onDrag}
-                            onDragEnd={onDragEnd}
-                            className={`droppable-element ${classes.droppable}`}
-                        >
-                            <config.icon />
-                        </Center>
-                    ))}
-                </Group>
-            </Paper>
+            <Box className={classes.positioner}>
+                <Paper
+                    {...props}
+                    className={`${className} ${classes.container}`}
+                    withBorder
+                    bg="var(--background-color-4)"
+                    shadow="md"
+                >
+                    <Group>
+                        {safeObjectValues(WIDGETS_CONFIG).map((config: WidgetConfig, i) => (
+                            <Tooltip
+                                key={i}
+                                label={capitalize(config.name)}
+                            >
+                                <Center
+                                    draggable={true}
+                                    unselectable="on"
+                                    onDragStart={onDragStart}
+                                    onDrag={onDrag}
+                                    onDragEnd={onDragEnd}
+                                    className={`droppable-element ${classes.droppable}`}
+                                >
+                                    <config.icon />
+                                </Center>
+                            </Tooltip>
+                        ))}
+                    </Group>
+                </Paper>
+            </Box>
         </>
     );
 };
