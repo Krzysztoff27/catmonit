@@ -2,7 +2,7 @@
 {
     public class DeviceIdentifier
     {
-        public int ID { get; set; }
+        public Guid ID { get; set; }
     }
     public class DeviceHelper
     {

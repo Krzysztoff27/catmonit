@@ -23,7 +23,7 @@ namespace webapi.Controllers.http.user
                 return auth.res;
             }
             string? un = userHelper.getUsername(auth.payload.id);
-            return (un == null ? Utils.returnVal(500) : Json(new { username = un }));
+            return (un == null ? Utils.returnVal(500) : Json(new { uuid= auth.payload.id.ToString() ,username = un }));
         }
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)

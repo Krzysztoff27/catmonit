@@ -4,7 +4,7 @@ namespace webapi.Models
 {
     public class StorageInfoModel
     {
-        public ConcurrentDictionary<int, storageDeviceInfo> monitoredDevices = new ConcurrentDictionary<int, storageDeviceInfo>();
+        public ConcurrentDictionary<Guid, storageDeviceInfo> monitoredDevices = new ConcurrentDictionary<Guid, storageDeviceInfo>();
         public string information { get; set; }
         public uint warningsCount { get; set; }
     }

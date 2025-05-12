@@ -8,7 +8,7 @@ namespace webapi.Helpers.DBconnection
 {
     public class LayoutHelper
     {
-        public static bool? addOrUpdateLayout(int userID, string layoutName, string layoutData)
+        public static bool? addOrUpdateLayout(Guid userID, string layoutName, string layoutData)
         {
             if (string.IsNullOrEmpty(layoutName) || string.IsNullOrEmpty(layoutData))
             {
@@ -31,7 +31,7 @@ namespace webapi.Helpers.DBconnection
                     new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@newLayout", layoutData } }) == null) ? null : false);
             }
         }
-        public static List<string>? getLayoutNames(int userID)
+        public static List<string>? getLayoutNames(Guid userID)
         {
             List<string> layoutNames = new List<string>();
             using (var reader = ConHelper.ExecuteReader("SELECT layout_name FROM dashboard_layouts WHERE user_id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
@@ -44,20 +44,23 @@ namespace webapi.Helpers.DBconnection
                 return layoutNames;
             }
         }
-        public static (int errorCode, JsonElement? json) getLayout(int userID, string name)
+        public static (int errorCode, JsonElement? json) getLayout(Guid userID, string name)
         {
             using (var reader = ConHelper.ExecuteReader("SELECT layout_body FROM dashboard_layouts WHERE user_id = @userID and layout_name = @layoutName;", new Dictionary<string, object>{{ "@userID", userID }, {"@layoutName", name} })){
                 if (reader == null) return (500, null);
                 return reader.Read() ? (200, JsonSerializer.Deserialize<JsonElement>(reader.GetString("layout_body"))) : (400, null);
             }
         }
-        public static IActionResult renameLayout(int userID, string layoutname, string newLayoutName)
+        public static IActionResult renameLayout(Guid userID, string layoutname, string newLayoutName)
         {
             if (ConHelper.execCountQuery("SELECT count(layout_id) from dashboard_layouts where user_id = @userID AND layout_name = @newName;", new Dictionary<string, object> { { "@userID", userID }, { "@newName", newLayoutName } }) > 0)
                 return Utils.returnVal(409, "layout with that name already exists");
-            return (ConHelper.execNonQuery("UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname }, { "@newName", newLayoutName } })==null) ? Utils.returnVal(500) : Utils.returnVal(200, "updated successfuly" );
+            bool? updateResult = (ConHelper.execNonQuery("UPDATE dashboard_layouts set layout_name = @newName where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname }, { "@newName", newLayoutName } }));
+            if (updateResult == null) return Utils.returnVal(500);
+            if (updateResult == true) return Utils.returnVal(200, "updated successfuly"); 
+            else return Utils.returnVal(400, "initial layout doesnt exist");
         }
-        public static bool? deleteLayout(int userID, string layoutname)
+        public static bool? deleteLayout(Guid userID, string layoutname)
         {
             return ConHelper.execNonQuery("DELETE FROM dashboard_layouts where user_id = @userID AND layout_name = @lName;", new Dictionary<string, object> { { "@userID", userID }, { "@lName", layoutname } });
         }

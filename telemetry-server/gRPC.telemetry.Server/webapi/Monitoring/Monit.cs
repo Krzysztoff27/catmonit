@@ -7,7 +7,7 @@ namespace webapi.Monitoring
     {
 
         public int requestTimeout;
-        public readonly ConcurrentDictionary<int, Subscriber> subscribers = new ConcurrentDictionary<int, Subscriber>(); // index is id in db (and in token)
+        public readonly ConcurrentDictionary<Guid, Subscriber> subscribers = new ConcurrentDictionary<Guid, Subscriber>(); // index is id in db (and in token)
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
         public CancellationTokenSource cancellationTokenSource;
         public Task monitorTask;

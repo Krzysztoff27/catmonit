@@ -3,9 +3,9 @@
     // HERE THE REQUEST MODELS ARE TO BE SENT IN BODY VIA POST REQUEST
     public class addAccessRequestModel
     {
-        public string Token { get; set; }
-        public int userID { get; set; }
-        public List<int> Resources { get; set; }
+        public Guid userID { get; set; }
+        public string access { get; set; } // to be the string representation of Permission enum (default, seeAll, modifyAccess)
+        public List<int>? Resources { get; set; } // if access = modifyAccess this shouldn't be null
     }
     public class addNotificationDeviceRequestModel
     {

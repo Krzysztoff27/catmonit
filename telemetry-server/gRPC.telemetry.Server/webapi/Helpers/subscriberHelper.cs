@@ -7,9 +7,9 @@ namespace webapi.Helpers
 {
     public class SubscriberHelper
     {
-        public static Subscriber createSubscriber(int userId, WebSocket webSocket)
+        public static Subscriber createSubscriber(Guid userID, WebSocket webSocket)
         {
-            return new Subscriber(userId, webSocket, userHelper.getDevices(userId));
+            return new Subscriber(userID, webSocket, userHelper.getDevices(userID));
         }
     }
 }

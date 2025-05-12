@@ -13,9 +13,9 @@ namespace webapi.Monitoring
         StorageInfoModel lastStorageInfo = new StorageInfoModel();
 
 
-        public void addDevicesToMonit(List<int> devices_id)
+        public void addDevicesToMonit(List<Guid> devices_id)
         {
-            foreach (int deviceID in devices_id)
+            foreach (Guid deviceID in devices_id)
             {
                 if (!lastStorageInfo.monitoredDevices.ContainsKey(deviceID))
                 {

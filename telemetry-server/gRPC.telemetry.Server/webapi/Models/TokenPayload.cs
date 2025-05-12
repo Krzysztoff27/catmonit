@@ -4,6 +4,6 @@
     {
         public long iat { get; set; } // issued at time
         public long exp { get; set; } // expiration time
-        public int id { get; set; } // user id
+        public Guid id { get; set; } // user id
     }
 }

@@ -1,20 +1,23 @@
 \c catmonit_base;
 
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(32) NOT NULL,
-    password_hash BYTEA NOT NULL,
-    salt BYTEA NOT NULL
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username character varying(32) NOT NULL,
+    password_hash bytea NOT NULL,
+    salt bytea NOT NULL,
+    permissions integer
 );
 
-CREATE TABLE IF NOT EXISTS dashboard_layouts (
-    layout_id SERIAL PRIMARY KEY,
-    user_id INTEGER,
-    layout_name TEXT,
-    layout_body JSON
+CREATE TABLE dashboard_layouts (
+    layout_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    layout_name TEXT NOT NULL,
+    layout_body JSON NOT NULL,
+    user_id UUID NOT NULL
 );
 
 CREATE TABLE users_devices (
-    user_id INTEGER,
-    device_id INTEGER
+    user_id UUID NOT NULL,
+    device_id UUID NOT NULL
 );
