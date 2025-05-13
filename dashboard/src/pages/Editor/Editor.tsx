@@ -1,75 +1,30 @@
-import { Box, Flex } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import WidgetBoard from "../../components/layout/WidgetBoard/WidgetBoard";
 import WidgetDrawer from "../../components/layout/WidgetDrawer/WidgetDrawer";
 import WidgetMenu from "../../components/layout/WidgetMenu/WidgetMenu";
 import WIDGETS_CONFIG from "../../config/widgets.config";
-import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
+import useWidgetLayout from "../../hooks/useWidgetLayout";
+import useWidgetDrawer from "../../hooks/useWidgetDrawer";
 
 function Editor() {
     const { layoutName } = useParams();
-    const [widgets, setWidgets] = useState<WidgetData[]>([
-        {
-            type: "DEVICE_DISKS",
-            rect: { x: 0, y: 0, w: 2, h: 2 },
-            data: { hostname: "Tux", ip: "10.10.100.1" },
-        },
-        {
-            type: "DEVICE_DISKS",
-            rect: { x: 2, y: 0, w: 2, h: 2 },
-            data: { hostname: "Tux", ip: "10.10.100.1" },
-        },
-    ]);
+    const { widgets, createWidget, getDisplayableLayoutData, setWidgetPositions, getComponent, deleteWidget } = useWidgetLayout(layoutName ?? "");
+    const { isOpened, selected, onWidgetDragStart, onWidgetDragStop, closeWidgetDrawer, DrawerComponent } = useWidgetDrawer(widgets);
 
-    const [widgetDrawerOpened, setWidgetDrawerOpened] = useState(false);
-    const [selected, setSelected] = useState<string | null>(null);
     const [currentDropType, setCurrentDropType] = useState<string | null>(null);
 
-    const closeWidgetDrawer = () => {
-        setWidgetDrawerOpened(false);
-        setSelected(null);
-    };
-
-    let clicked = false;
-
-    const onDragStart = () => {
-        clicked = true;
-        setTimeout(() => (clicked = false), 500);
-    };
-
-    const onDragStop = (_: Layout, before: LayoutItem, after: LayoutItem) => {
-        if (!clicked || JSON.stringify(before) !== JSON.stringify(after)) return;
-        setSelected(after.i);
-        setWidgetDrawerOpened(true);
-    };
-
     const onDrop = (layout: Layout, item: LayoutItem) => {
-        setWidgets((prev) => [
-            ...prev,
-            {
-                type: currentDropType,
-                data: {},
-                rect: {
-                    x: item.x,
-                    y: item.y,
-                    h: item.h,
-                    w: item.w,
-                },
-            } as WidgetData,
-        ]);
+        createWidget(currentDropType, item);
     };
-
-    const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : Box;
 
     const currentDroppingItem = useMemo(() => {
         if (!currentDropType) return { i: "__droppable__", w: 2, h: 2 };
         const { minW, minH } = WIDGETS_CONFIG[currentDropType].limits;
         return { i: "__droppable__", w: minW, h: minH };
     }, [currentDropType]);
-
-    console.log(currentDropType);
 
     return (
         <>
@@ -82,7 +37,7 @@ function Editor() {
                     position="right"
                     size="sm"
                     overlayProps={{ backgroundOpacity: 0 }}
-                    opened={widgetDrawerOpened}
+                    opened={isOpened}
                     onClose={closeWidgetDrawer}
                 >
                     <DrawerComponent />
@@ -93,11 +48,14 @@ function Editor() {
                     setCurrentDropType={setCurrentDropType}
                 />
                 <WidgetBoard
-                    selected={selected}
-                    setWidgets={setWidgets}
                     widgets={widgets}
-                    onDragStart={onDragStart}
-                    onDragStop={onDragStop}
+                    getComponent={getComponent}
+                    deleteWidget={deleteWidget}
+                    layout={getDisplayableLayoutData()}
+                    updateLayout={setWidgetPositions}
+                    selected={selected}
+                    onDragStart={onWidgetDragStart}
+                    onDragStop={onWidgetDragStop}
                     onDrop={onDrop}
                     droppingItem={currentDroppingItem}
                 />

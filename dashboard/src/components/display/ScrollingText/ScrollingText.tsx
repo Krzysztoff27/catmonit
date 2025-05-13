@@ -9,7 +9,6 @@ const ScrollingText = ({ children, scroll = true, ...props }): React.JSX.Element
     const [shouldScroll, setShouldScroll] = useState(false);
 
     useEffect(() => {
-        console.log(scroll, textWidth, containerWidth);
         setShouldScroll(scroll && containerWidth > 0 && textWidth > 0 && textWidth > containerWidth);
     }, [scroll, textWidth, containerWidth]);
 

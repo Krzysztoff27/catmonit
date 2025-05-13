@@ -11,12 +11,15 @@ function AlertCount({ criticalCount, mediumCount, isWarning }: AlertCountProps) 
     return (
         <Paper
             radius="md"
-            h="224"
+            h="242"
             w="224"
             bg="var(--background-color-6)"
             p="16"
         >
-            <Stack gap={0}>
+            <Stack
+                gap={0}
+                h="100%"
+            >
                 <Group gap="xs">
                     {isWarning ? (
                         <>
@@ -49,7 +52,10 @@ function AlertCount({ criticalCount, mediumCount, isWarning }: AlertCountProps) 
                 >
                     {criticalCount + mediumCount}
                 </Text>
-                <Group gap={5}>
+                <Group
+                    gap={5}
+                    mt="auto"
+                >
                     {/* add padding-bottom instead of lh in count */}
                     <Text
                         c="red.7"

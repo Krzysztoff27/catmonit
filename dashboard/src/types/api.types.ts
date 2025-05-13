@@ -29,4 +29,5 @@ export interface WidgetData {
         h: number;
     };
     data: any;
+    settings: any;
 }

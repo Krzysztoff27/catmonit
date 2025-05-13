@@ -1,4 +1,5 @@
 import urlConfig from "../config/url.config.ts";
+import { normalizePath } from "../utils/misc.ts";
 import useAuth from "./useAuth.ts";
 
 const responseOnNoResponse = new Response(JSON.stringify({ detail: "No response from server" }), {
@@ -45,21 +46,19 @@ export const useApiRequests = () => {
     const API_URL: string = urlConfig.api_requests;
     const { authOptions, refreshOptions, setAccessToken, setRefreshToken } = useAuth();
 
-    const normalizePath = (path = "") => (path.startsWith("/") ? path : `/${path}`);
-
     const getPath = (path: string): string => (API_URL ? `${API_URL}${normalizePath(path)}` : "");
 
     const parseAndHandleError = (response, body) => console.error(response, body);
 
     const refreshTokens = async () => {
         return fetch(getPath("refresh"), refreshOptions)
-            .then(res => res.ok && res.json())
-            .then(json => {
+            .then((res) => res.ok && res.json())
+            .then((json) => {
                 setAccessToken(json?.access_token);
                 setRefreshToken(json?.refresh_token);
                 return json?.access_token;
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error("Error occured while parsing response body during token refresh.\n", err);
                 return null;
             });

@@ -22,7 +22,7 @@ const initialAlerts: Alert[] = [
     { id: 10, isWarning: false },
 ];
 
-function AlertWidget(props) {
+function AlertWidget({ data, settings, className, ...props }) {
     const [alerts, setAlerts] = useState(initialAlerts);
 
     const handleRemove = (idToRemove: number) => {
@@ -31,11 +31,8 @@ function AlertWidget(props) {
 
     return (
         <Paper
-            className={classes.container}
-            p="sm"
-            flex="1"
-            maw="100%"
             {...props}
+            className={`${className} ${classes.container}`}
         >
             <Group
                 gap="sm"

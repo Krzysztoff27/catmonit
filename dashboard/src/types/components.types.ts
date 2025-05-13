@@ -4,7 +4,8 @@ import { ItemCallback, Layout, LayoutItem } from "./reactGridLayout.types";
 
 export interface WidgetComponentProps {
     data: any;
-    updateData: any;
+    settings: any;
+    className: string;
     [key: string]: any;
 }
 
@@ -12,8 +13,11 @@ export type WidgetComponent = ComponentType<WidgetComponentProps>;
 
 export interface WidgetLayoutProps {
     widgets: WidgetData[];
+    getComponent: (widget: WidgetData) => WidgetComponent;
+    deleteWidget: (index: string | number) => void;
+    layout: Layout;
+    updateLayout: (layout: Layout) => void;
     selected?: string | null;
-    setWidgets: (callback: (widgets: WidgetData[]) => WidgetData[]) => void;
     onDragStart?: ItemCallback;
     onDrag?: ItemCallback;
     onDragStop?: ItemCallback;

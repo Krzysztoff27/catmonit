@@ -3,8 +3,8 @@ import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
 import { WidgetComponentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
-import DeviceTitleSmall from "../../display/DeviceTitle/DeviceTitleSmall";
 import classes from "./OverallDeviceStorageWidget.module.css";
+import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 
 function OverallDeviceStorageWidget({ data, className, ...props }: WidgetComponentProps) {
     const total = data?.reduce?.((sum, item) => sum + item.value, 0);
@@ -35,9 +35,8 @@ function OverallDeviceStorageWidget({ data, className, ...props }: WidgetCompone
             // px="md"
             className={`${classes.container} ${className}`} //   w="fit-content"
         >
-            <DeviceTitleSmall
-                name={data.hostname}
-                address={data.ip}
+            <DeviceTitleOneLine
+                data={data}
                 mb="md"
             />
             <Flex
