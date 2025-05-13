@@ -24,18 +24,19 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    SERVICE_STATUS: {
-        name: "device's status ",
-        icon: IconProgressCheck,
-        component: ServiceStatusWidget,
-        drawer: ServiceStatusDrawer, //@TODO change it
-        limits: {
-            minH: 2,
-            maxH: 5,
-            minW: 2,
-            maxW: 4,
-        },
-    },
+    //we decided not to create this component:
+    // SERVICE_STATUS: {
+    //     name: "device's status ",
+    //     icon: IconProgressCheck,
+    //     component: ServiceStatusWidget,
+    //     drawer: ServiceStatusDrawer, //@TODO change it
+    //     limits: {
+    //         minH: 2,
+    //         maxH: 5,
+    //         minW: 2,
+    //         maxW: 4,
+    //     },
+    // },
     OVERALL_DEVICE_STORAGE_WIDGET: {
         name: "overall device's storage",
         icon: IconStorm,

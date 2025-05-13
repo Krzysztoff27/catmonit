@@ -7,7 +7,6 @@ import { GRID_SIZE_PX } from "../../../config/widgets.config";
 import DeviceTitleSmall from "../../display/DeviceTitle/DeviceTitleSmall";
 import classes from "./OverallDeviceStorageWidget.module.css";
 
-
 function OverallDeviceStorageWidget({ data, className, ...props }: WidgetComponentProps) {
     const total = chart_data.reduce((sum, item) => sum + item.value, 0);
     const used = chart_data.find((item) => item.name.toLowerCase() === "used")?.value || 0;
@@ -40,16 +39,16 @@ function OverallDeviceStorageWidget({ data, className, ...props }: WidgetCompone
             ref={ref}
             {...props}
             // radius="md"
-            // py="md"
-            // px="md"
+            py="md"
+            px="md"
             className={`${classes.container} ${className}`}
             //   w="fit-content"
+            withBorder
         >
-            <DeviceTitleSmall
-                name={data.hostname}
-                address={data.ip}
-                mb="md"
-            />
+            <DeviceTitleSmall 
+            name={data.hostname}
+                    address={data.ip}
+                    mb="6" />
             <Flex
                 align="center"
                 direction={num_cols > num_rows ? "row" : "column"}
@@ -61,6 +60,7 @@ function OverallDeviceStorageWidget({ data, className, ...props }: WidgetCompone
                     w={chartSize}
                     h={chartSize}
                     mx="md"
+                    mt="sm"
                     chartLabel={`${used}GB/${total}GB`}
                     styles={{
                         label: {

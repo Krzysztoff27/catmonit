@@ -12,14 +12,19 @@ function Editor() {
     const { layoutName } = useParams();
     const [widgets, setWidgets] = useState<WidgetData[]>([
         {
-            type: "DEVICE_DISKS",
-            rect: { x: 0, y: 0, w: 2, h: 2 },
+            type: "STORAGE_ALERTS_WIDGET",
+            rect: { x: 0, y: 0, w: 5, h: 2 },
             data: { hostname: "Tux", ip: "10.10.100.1" },
         },
         {
-            type: "DEVICE_DISKS",
+            type: "DETAILED_DEVICE_STORAGE",
             rect: { x: 2, y: 0, w: 2, h: 2 },
             data: { hostname: "Tux", ip: "10.10.100.1" },
+        },
+        {
+            type: "OVERALL_DEVICE_STORAGE_WIDGET",
+            rect: { x: 4, y: 2, w: 2, h: 2 },
+            data: { hostname: "Tux", ip: "10.50.100.1" },
         },
     ]);
 

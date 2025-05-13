@@ -117,6 +117,7 @@ function DetailedDeviceStorageWidget({ data, className, ...props }: WidgetCompon
             ref={ref}
             {...props}
             className={`${classes.container} ${className}`}
+            withBorder
         >
             <Stack className={classes.stack}>
                 <Title
