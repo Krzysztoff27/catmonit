@@ -7,7 +7,7 @@ import { WidgetsConfig } from "../types/config.types";
 import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWIdget/OverallDeviceStorageWIdget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 
 export const GRID_SIZE_PX = 128;
 
