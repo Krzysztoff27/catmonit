@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using webapi.Helpers;
 using webapi.Helpers.DBconnection;
 using webapi.Models;
@@ -76,6 +79,14 @@ namespace webapi.webapi
             {
                 return new authResult { res = Utils.returnVal(401, "token not found"), payload = null };
             }
+        }
+        public static bool IsCorrectPassword(string pass)
+        {
+#if DEBUG
+            return !(string.IsNullOrEmpty(pass));
+#else
+            return Regex.IsMatch(pass, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$");
+#endif
         }
     }
 }

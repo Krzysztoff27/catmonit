@@ -20,6 +20,7 @@ namespace webapi.Models
     }
     public class NetworkInfoModel
     {
+        public DateTime SnapshotTime { get; set; }
         public string Information { get; set; } = string.Empty;
         public uint WarningsCount { get; set; }
         public ConcurrentDictionary<Guid, NetworkDeviceInfo> MonitoredDevices { get; set; } = new();
@@ -129,6 +130,7 @@ namespace webapi.Models
             {
                 return new NetworkInfoModel
                 {
+                    SnapshotTime = DateTime.Now,
                     Information = this.Information,
                     WarningsCount = this.WarningsCount,
                     MonitoredDevices = _monitoredDevices,

@@ -63,18 +63,24 @@ namespace webapi.Websocket
                         switch (messageType)
                         {
                             case "start":
-                                NetworkMonit.Instance.Unsubscribe(potentialSubscriber);
-                                List<string> devices = new List<string>();
-                                int? auto = null;
+                                NetworkMonit.Instance.Unsubscribe(potentialSubscriber); 
+                                List<Guid>? devices = new List<Guid>();
+
+                                int auto = 0;
 
                                 if (root.TryGetProperty("devices", out var devicesProp) && devicesProp.ValueKind == JsonValueKind.Array)
                                 {
-                                    devices = devicesProp.EnumerateArray().Where(d => d.ValueKind == JsonValueKind.String).Select(d => d.GetString()).ToList();
+                                    devices = devicesProp.EnumerateArray()
+                                        .Where(d => d.ValueKind == JsonValueKind.String && Guid.TryParse(d.GetString(), out _))
+                                        .Select(d => Guid.Parse(d.GetString()!))
+                                        .ToList();
+                                    potentialSubscriber.userPossibleMonitoredDevices = devices;
                                 }
 
                                 if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
                                 {
                                     auto = autoProp.GetInt32();
+                                    potentialSubscriber.autoDevicesCount = auto;
                                 }
                                 NetworkMonit.Instance.Subscribe(potentialSubscriber);
                                 break;

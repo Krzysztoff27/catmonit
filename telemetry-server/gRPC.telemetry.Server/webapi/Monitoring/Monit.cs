@@ -13,7 +13,8 @@ namespace webapi.Monitoring
         public Task monitorTask;
 
         public void Subscribe(Subscriber sub)
-        { 
+        {
+            if (subscribers.IsEmpty) NetworkMonit.Instance.UpdateGeneralData();
             subscribers.TryAdd(sub.userID, sub);
             onSubscribe(sub);
         }

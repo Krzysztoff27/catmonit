@@ -1,8 +1,12 @@
 #define CM_RUN_ALL
+#define CM_GENERATE_SWAGGER
 
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using webapi.Monitoring;
 using webapi.Websocket;
+#if CM_GENERATE_SWAGGER
+using Microsoft.OpenApi.Models;
+#endif
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 #if CM_RUN_ALL
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
+#endif
+#if CM_GENERATE_SWAGGER
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "catmonit",
+        Version = "v1",
+        Description = "Auto-generated OpenAPI docs by Swagger"
+    });
+});
 #endif
 builder.Services.AddGrpc();
 
@@ -35,24 +50,28 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 #if CM_RUN_ALL
+
 // Enable WebSockets
 app.UseWebSockets();
 app.Use(async (context, next) =>
 {
-    if (context.WebSockets.IsWebSocketRequest)
-    {
-        var path = context.Request.Path.ToString();
+    var path = context.Request.Path.ToString();
 
-        if (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase) ||
-            path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase))
-        {
-            await NetworkMonitHandler.instance.HandleRequestAsync(context);
-        }
-        else
-        {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync("Unsupported WebSocket route.");
-        }
+    // Skip WebSocket middleware for Swagger and other non-WebSocket routes
+    if (path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith("/favicon.ico", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith("/css", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith("/js", StringComparison.OrdinalIgnoreCase))
+    {
+        await next();
+        return;
+    }
+
+    if (context.WebSockets.IsWebSocketRequest &&
+        (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase) ||
+         path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase)))
+    {
+        await NetworkMonitHandler.instance.HandleRequestAsync(context);
     }
     else
     {
@@ -60,6 +79,21 @@ app.Use(async (context, next) =>
     }
 });
 
+//app.Use(async (context, next) =>
+//{
+//    var path = context.Request.Path.ToString();
+
+//    if (context.WebSockets.IsWebSocketRequest &&
+//        (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase) ||
+//         path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase)))
+//    {
+//        await NetworkMonitHandler.instance.HandleRequestAsync(context);
+//    }
+//    else
+//    {
+//        await next();
+//    }
+//});
 // MVC routes
 app.MapControllerRoute(
     name: "default",
@@ -84,5 +118,17 @@ app.UseEndpoints(endpoints =>
 #endif
 // Map gRPC only if the request comes via gRPC endpoint (port 5001)
 app.MapGrpcService<TelemetryService>();
+
+#if CM_GENERATE_SWAGGER
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "cm");
+    });
+}
+#endif
+
 
 app.Run();

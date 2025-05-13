@@ -18,6 +18,7 @@ namespace webapi.Monitoring
             this.WebSocket = webSocket;
             this.userPermissions = permissions;
             this.userPossibleMonitoredDevices = permittedMonitoringDevices;
+            this.monitoredDevicesIndexes = new List<Guid>();
         }
     }
 }

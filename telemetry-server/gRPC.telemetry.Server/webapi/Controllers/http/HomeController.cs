@@ -8,6 +8,7 @@ namespace webapi.Controllers.http
     [Route("")]
     public class HomeController : Controller
     {
+        [HttpGet]
         public JsonResult Get()
         {
             var data = new { Message = "Hello, JSON!", Time = DateTime.UtcNow };

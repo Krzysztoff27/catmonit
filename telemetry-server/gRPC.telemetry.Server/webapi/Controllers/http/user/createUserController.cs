@@ -12,6 +12,7 @@ namespace webapi.Controllers.http.user
         [HttpPost]
         public IActionResult Post([FromBody] createUserRequest user)
         {
+            if (!Utils.IsCorrectPassword(user.password)) return Utils.returnVal(400, "password doesn't comply with the requirements");
             switch (userHelper.createUser(user.username, user.password, (user.permissions == null) ? (int)Permissions.defaultPermission: PermissionHelper.createPermissionBitmask(user.permissions)))
             {
                 case userCreateStatus.Success:
