@@ -11,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 #if CM_RUN_ALL
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<StorageMonit>();
-builder.Services.AddTransient<StorageMonitHandler>();
 #endif
 builder.Services.AddGrpc();
 
@@ -48,8 +46,7 @@ app.Use(async (context, next) =>
         if (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase))
         {
-            var handler = context.RequestServices.GetRequiredService<StorageMonitHandler>();
-            await handler.HandleRequestAsync(context);
+            await NetworkMonitHandler.instance.HandleRequestAsync(context);
         }
         else
         {

@@ -4,8 +4,7 @@
     public class addAccessRequestModel
     {
         public Guid userID { get; set; }
-        public string access { get; set; } // to be the string representation of Permission enum (default, seeAll, modifyAccess)
-        public List<int>? Resources { get; set; } // if access = modifyAccess this shouldn't be null
+        public string access { get; set; } // to be the string representation of Permission enum 
     }
     public class addNotificationDeviceRequestModel
     {
@@ -13,6 +12,13 @@
 
     }
 
+    public class createUserRequest
+    {
+        public string username { get; set; }
+        public string password { get; set; }
+        public List<string>? permissions { get; set; } // to be the string representation of Permission enum (eg. "seeAll")
+    }
+
     // login request model is userModel
-    // addUser request model is userModel
+
 }

@@ -10,9 +10,9 @@ namespace webapi.Controllers.http.user
     public class createUserController : Controller
     {
         [HttpPost]
-        public IActionResult Post([FromBody] UserModel user)
+        public IActionResult Post([FromBody] createUserRequest user)
         {
-            switch (userHelper.createUser(user.username, user.password))
+            switch (userHelper.createUser(user.username, user.password, (user.permissions == null) ? (int)Permissions.defaultPermission: PermissionHelper.createPermissionBitmask(user.permissions)))
             {
                 case userCreateStatus.Success:
                     var data0 = new { message = "User created successfully" };

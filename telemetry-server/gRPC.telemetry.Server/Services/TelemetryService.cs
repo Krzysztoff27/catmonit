@@ -6,6 +6,7 @@ using Grpc.Core;
 using gRPC.telemetry;
 using gRPC.telemetry.Server.Models;
 using Microsoft.Extensions.Logging;
+using gRPC.telemetry.Server.webapi.Websocket;
 
 public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryServiceBase
 {
@@ -22,6 +23,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
     {
         var responses = new List<ResponseModel>();
 
+        Guid guid = Guid.Empty;
         try
         {
             await foreach (var request in requestStream.ReadAllAsync())
@@ -37,11 +39,13 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Os = request.OperatingSystem
                     };
 
+                    if (guid == Guid.Empty) guid = Guid.Parse(response.Uuid);
                     switch (request.PayloadCase)
                     {
                         case TelemetryRequest.PayloadOneofCase.Network:
                             response.PayloadType = PayloadType.Network;
                             response.Payload = ProcessNetworkPayload(request.Network);
+                            RequestParser.onResponseReceived(guid, response);
                             break;
 
                         case TelemetryRequest.PayloadOneofCase.Disks:
@@ -59,6 +63,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                             _logger.LogWarning("Received message with no valid payload");
                             break;
                     }
+                    RequestParser.onResponseReceived(guid, response);
 
                     responses.Add(response);
                     _logger.LogInformation("Processed message from {Hostname}", request.Hostname);
@@ -84,6 +89,9 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         }
         catch (Exception ex)
         {
+            // disconnect
+            RequestParser.onDisconnected(guid);
+
             _logger.LogError(ex, "Error in StreamTelemetry");
             return new TelemetryResponse 
             { 

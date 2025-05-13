@@ -43,26 +43,23 @@ namespace webapi.Monitoring
         {
             while (!token.IsCancellationRequested)
             {
-                if (!subscribers.IsEmpty)
+                await monitorLock.WaitAsync(token);
+                try
                 {
-                    await monitorLock.WaitAsync(token);
-                    try
-                    {
-                        FetchData();
-                        sendData();
-                    }
-                    finally
-                    {
-                        monitorLock.Release();
-                    }
+                    UpdateGeneralData();
+                    sendData();
                 }
-
+                finally
+                {
+                    monitorLock.Release();
+                }
                 await Task.Delay((int)requestTimeout, token);
             }
+
         }
 
         public virtual void sendData() { }
-        public virtual void FetchData() { }
+        public virtual void UpdateGeneralData() { }
         public virtual void onSubscribe(Subscriber subber) { }
         public virtual void onUnsubscribe(Subscriber subber) { }
     }

@@ -1,0 +1,47 @@
+﻿using gRPC.telemetry.Server.Models;
+using webapi.Models;
+
+namespace gRPC.telemetry.Server.webapi.Websocket
+{
+    public class RequestParser
+    {
+        public static void onResponseReceived(Guid deviceGUID, ResponseModel response)
+        {
+            
+            switch (response.PayloadType)
+            {
+                case PayloadType.Network:
+                    {
+                        NetworkDeviceInfo di = new NetworkDeviceInfo();
+
+                        di.DeviceInfo = new DeviceInfo();
+                        di.DeviceInfo.LastUpdated = response.Timestamp;
+                        di.DeviceInfo.Hostname = response.Hostname;
+                        di.DeviceInfo.IpAddress = response.IpAddress;
+                        di.DeviceInfo.Uuid = Guid.Parse(response.Uuid);
+                        di.DeviceInfo.Os = response.Os;
+
+                        foreach (NetworkPayload pl in (List<NetworkPayload>)response.Payload)
+                        {
+                            if (pl.IsMain == true)
+                            {
+                                di.InterfaceName = pl.InterfaceName;
+                                di.RxMbps = pl.RxMbps;
+                                di.TxMbps = pl.TxMbps;
+                                break;
+                            }
+                        }
+
+                        NetworkInfo.Instance.AddOrUpdateDevice(di);
+
+                        return;
+                    }
+                    
+            }
+        }
+        public static void onDisconnected(Guid UUID)
+        {
+
+        }
+    }
+}

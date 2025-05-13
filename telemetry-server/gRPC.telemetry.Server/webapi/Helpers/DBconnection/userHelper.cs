@@ -86,22 +86,6 @@ namespace webapi.Helpers.DBconnection
             return userCreateStatus.Success;
         }
 
-        public static List<DeviceIdentifier> getDevices(Guid userID)
-        {
-            List<DeviceIdentifier> devices = new List<DeviceIdentifier>();
-            using (var reader = ConHelper.ExecuteReader("SELECT device_id FROM users_devices where user_id = @userID;", new Dictionary<string, object> { { "@userID", userID} }))
-            {
-                if (reader == null) return devices;
-
-                while (reader.Read())
-                {
-                    devices.Add(
-                        new DeviceIdentifier { ID = (Guid)reader["device_id"] }
-                    );
-                }
-            }
-            return devices;
-        }
         public static string? getUsername(Guid userID)
         {
             using (var reader = ConHelper.ExecuteReader("SELECT username FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
@@ -116,6 +100,25 @@ namespace webapi.Helpers.DBconnection
 
     public class PermissionHelper
     {
+        public static Permissions getPermissionBit(string permission)
+        {
+            switch (permission)
+            {
+                case "default": return Permissions.defaultPermission;
+                case "seeAll": return Permissions.seeAllPermission;
+                case "modifyAccess": return Permissions.modifyAccessPermission;
+                default: return Permissions.defaultPermission;
+            }
+        }
+        public static int createPermissionBitmask(List<string> permissions)
+        {
+            int res = 0;
+            foreach (string perm in permissions)
+            {
+                res |= (int)getPermissionBit(perm);
+            }
+            return res;
+        }
         public static int? UserPermission(Guid userID)
         {
             using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
