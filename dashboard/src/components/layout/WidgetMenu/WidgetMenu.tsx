@@ -4,8 +4,7 @@ import classes from "./WidgetMenu.module.css";
 
 import { capitalize } from "lodash";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../../config/widgets.config";
-import { WidgetConfig } from "../../../types/config.types";
-import { safeObjectValues } from "../../../utils/object";
+import { safeObjectEntries } from "../../../utils/object";
 
 interface WidgetMenuProps extends PaperProps {
     currentDropType: string | null;
@@ -29,8 +28,8 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
     const currentConfiguration = currentDropType ? WIDGETS_CONFIG[currentDropType] : undefined;
 
     const onDragStart = (e) => {
-        setCurrentDropType("DEVICE_DISKS");
-        e.dataTransfer.setData("text/plain", "DEVICE_DISKS");
+        setCurrentDropType(e.target.id);
+        e.dataTransfer.setData("text/plain", e.target.id);
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setDragImage(img, 0, 0);
         setIsDragging(true);
@@ -60,16 +59,16 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
                     {...props}
                     className={`${className} ${classes.container}`}
                     withBorder
-                    bg="var(--background-color-4)"
                     shadow="md"
                 >
-                    <Group>
-                        {safeObjectValues(WIDGETS_CONFIG).map((config: WidgetConfig, i) => (
+                    <Group gap="0">
+                        {safeObjectEntries(WIDGETS_CONFIG).map(([type, config], i) => (
                             <Tooltip
                                 key={i}
                                 label={capitalize(config.name)}
                             >
                                 <Center
+                                    id={type}
                                     draggable={true}
                                     unselectable="on"
                                     onDragStart={onDragStart}

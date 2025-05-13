@@ -1,6 +1,8 @@
-import { Center, Flex, Group, Paper, Text } from "@mantine/core";
-import { IconAlertTriangleFilled, IconExclamationCircleFilled, IconX } from "@tabler/icons-react";
+import { Box, Center, Flex, Group, Paper, Text } from "@mantine/core";
+import { IconAlertCircle, IconAlertTriangleFilled, IconExclamationCircleFilled, IconEyeOff, IconX } from "@tabler/icons-react";
 import DeviceTitle from "../DeviceTitle/DeviceTitle";
+import classes from "./AlertListElement.module.css";
+import ScrollingText from "../ScrollingText/ScrollingText";
 
 interface AlertListElementProps {
     isWarning: boolean;
@@ -10,33 +12,48 @@ interface AlertListElementProps {
 function AlertListElement({ isWarning, onRemove }: AlertListElementProps) {
     return (
         <Paper
-            w="800px"
-            p="sm"
+            maw="100%"
             bg="var(--background-color-6)"
+            h="48px"
+            miw="0"
+            style={{ overflow: "hidden" }}
         >
-            <Group>
-                <Center h="100%">
-                    <DeviceTitle
-                        name="Tux"
-                        address="10.10.10.10"
-                        mr="150px"
-                    />
-                    {isWarning ? <IconAlertTriangleFilled color="red" /> : <IconExclamationCircleFilled color="red" />}
-                    <Text
-                        ml="sm"
-                        c="red.7"
+            <Group
+                w="100%"
+                h="100%"
+                align="center"
+                px="xs"
+            >
+                <DeviceTitle
+                    name="Tuxaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                    address="10.10.10.10"
+                    iconSize={36}
+                    style={{ overflow: "hidden" }}
+                />
+                <Box style={{ flex: "1 0 0", minWidth: 0 }}>
+                    <ScrollingText
+                        maw="100%"
+                        scroll={true}
                     >
-                        Storage below 5%. Free up space.
-                    </Text>
-                </Center>
+                        <IconAlertCircle
+                            size="16"
+                            style={{ transform: "translateY(2.5px)", marginRight: "4" }}
+                        />
+                        Storage below 5%. Free up space. Test Test Test Testa
+                    </ScrollingText>
+                </Box>
+
                 <Flex
-                    justify="flex-end"
-                    flex="1"
+                    justify="center"
+                    w="fit-content"
+                    pr="xs"
+                    ml="auto"
                 >
-                    {/* might want to add  some pop-up when on hover 
+                    {/* might want to add  some pop-up when on hover
                     and change color of the icon */}
-                    <IconX
-                        stroke="3.5px"
+                    <IconEyeOff
+                        stroke="2.5"
+                        size={18}
                         color="var(--background-color-3)"
                         onClick={onRemove}
                         style={{ cursor: "pointer" }}

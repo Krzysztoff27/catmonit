@@ -1,0 +1,5 @@
+.container {
+    background-color: var(--background-color-8);
+    flex: 1;
+    max-width: 100%;
+}

@@ -69,6 +69,8 @@ function Editor() {
         return { i: "__droppable__", w: minW, h: minH };
     }, [currentDropType]);
 
+    console.log(currentDropType);
+
     return (
         <>
             <Flex
