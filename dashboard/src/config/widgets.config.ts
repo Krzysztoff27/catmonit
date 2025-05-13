@@ -4,7 +4,7 @@ import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceSto
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
 import { WidgetsConfig } from "../types/config.types";
-import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
+// import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
 import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
@@ -24,18 +24,18 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    SERVICE_STATUS: {
-        name: "device's status ",
-        icon: IconProgressCheck,
-        component: ServiceStatusWidget,
-        drawer: ServiceStatusDrawer, //@TODO change it
-        limits: {
-            minH: 2,
-            maxH: 5,
-            minW: 2,
-            maxW: 4,
-        },
-    },
+    // SERVICE_STATUS: {
+    //     name: "device's status ",
+    //     icon: IconProgressCheck,
+    //     component: ServiceStatusWidget,
+    //     drawer: ServiceStatusDrawer, //@TODO change it
+    //     limits: {
+    //         minH: 2,
+    //         maxH: 5,
+    //         minW: 2,
+    //         maxW: 4,
+    //     },
+    // },
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
         icon: IconStorm,

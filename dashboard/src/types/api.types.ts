@@ -20,6 +20,16 @@ export interface DeviceDiskData extends Device {
     disks: Disk[];
 }
 
+// export interface OverallDeviceStorageData { //extends Device
+//   hostname: string;
+//   ip: string;
+//   storage: {
+//     name: string;
+//     value: number;
+//   }[];
+// }
+
+
 export interface WidgetData {
     type: string;
     rect: {
@@ -30,3 +40,4 @@ export interface WidgetData {
     };
     data: any;
 }
+

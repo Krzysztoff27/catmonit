@@ -12,7 +12,7 @@ function Editor() {
     const { layoutName } = useParams();
     const [widgets, setWidgets] = useState<WidgetData[]>([
         {
-            type: "STORAGE_ALERTS_WIDGET",
+            type: "STORAGE_ALERTS",
             rect: { x: 0, y: 0, w: 5, h: 2 },
             data: { hostname: "Tux", ip: "10.10.100.1" },
         },
@@ -22,9 +22,18 @@ function Editor() {
             data: { hostname: "Tux", ip: "10.10.100.1" },
         },
         {
-            type: "OVERALL_DEVICE_STORAGE_WIDGET",
+            type: "OVERALL_DEVICE_STORAGE",
             rect: { x: 4, y: 2, w: 2, h: 2 },
-            data: { hostname: "Tux", ip: "10.50.100.1" },
+            data: {
+                uuid: "device-1",
+                hostname: "Tux",
+                ip: "10.50.100.1",
+                mask: "255.255.255.0",
+                disks: [
+                    { path: "/dev/sda1", storageLimit: 100, storageCurrent: 70 },
+                    { path: "/dev/sdb1", storageLimit: 50, storageCurrent: 10 },
+                ],
+            },
         },
     ]);
 

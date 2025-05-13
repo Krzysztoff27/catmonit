@@ -5,43 +5,65 @@ import { WidgetComponentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
 import DeviceTitleSmall from "../../display/DeviceTitle/DeviceTitleSmall";
 import classes from "./OverallDeviceStorageWidget.module.css";
+import "@mantine/charts/styles.css";
+import { DeviceDiskData } from "../../../types/api.types";
+import { useEffect } from "react";
 
-function OverallDeviceStorageWidget({ data, className, ...props }: WidgetComponentProps) {
-    const total = data?.reduce?.((sum, item) => sum + item.value, 0);
-    const used = data?.find?.((item) => item.name.toLowerCase() === "used")?.value || 0;
-    const formattedData = data?.map?.((item) => {
-        const percent = ((item.value / total) * 100).toFixed(1);
-        const color = item.name.toLowerCase() === "used" ? "purple" : "var(--background-color-3)";
-        return { ...item, color, label: `${item.value} GB (${percent}%)` };
-    });
-    const chartLabel = formattedData
-        .map(
-            (item) => `${item.name}: ${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)` // ✅ fixed
-        )
-        .join("\n");
+function OverallDeviceStorageWidget({ data, className, settings, ...props }: WidgetComponentProps) {
+    // DATA CALCULAIONS ETC.
+    const { hostname, ip, disks } = data as DeviceDiskData;
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+    const total = disks?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
+    const used = disks?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
+    const free = total - used;
+
+    const formattedData = [
+        {
+            name: "Used",
+            value: used,
+            color: "blue",
+            //label: `${used} GB (${((used / total) * 100).toFixed(1)}%)`,
+        },
+        {
+            name: "Free",
+            value: free,
+            color: "var(--background-color-3)",
+            //label: `${free} GB (${((free / total) * 100).toFixed(1)}%)`,
+        },
+    ];
+
+    const chartLabel = formattedData.map((item) => `${item.name}\n ${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`).join("\n");
+
+    // RESPONSIVENESS
     const { ref, width, height } = useElementSize();
-    const num_cols = Math.floor(width / GRID_SIZE_PX);
-    const num_rows = Math.floor(height / GRID_SIZE_PX);
-    console.log("cosl: " + num_cols + "\nrows: " + num_rows);
+    const num_cols = Math.round(width / GRID_SIZE_PX);
+    const num_rows = Math.round(height / GRID_SIZE_PX);
     const baseChartSize = 170;
     const chartScale = Math.min(num_cols, num_rows);
     const scaleMultiplier = chartScale <= 2 ? 1 : 1 + (chartScale - 2) * 0.25;
     const chartSize = baseChartSize * scaleMultiplier;
+    useEffect(() => {
+        console.log("Num cols:" + num_cols); // Logs every time num_cols changes
+        console.log("Num rows:" + num_rows); // Logs every time num_cols changes
+        console.log("Height:" + height); // Logs every time num_cols changes
+        console.log("WIdth:" + width); // Logs every time num_cols changes
+        console.log("grid size: " + GRID_SIZE_PX);
+    }, [num_cols]);
+
     return (
         <Paper
             ref={ref}
             {...props}
-            // radius="md"
             py="md"
             px="md"
             className={`${classes.container} ${className}`}
-            //   w="fit-content"
             withBorder
         >
-            <DeviceTitleSmall 
-            name={data.hostname}
-                    address={data.ip}
-                    mb="6" />
+            <DeviceTitleSmall
+                name={hostname}
+                address={ip}
+                mb="6"
+            />
             <Flex
                 align="center"
                 direction={num_cols > num_rows ? "row" : "column"}
@@ -59,18 +81,28 @@ function OverallDeviceStorageWidget({ data, className, ...props }: WidgetCompone
                         label: {
                             fill: "var(--background-color-1)",
                             whiteSpace: "pre-line",
+                            //change font size later
                         },
                     }}
                 />
+                {/* @TODO center voth horizontyally and vbertically, also the chart */}
                 <Text
                     mt="md"
+                    w="100%"
                     c="var(--background-color-1)"
-                    style={{
-                        whiteSpace: "pre-line",
-                    }}
+                    style={{ whiteSpace: "pre-line" }}
                     display={height < 300 && width < 300 ? "none" : "initial"}
                 >
-                    {chartLabel}
+                    {formattedData.map((item, index) => (
+                        <div
+                            key={index}
+                            style={{  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}
+                        >
+                            <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{item.name}</span>
+                            
+                            <span>{`${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`}</span>
+                        </div>
+                    ))}
                 </Text>
             </Flex>
         </Paper>
