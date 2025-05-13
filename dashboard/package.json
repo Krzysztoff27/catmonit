@@ -13,6 +13,8 @@
     "dependencies": {
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
+        "@fortawesome/free-brands-svg-icons": "^6.7.2",
+        "@fortawesome/free-regular-svg-icons": "^6.7.2",
         "@mantine/charts": "^8.0.0",
         "@mantine/code-highlight": "^8.0.0",
         "@mantine/core": "^8.0.0",

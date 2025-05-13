@@ -38,7 +38,7 @@ function WidgetBoard({
                 ...getLimits(widget),
             } as LayoutItem)
     );
-    // if (!layout) return;
+    if (!layout) return;
 
     const updateLayout = (newLayout: Layout) => {
         if (isEmpty(newLayout)) return;
@@ -59,7 +59,7 @@ function WidgetBoard({
         );
     };
 
-    const updateWidgetData = (widgetNumber, newData) => {
+    const updateWidgetData = (widgetNumber: number, newData: WidgetData) => {
         setWidgets((prev: WidgetData[]) => {
             prev[widgetNumber].data = newData;
             return prev;
@@ -127,7 +127,7 @@ function WidgetBoard({
                                 updateData={(data) => updateWidgetData(i, data)}
                                 style={{
                                     cursor: "pointer",
-                                    backgroundColor: selected === `${i}` ? "var(--background-color-6)" : "",
+                                    filter: selected === `${i}` ? "brightness(120%)" : "",
                                 }}
                             />
                         </Flex>

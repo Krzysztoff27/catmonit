@@ -10,6 +10,7 @@ import "@mantine/code-highlight/styles.css";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./styles/main.css";
+
 import { CookiesProvider } from "react-cookie";
 
 createRoot(document.getElementById("root")!).render(
