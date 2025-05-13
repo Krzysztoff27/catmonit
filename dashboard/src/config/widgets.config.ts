@@ -36,7 +36,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    OVERALL_DEVICE_STORAGE_WIDGET: {
+    OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
         icon: IconStorm,
         component: OverallDeviceStorageWidget,
@@ -48,7 +48,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    STORAGE_ALERTS_WIDGET: {
+    STORAGE_ALERTS: {
         name: "storage alerts widget",
         icon: IconDatabaseX,
         component: AlertWidget,
