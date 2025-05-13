@@ -1,14 +1,15 @@
 import { Box, Group, GroupProps, Stack, Text } from "@mantine/core";
 import { IconServer2 } from "@tabler/icons-react";
+import { Device } from "../../../types/api.types";
+import { isEmpty } from "lodash";
 
 interface DeviceTitleProps extends GroupProps {
-    name: string;
-    address: string;
+    data: Device;
     size?: number | string;
     iconSize?: number | string;
 }
 
-function DeviceTitle({ name, size = "var(--mantine-font-size-lg)", iconSize = 44, address, ...props }: DeviceTitleProps) {
+function DeviceTitle({ data, size = "var(--mantine-font-size-lg)", iconSize = 44, ...props }: DeviceTitleProps) {
     return (
         <Group
             gap="8"
@@ -31,13 +32,13 @@ function DeviceTitle({ name, size = "var(--mantine-font-size-lg)", iconSize = 44
                     lh="xs"
                     fw="600"
                 >
-                    {name}
+                    {data.hostname ?? "Not set"}
                 </Text>
                 <Text
                     fz={`calc(${size} * 0.75)`}
                     lh="xs"
                 >
-                    {address}
+                    {data.ip && data.mask ? `${data.ip}/${data.mask}` : ""}
                 </Text>
             </Stack>
         </Group>

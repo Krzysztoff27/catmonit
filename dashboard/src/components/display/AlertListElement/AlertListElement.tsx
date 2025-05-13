@@ -14,7 +14,7 @@ function AlertListElement({ isWarning, onRemove }: AlertListElementProps) {
         <Paper
             maw="100%"
             bg="var(--background-color-6)"
-            h="48px"
+            h="53"
             miw="0"
             style={{ overflow: "hidden" }}
         >
@@ -25,9 +25,14 @@ function AlertListElement({ isWarning, onRemove }: AlertListElementProps) {
                 px="xs"
             >
                 <DeviceTitle
-                    name="Tuxaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                    address="10.10.10.10"
+                    data={{
+                        hostname: "Tuxaababababababa",
+                        ip: "10.10.10.10",
+                        mask: "24",
+                        uuid: "abc",
+                    }}
                     iconSize={36}
+                    size="var(--mantine-font-size-md)"
                     style={{ overflow: "hidden" }}
                 />
                 <Box style={{ flex: "1 0 0", minWidth: 0 }}>

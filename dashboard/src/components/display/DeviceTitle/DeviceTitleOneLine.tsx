@@ -1,17 +1,15 @@
-import { Group, GroupProps, Stack, Text } from "@mantine/core";
+import { Group, GroupProps, Text } from "@mantine/core";
 import { IconServer2 } from "@tabler/icons-react";
-
+import { Device } from "../../../types/api.types";
 interface DeviceTitleProps extends GroupProps {
-    name: string;
-    address: string;
+    data: Device;
 }
 
-function DeviceTitleSmall({ name, address, ...props }: DeviceTitleProps) {
+function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
     return (
         <Group
             gap="8"
-            {...props}
-            // bg="red"
+            {...props} // bg="red"
             pr="sm"
         >
             <IconServer2
@@ -21,18 +19,18 @@ function DeviceTitleSmall({ name, address, ...props }: DeviceTitleProps) {
             <Text
                 fz="lg"
                 lh="xs"
-                fw="700"
+                fw="600"
             >
-                {name}
+                {data.hostname ?? "Not set"}
             </Text>
             <Text
                 fz="sm"
                 ml="auto"
             >
-                {address}
+                {data.ip && data.mask ? `${data.ip}/${data.mask}` : ""}
             </Text>
         </Group>
     );
 }
 
-export default DeviceTitleSmall;
+export default DeviceTitleOneLine;

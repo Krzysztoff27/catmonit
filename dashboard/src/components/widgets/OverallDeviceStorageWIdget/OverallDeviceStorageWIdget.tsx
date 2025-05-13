@@ -3,11 +3,11 @@ import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
 import { WidgetComponentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
-import DeviceTitleSmall from "../../display/DeviceTitle/DeviceTitleSmall";
 import classes from "./OverallDeviceStorageWidget.module.css";
 import "@mantine/charts/styles.css";
 import { DeviceDiskData } from "../../../types/api.types";
 import { useEffect } from "react";
+import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 
 function OverallDeviceStorageWidget({ data, className, settings, ...props }: WidgetComponentProps) {
     // DATA CALCULAIONS ETC.
@@ -59,10 +59,9 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
             className={`${classes.container} ${className}`}
             withBorder
         >
-            <DeviceTitleSmall
-                name={hostname}
-                address={ip}
-                mb="6"
+            <DeviceTitleOneLine
+                data={data}
+                mb="md"
             />
             <Flex
                 align="center"

@@ -28,6 +28,7 @@
         "react-dom": "^19.1.0",
         "react-grid-layout": "^1.5.1",
         "react-router-dom": "^7.5.3",
+        "react-use-websocket": "^4.13.0",
         "recharts": "^2.15.3"
     },
     "devDependencies": {

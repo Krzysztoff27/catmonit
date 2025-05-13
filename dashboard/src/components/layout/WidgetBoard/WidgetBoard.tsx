@@ -1,16 +1,18 @@
 import { ActionIcon, Flex } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
-import { isEmpty } from "lodash";
 import GridLayout from "react-grid-layout";
-import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../../config/widgets.config";
+import { GRID_MARGIN_PX, GRID_SIZE_PX } from "../../../config/widgets.config";
 import { WidgetData } from "../../../types/api.types";
 import { WidgetLayoutProps } from "../../../types/components.types";
-import { Layout, LayoutItem } from "../../../types/reactGridLayout.types";
+import classes from "./WidgetBoard.module.css";
 
 function WidgetBoard({
     widgets,
-    setWidgets,
+    getComponent,
+    deleteWidget,
+    layout,
+    updateLayout,
     selected,
     onDragStart,
     onDrag,
@@ -23,63 +25,16 @@ function WidgetBoard({
 }: WidgetLayoutProps) {
     const { width, ref } = useElementSize();
     const cols = Math.floor(width / GRID_SIZE_PX);
-    const layoutWidth = cols * GRID_SIZE_PX;
+    const layoutWidth = GRID_SIZE_PX * cols + GRID_MARGIN_PX * (cols - 1);
 
-    const getLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
-
-    const getComponent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].component;
-
-    const widgetTypes = widgets.map((widget) => widget.type);
-    const layout: Layout = widgets.map(
-        (widget: WidgetData, i) =>
-            ({
-                i: `${i}`,
-                ...widget.rect,
-                ...getLimits(widget),
-            } as LayoutItem)
-    );
     if (!layout) return;
-
-    const updateLayout = (newLayout: Layout) => {
-        if (isEmpty(newLayout)) return;
-        setWidgets((prev: WidgetData[]) =>
-            prev.map((widget: WidgetData, i) => {
-                const { x, y, w, h } = newLayout[i];
-                return {
-                    data: widget.data,
-                    rect: {
-                        x,
-                        y,
-                        w,
-                        h,
-                    },
-                    type: widgetTypes[i],
-                } as WidgetData;
-            })
-        );
-    };
-
-    const updateWidgetData = (widgetNumber: number, newData: WidgetData) => {
-        setWidgets((prev: WidgetData[]) => {
-            prev[widgetNumber].data = newData;
-            return prev;
-        });
-    };
-
-    const onDelete = (widgetNumber) => {
-        setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== widgetNumber));
-    };
 
     return (
         <GridLayout
-            className="layout"
+            className={`layout ${classes.layout}`}
             onLayoutChange={updateLayout}
             cols={cols}
             width={layoutWidth}
-            style={{
-                minHeight: "100vh",
-                flex: 1,
-            }}
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
@@ -93,6 +48,7 @@ function WidgetBoard({
             isDroppable={true}
             droppingItem={droppingItem}
             innerRef={ref}
+            margin={[GRID_MARGIN_PX, GRID_MARGIN_PX]}
         >
             {/* !!! important to have the width check here */}
             {/* it prevents widgets having assigned unexpected positions due to ref being assigned late*/}
@@ -106,29 +62,20 @@ function WidgetBoard({
                             data-grid={layout[i]}
                         >
                             <ActionIcon
-                                pos="absolute"
-                                right={2}
-                                top={8}
-                                style={{
-                                    zIndex: 100,
-                                }}
-                                variant="transparent"
+                                className={classes.deleteButton}
                                 c="var(--background-color-2)"
+                                variant="transparent"
                                 onClick={(event) => {
                                     event.stopPropagation();
-                                    onDelete(i);
+                                    deleteWidget(i);
                                 }}
                             >
                                 <IconX size={18} />
                             </ActionIcon>
                             <WidgetComponent
-                                className="drag-handle"
+                                className={`drag-handle ${classes.widget} ${selected === `${i}` ? classes.selected : ""}`}
                                 data={widget.data}
-                                updateData={(data) => updateWidgetData(i, data)}
-                                style={{
-                                    cursor: "pointer",
-                                    filter: selected === `${i}` ? "brightness(120%)" : "",
-                                }}
+                                settings={widget.settings}
                             />
                         </Flex>
                     );

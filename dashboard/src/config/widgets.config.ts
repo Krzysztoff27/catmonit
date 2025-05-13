@@ -10,6 +10,7 @@ import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStora
 import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 
 export const GRID_SIZE_PX = 128;
+export const GRID_MARGIN_PX = 10;
 
 const WIDGETS_CONFIG: WidgetsConfig = {
     DETAILED_DEVICE_STORAGE: {

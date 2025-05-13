@@ -1,10 +1,10 @@
 import { Box, Center, Group, Paper, PaperProps, Tooltip } from "@mantine/core";
 import { useRef, useState } from "react";
 import classes from "./WidgetMenu.module.css";
-
 import { capitalize } from "lodash";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../../config/widgets.config";
 import { safeObjectEntries } from "../../../utils/object";
+import DUMMIES from "./dummies";
 
 interface WidgetMenuProps extends PaperProps {
     currentDropType: string | null;
@@ -21,7 +21,8 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
     const img = new Image();
     img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
 
-    const updateGhostPosition = (x, y) => {
+    const updateGhostPosition = (x: number, y: number) => {
+        if (!ref.current) return;
         ref.current!.style.transform = `translate(${x - DRAG_OFFSET}px, ${y - DRAG_OFFSET}px)`;
     };
 
@@ -32,6 +33,7 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
         e.dataTransfer.setData("text/plain", e.target.id);
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setDragImage(img, 0, 0);
+        updateGhostPosition(e.clientX, e.clientY);
         setIsDragging(true);
     };
 
@@ -43,8 +45,8 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
         <>
             {currentConfiguration && (
                 <currentConfiguration.component
-                    data={{}}
-                    updateData={() => {}}
+                    data={currentDropType ? DUMMIES[currentDropType] : {}}
+                    settings={{}}
                     ref={ref}
                     style={{
                         width: currentConfiguration.limits.minW * GRID_SIZE_PX,
