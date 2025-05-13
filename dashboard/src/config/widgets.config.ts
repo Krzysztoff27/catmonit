@@ -7,7 +7,7 @@ import { WidgetsConfig } from "../types/config.types";
 import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWIdget/OverallDeviceStorageWIdget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 
 export const GRID_SIZE_PX = 128;
 
@@ -24,20 +24,19 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    //we decided not to create this component:
-    // SERVICE_STATUS: {
-    //     name: "device's status ",
-    //     icon: IconProgressCheck,
-    //     component: ServiceStatusWidget,
-    //     drawer: ServiceStatusDrawer, //@TODO change it
-    //     limits: {
-    //         minH: 2,
-    //         maxH: 5,
-    //         minW: 2,
-    //         maxW: 4,
-    //     },
-    // },
-    OVERALL_DEVICE_STORAGE_WIDGET: {
+    SERVICE_STATUS: {
+        name: "device's status ",
+        icon: IconProgressCheck,
+        component: ServiceStatusWidget,
+        drawer: ServiceStatusDrawer, //@TODO change it
+        limits: {
+            minH: 2,
+            maxH: 5,
+            minW: 2,
+            maxW: 4,
+        },
+    },
+    OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
         icon: IconStorm,
         component: OverallDeviceStorageWidget,
@@ -49,7 +48,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
     },
-    STORAGE_ALERTS_WIDGET: {
+    STORAGE_ALERTS: {
         name: "storage alerts widget",
         icon: IconDatabaseX,
         component: AlertWidget,

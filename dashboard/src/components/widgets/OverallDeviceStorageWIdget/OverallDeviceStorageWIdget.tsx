@@ -1,6 +1,5 @@
 import { Paper, Text, Flex } from "@mantine/core";
 import { DonutChart } from "@mantine/charts";
-import { chart_data } from "./data.local";
 import { useElementSize } from "@mantine/hooks";
 import { WidgetComponentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
@@ -8,24 +7,18 @@ import DeviceTitleSmall from "../../display/DeviceTitle/DeviceTitleSmall";
 import classes from "./OverallDeviceStorageWidget.module.css";
 
 function OverallDeviceStorageWidget({ data, className, ...props }: WidgetComponentProps) {
-    const total = chart_data.reduce((sum, item) => sum + item.value, 0);
-    const used = chart_data.find((item) => item.name.toLowerCase() === "used")?.value || 0;
-    const formattedData = chart_data.map((item) => {
+    const total = data?.reduce?.((sum, item) => sum + item.value, 0);
+    const used = data?.find?.((item) => item.name.toLowerCase() === "used")?.value || 0;
+    const formattedData = data?.map?.((item) => {
         const percent = ((item.value / total) * 100).toFixed(1);
         const color = item.name.toLowerCase() === "used" ? "purple" : "var(--background-color-3)";
-        return {
-            ...item,
-            color,
-            label: `${item.value} GB (${percent}%)`,
-        };
+        return { ...item, color, label: `${item.value} GB (${percent}%)` };
     });
-
     const chartLabel = formattedData
         .map(
             (item) => `${item.name}: ${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)` // ✅ fixed
         )
         .join("\n");
-
     const { ref, width, height } = useElementSize();
     const num_cols = Math.floor(width / GRID_SIZE_PX);
     const num_rows = Math.floor(height / GRID_SIZE_PX);
