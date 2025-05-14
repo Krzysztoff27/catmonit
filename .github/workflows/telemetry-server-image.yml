@@ -43,8 +43,8 @@ jobs:
             - name: Build and push Catmonit Telemetry Server Docker image
               uses: docker/build-push-action@v4
               with:
-                context: gRPC.telemetry.Server
-                file: gRPC.telemetry.Server/Dockerfile
+                context: telemetry-server/gRPC.telemetry.Server
+                file: telemetry-server/gRPC.telemetry.Server/Dockerfile
                 push: true
                 tags: |
                   ghcr.io/${{ env.OWNER }}/catmonit-telemetry-server:${{ github.ref_name }}
