@@ -44,5 +44,14 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 );
         }
 
+        public static bool? DeviceExistsInDB(Guid deviceID)
+        {
+            int? res = ConHelper.execCountQuery("SELECT count(device_id) from devices where device_id = @devID", new Dictionary<string, object> { { "@devID", deviceID } });
+            if ( res == null ) return null;
+            else if ( res == 0 ) return false;
+            else if ( res == 1 ) return true;
+            else Utils.assert( false );
+            return true;
+        }
     }
 }

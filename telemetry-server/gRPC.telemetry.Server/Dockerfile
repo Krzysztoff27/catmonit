@@ -12,7 +12,7 @@ EXPOSE 5001
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./gRPC.telemetry.Server.csproj", "."]
+COPY ["gRPC.telemetry.Server.csproj", "."]
 RUN dotnet restore "./gRPC.telemetry.Server.csproj"
 COPY . .
 WORKDIR "/src/."

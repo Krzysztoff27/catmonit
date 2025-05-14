@@ -155,7 +155,7 @@ namespace webapi.Helpers.DBconnection
             foreach (var machine in machines)
             {
                 if (ConHelper.execNonQuery(
-                    "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID;",
+                      "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID)",
                     new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } }
                     )==null) res = null;
             }

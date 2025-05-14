@@ -1,9 +1,11 @@
-﻿using Grpc.Core;
+﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 using System.Security;
 using webapi.Helpers;
 using webapi.Helpers.DBconnection;
 using webapi.Models;
+using webapi.Monitoring;
 using webapi.webapi;
 
 namespace webapi.Controllers.http.user
@@ -29,11 +31,14 @@ namespace webapi.Controllers.http.user
 
                 Permissions RequestedActionPermission = PermissionHelper.getPermissionBit(addAccessRequest.access);
                 if (RequestedActionPermission == Permissions.defaultPermission) return Utils.returnVal(400, "unknown action");
-                if (RequestedActionPermission == Permissions.seeSelectedPermission && ((granterPermission & (int)Permissions.seeAllPermission)==0))
+                if (RequestedActionPermission == Permissions.seeSelectedPermission)
                 {
-                    return Utils.returnVal(403, "you cannot add access to devices if you don't have access to see all devices. (how did you even send this request???) (this is probably a bug, please report it)");
-                }
-                if ((granterPermission & (int)RequestedActionPermission) == 0) return Utils.returnVal(403, "you cannot give others permissions you don't have yourself");
+                    if (((granterPermission & (int)Permissions.seeAllPermission) == 0))
+                        return Utils.returnVal(403, "you cannot add access to devices if you don't have access to see all devices. (how did you even send this request???) (this is probably a bug, please report it)");
+                    bool? checkIfUserAlreadyCanSeeAllRes = (PermissionHelper.checkIfUserHasPermissions(addAccessRequest.userID, (int)Permissions.seeAllPermission));
+                    if (checkIfUserAlreadyCanSeeAllRes == null) return Utils.returnVal(500);
+                    else if (checkIfUserAlreadyCanSeeAllRes == true) return Utils.returnVal(400, "the user you are attempting to give access already can see all machines");
+                }else if ((granterPermission & (int)RequestedActionPermission) == 0) return Utils.returnVal(403, "you cannot give others permissions you don't have yourself");
 
 
                 // actually give the permission
@@ -50,8 +55,18 @@ namespace webapi.Controllers.http.user
                     List<Guid> madeUpDevices = new List<Guid>();
                     foreach (var deviceID in addAccessRequest.devicesIDs)
                     {
-                        // TODO
-                        // check if device really exist/ is active
+                        if (!NetworkMonit.networkDeviceInfos.MonitoredDevices.ContainsKey(deviceID))
+                        {
+                            madeUpDevices.Add(deviceID);
+                        }
+                        else
+                        {
+                            bool? res = DeviceHelper.DeviceExistsInDB(deviceID);
+                            if (res == null) return Utils.returnVal(500);
+                            if (!res.Value) {
+                                madeUpDevices.Add(deviceID);
+                            }
+                        }
                     }
 
                     var existingDevices = addAccessRequest.devicesIDs.Except(madeUpDevices).ToList();
