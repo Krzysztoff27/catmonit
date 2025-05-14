@@ -46,7 +46,7 @@ Thumbs.db
 ## pyinstaller build results
 build/
 dist/
-*.spec
+#*.spec
 
 ## custom exclusionssl/
 ssl/
