@@ -1,8 +1,7 @@
-import { useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import urlConfig from "../config/url.config";
 import useAuth from "./useAuth";
-import { normalizePath } from "../utils/misc";
+import { normalizePath } from "../utils/api";
 
 export default function useApiWebSocket(path: string) {
     const API_WEBSOCKET_URL: string = urlConfig.api_websockets;
