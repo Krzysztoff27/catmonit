@@ -12,8 +12,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 {
                     conn.Open();
                 }
-                catch (NpgsqlException)
+                catch (NpgsqlException e)
                 {
+                    Console.WriteLine(e.Message);
                     return null;
                 }
 
@@ -43,8 +44,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 {
                     conn.Open();
                 }
-                catch (NpgsqlException)
+                catch (NpgsqlException e)
                 {
+                    Console.WriteLine(e.Message);
                     return null;
                 }
 
@@ -68,8 +70,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
             {
                 conn.Open();
             }
-            catch (NpgsqlException)
+            catch (NpgsqlException e)
             {
+                Console.WriteLine(e.Message);
                 return null;
             }
             var cmd = new NpgsqlCommand(query, conn);
@@ -91,8 +94,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 {
                     conn.Open();
                 }
-                catch (NpgsqlException)
+                catch (NpgsqlException e)
                 {
+                    Console.WriteLine(e.Message);
                     return null;
                 }
                 using (var transaction = conn.BeginTransaction())
@@ -130,8 +134,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 {
                     conn.Open();
                 }
-                catch (NpgsqlException)
+                catch (NpgsqlException e)
                 {
+                    Console.WriteLine(e.Message);
                     return null;
                 }
                 using (var transaction = conn.BeginTransaction())
