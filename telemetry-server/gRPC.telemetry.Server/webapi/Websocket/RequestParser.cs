@@ -1,4 +1,5 @@
 ﻿using gRPC.telemetry.Server.Models;
+using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using webapi.Models;
 
 namespace gRPC.telemetry.Server.webapi.Websocket
@@ -7,7 +8,6 @@ namespace gRPC.telemetry.Server.webapi.Websocket
     {
         public static void onResponseReceived(Guid deviceGUID, ResponseModel response)
         {
-            
             switch (response.PayloadType)
             {
                 case PayloadType.Network:
@@ -41,7 +41,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
         }
         public static void onDisconnected(Guid UUID)
         {
-
+            DeviceHelper.OnDeviceDisconnected(UUID);
         }
     }
 }

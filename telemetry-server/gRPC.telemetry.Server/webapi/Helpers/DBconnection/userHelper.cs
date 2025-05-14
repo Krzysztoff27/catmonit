@@ -1,4 +1,5 @@
 ﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using System;
 
 
 namespace webapi.Helpers.DBconnection
@@ -20,8 +21,9 @@ namespace webapi.Helpers.DBconnection
     public enum Permissions
     {
         defaultPermission = 0,
-        seeAllPermission = 1<<0,
-        modifyAccessPermission = 1<<1,
+        seeSelectedPermission = 1<<0, // user should never have this permission, it's just here to simplify addAccess.
+        seeAllPermission = 1<<1,
+        modifyAccessPermission = 1<<2,
     }
 
     public class userHelper
@@ -88,6 +90,7 @@ namespace webapi.Helpers.DBconnection
 
         public static string? getUsername(Guid userID)
         {
+            
             using (var reader = ConHelper.ExecuteReader("SELECT username FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
             {
                 if (reader == null) return null;
@@ -106,6 +109,7 @@ namespace webapi.Helpers.DBconnection
             {
                 case "default": return Permissions.defaultPermission;
                 case "seeAll": return Permissions.seeAllPermission;
+                case "seeSelected": return Permissions.seeSelectedPermission;
                 case "modifyAccess": return Permissions.modifyAccessPermission;
                 default: return Permissions.defaultPermission;
             }
@@ -137,6 +141,25 @@ namespace webapi.Helpers.DBconnection
                 if (!reader.Read()) return null;
                 return (((int)reader["permissions"]) & permissions) == permissions;
             }
+        }
+        public static bool? addPermissionToUser(Guid guid, Permissions permissions)
+        {
+            int? currentPermission = UserPermission(guid);
+            if (currentPermission == null) return null;
+            int addedPermission = currentPermission.Value | (int)permissions;
+            return ConHelper.execNonQuery("UPDATE users SET permissions = @perms WHERE id = @userID", new Dictionary<string, object> { { "@perms", addedPermission }, { "@userID", guid } });
+        }
+        public static bool? addAccessToMachines(Guid userID, List<Guid> machines)
+        {
+            bool? res = true;
+            foreach (var machine in machines)
+            {
+                if (ConHelper.execNonQuery(
+                    "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID;",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } }
+                    )==null) res = null;
+            }
+            return res;
         }
     }
 }

@@ -21,3 +21,8 @@ CREATE TABLE users_devices (
     user_id UUID NOT NULL,
     device_id UUID NOT NULL
 );
+
+CREATE TABLE devices (
+    device_id UUID PRIMARY KEY,
+    last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL
+);
