@@ -1,0 +1,9 @@
+services:
+  grpc.telemetry.server:
+    container_name: catmonit-telemetry-server
+    image: "ghcr.io/krzysztoff27/catmonit-telemetry-server:latest"
+    command: "docker cp server.pfx catmonit-telemetry-server:/app/SSL"
+    ports:
+      - "5001:5001"
+      - "5172:5172"
+    
