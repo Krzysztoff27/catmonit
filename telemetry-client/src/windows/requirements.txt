@@ -1,0 +1,15 @@
+﻿grpcio
+asyncio
+time
+pydantic
+socket
+subprocess
+platform
+psutil
+json
+typing
+functools
+PyYAML
+grpcio-tools
+pywin32
+ssl
