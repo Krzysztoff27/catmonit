@@ -6,4 +6,12 @@ services:
     ports:
       - "5001:5001"
       - "5172:5172"
-    
+    networks:
+      - catmonit-network
+    volumes:
+      - "/opt/catmonit-telemetry-server/backend/backend/Docker/telemetry-server/certs/server.pfx:/app/SSL:ro"
+
+networks:
+  catmonit-network:
+    name: catmonit-network
+    external: true
