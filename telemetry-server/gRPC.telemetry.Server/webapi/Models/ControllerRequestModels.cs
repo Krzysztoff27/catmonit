@@ -5,6 +5,7 @@
     {
         public Guid userID { get; set; }
         public string access { get; set; } // to be the string representation of Permission enum 
+        public List<Guid> devicesIDs { get; set; }
     }
     public class addNotificationDeviceRequestModel
     {
