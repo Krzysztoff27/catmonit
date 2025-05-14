@@ -6,7 +6,7 @@ import json
 from typing import List
 from pydantic import BaseModel
 from functools import lru_cache
-from logic import telemetry_pb2
+import telemetry_pb2
 
 
 class Base(BaseModel):
@@ -130,14 +130,36 @@ def get_fileshares_payload() -> List[telemetry_pb2.FileShares]:
             text=True,
             check=True
         )
+        raw_json = result.stdout.strip()
+        if not raw_json:
+            print("Empty JSON output from PowerShell")
+            return []
+
+        parsed = json.loads(raw_json)
+
+        # Ensure it's a list
+        if isinstance(parsed, dict):
+            parsed = [parsed]
+        elif not isinstance(parsed, list):
+            print(f"Unexpected JSON type: {type(parsed)}")
+            return []
+
         shares = []
-        for share in json.loads(result.stdout):
-            fs = telemetry_pb2.FileShares()
-            fs.share_path = share["share_path"]
-            fs.usage = int(share["usage"])
-            fs.capacity = int(share["capacity"])
-            shares.append(fs)
+        for share in parsed:
+            try:
+                fs = telemetry_pb2.FileShares()
+                fs.share_path = share["share_path"]
+                fs.usage = int(share["usage"])
+                fs.capacity = int(share["capacity"])
+                shares.append(fs)
+            except (KeyError, ValueError, TypeError) as e:
+                print(f"Invalid share data: {share}, error: {e}")
         return shares
+
+    except subprocess.CalledProcessError as e:
+        print(f"PowerShell script failed: {e.stderr}")
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON returned: {e}")
     except Exception as e:
         print(f"Error getting fileshares: {e}")
-        return []
+    return []

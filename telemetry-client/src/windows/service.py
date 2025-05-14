@@ -1,114 +1,88 @@
-﻿import win32serviceutil
+﻿import threading
+
+import win32serviceutil
 import win32service
 import win32event
 import servicemanager
-import threading
-import asyncio
-import logging
-import time
-
+import os
+import sys
 import yaml
+import asyncio
 
 from logic.catmonit_client import TelemetryStream
-import os
 
-SERVICE_NAME = "CatMonitTelemetryClient"
-SERVICE_DISPLAY_NAME = "CatMonit Telemetry Client"
-SERVICE_DESCRIPTION = "Sends telemetry data to CatMonit server."
-
-# Setup logging
+import logging
 logging.basicConfig(
+    filename="C:\\Program Files\\CatMonit Telemetry Client\\telemetry.log",
     level=logging.DEBUG,
-    format='%(asctime)s [%(levelname)s] [%(threadName)s] %(name)s: %(message)s',
-    handlers=[logging.FileHandler("catmonit_service.log"), logging.StreamHandler()]
+    format="%(asctime)s [%(levelname)s] %(message)s"
 )
-logger = logging.getLogger(__name__)
 
-
-class CatMonitTelemetryClient(win32serviceutil.ServiceFramework):
-    _svc_name_ = SERVICE_NAME
-    _svc_display_name_ = SERVICE_DISPLAY_NAME
-    _svc_description_ = SERVICE_DESCRIPTION
+class CatMonitService(win32serviceutil.ServiceFramework):
+    _svc_name_ = "CatMonitTelemetryClient"
+    _svc_display_name_ = "CatMonit Telemetry Client"
+    _svc_description_ = "Pushes telemetry data to a central server using gRPC."
 
     def __init__(self, args):
-        win32serviceutil.ServiceFramework.__init__(self, args)
-        self.stop_event = threading.Event()
-        self.started_event = threading.Event()
-        self.worker_thread = threading.Thread(target=self.main_service_logic, name="CatMonitWorker")
-        self.telemetry = None
-        logger.info("CatMonitTelemetryClient: Service __init__ completed.")
+        super().__init__(args)
+        self.stop_event = win32event.CreateEvent(None, 0, 0, None)
+        self.running = True
+        self.loop = asyncio.new_event_loop()
 
-    def SvcDoRun(self):
-        logger.info("CatMonitTelemetryClient: SvcDoRun entered.")
-
-        # Set Windows Proactor event loop policy
-        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
-        logger.debug("CatMonitTelemetryClient: Using proactor: WindowsProactorEventLoopPolicy")
-
-        self.ReportServiceStatus(self._svc_name_, win32service.SERVICE_START_PENDING)
-        self.worker_thread.start()
-        self.ReportServiceStatus(win32service.SERVICE_RUNNING)
-        logger.info("CatMonitTelemetryClient: Worker thread started.")
-
-        logger.info("Waiting for service logic to confirm startup...")
-        if self.started_event.wait(timeout=25):
-            logger.info("Reported SERVICE_RUNNING. Waiting for stop event.")
-        else:
-            logger.error("Timed out waiting for service logic to start.")
-            self.SvcStop()
-            return
-
-        self.stop_event.wait()
-        logger.info("Stop event received in SvcDoRun.")
-        logger.info("SvcDoRun is exiting.")
 
     def SvcStop(self):
-        logger.info("SvcStop called.")
+        logging.info("Service stop requested")
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-        logger.info("Requesting asyncio loop to stop.")
-        self.stop_event.set()
-        logger.info("Waiting for worker thread to join.")
-        self.worker_thread.join()
-        logger.info("Worker thread joined successfully.")
-        self.ReportServiceStatus(win32service.SERVICE_STOPPED)
-        logger.info("Service reported as STOPPED.")
+        self.running = False
+        win32event.SetEvent(self.stop_event)
+        self.loop.call_soon_threadsafe(self.loop.stop)
 
-    def main_service_logic(self):
-        logger.info("main_service_logic (worker thread) started.")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        logger.info("Asyncio event loop created and set for worker thread.")
+    def SvcDoRun(self):
+        servicemanager.LogInfoMsg("CatMonit Telemetry service is starting...")
+        logging.info("SvcDoRun started")
+
+        thread = threading.Thread(target=self.run_async_main, daemon=True)
+        thread.start()
+
+        self.ReportServiceStatus(win32service.SERVICE_RUNNING)
+        win32event.WaitForSingleObject(self.stop_event, win32event.INFINITE)
+        logging.info("SvcDoRun exiting")
+
+    def run_async_main(self):
+        asyncio.set_event_loop(self.loop)
         try:
-            loop.run_until_complete(self.run_main_async())
+            self.loop.run_until_complete(self.run_main())
         except Exception as e:
-            logger.exception("Unhandled exception in worker thread (main_service_logic): %s", e)
+            logging.exception("Async main loop crashed: %s", e)
         finally:
-            logger.info("main_service_logic (worker thread) attempting to close asyncio loop.")
-            loop.close()
-            logger.info("Asyncio loop closed.")
-            logger.info("main_service_logic (worker thread) finished.")
+            self.loop.close()
+            logging.info("Async loop closed")
 
-    async def run_main_async(self):
-        logger.info("run_main_async started.")
+    async def run_main(self):
         try:
-            self.telemetry = TelemetryStream()
             config = load_config()
-            server = config.get("server_address", "localhost")
-            port = config.get("server_port", "5001")
-            await self.telemetry.open_stream(server, port)  # Pass self to signal start
+            logging.info(f"Loaded config: {config}")
+
+            stream = TelemetryStream()
+            await stream.open_stream(
+                config.get("server_address", "localhost"),
+                config.get("server_port", "5001")
+            )
         except Exception as e:
-            logger.exception("run_main_async finished with exception: %s", e)
-        logger.info("run_main_async finished.")
+            logging.exception("Error in run_main: %s", e)
+
 
 def load_config():
     path = os.path.join(os.environ.get("PROGRAM_FILES", "C:\\Program Files"), "CatMonit Telemetry Client", "config.yaml")
-    logging.info(f"Loading config from {path}")
-    try:
-        with open(path, "r") as f:
-            return yaml.safe_load(f)
-    except Exception as e:
-        logging.exception("Failed to load config file")
-        raise
+
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
 
 if __name__ == '__main__':
-    win32serviceutil.HandleCommandLine(CatMonitTelemetryClient)
+    if len(sys.argv) == 1:
+        servicemanager.Initialize()
+        servicemanager.PrepareToHostSingle(CatMonitService)
+        servicemanager.StartServiceCtrlDispatcher()
+    else:
+        win32serviceutil.HandleCommandLine(CatMonitService)
