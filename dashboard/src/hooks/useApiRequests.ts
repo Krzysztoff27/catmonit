@@ -1,5 +1,5 @@
 import urlConfig from "../config/url.config.ts";
-import { normalizePath } from "../utils/misc.ts";
+import { normalizePath } from "../utils/api.ts";
 import useAuth from "./useAuth.ts";
 
 const responseOnNoResponse = new Response(JSON.stringify({ detail: "No response from server" }), {
