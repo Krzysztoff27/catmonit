@@ -7,7 +7,7 @@ const devices: DeviceDiskData[] = [
         uuid: "1234",
         hostname: "Tux",
         ip: "192.168.1.1",
-        mask: "/24",
+        mask: "24",
         disks: [
             {
                 path: "/dev/sda",
@@ -30,7 +30,7 @@ const devices: DeviceDiskData[] = [
         uuid: "5678",
         hostname: "Kamel",
         ip: "192.168.1.2",
-        mask: "/24",
+        mask: "24",
         disks: [
             {
                 path: "/dev/sda",
