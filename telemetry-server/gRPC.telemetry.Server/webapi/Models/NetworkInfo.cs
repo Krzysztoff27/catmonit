@@ -21,7 +21,6 @@ namespace webapi.Models
     public class NetworkInfoModel
     {
         public DateTime SnapshotTime { get; set; }
-        public string Information { get; set; } = string.Empty;
         public uint WarningsCount { get; set; }
         public ConcurrentDictionary<Guid, NetworkDeviceInfo> MonitoredDevices { get; set; } = new();
         public List<Guid> AutoCandidates { get; set; } = new();
@@ -37,7 +36,6 @@ namespace webapi.Models
         private readonly ReaderWriterLockSlim _rwLock = new();
         private readonly Thread _writeWorker;
 
-        public string Information { get; set; }
         public uint WarningsCount { get; set; }
 
         private NetworkInfo()
@@ -90,6 +88,18 @@ namespace webapi.Models
                 _rwLock.ExitReadLock();
             }
         }
+        public List<Guid> GetAllDevicesUUIDs()
+        {
+            _rwLock.EnterReadLock();
+            try
+            {
+                return _monitoredDevices.Keys.ToList();
+            }
+            finally
+            {
+                _rwLock.ExitReadLock();
+            }
+        }
 
         public NetworkDeviceInfo? GetDevice(Guid uuid)
         {
@@ -131,7 +141,6 @@ namespace webapi.Models
                 return new NetworkInfoModel
                 {
                     SnapshotTime = DateTime.Now,
-                    Information = this.Information,
                     WarningsCount = this.WarningsCount,
                     MonitoredDevices = _monitoredDevices,
                     AutoCandidates = new List<Guid>(_autoCandidates)

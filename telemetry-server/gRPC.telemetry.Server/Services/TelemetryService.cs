@@ -7,6 +7,7 @@ using gRPC.telemetry;
 using gRPC.telemetry.Server.Models;
 using Microsoft.Extensions.Logging;
 using gRPC.telemetry.Server.webapi.Websocket;
+using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 
 public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryServiceBase
 {
@@ -39,7 +40,11 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Os = request.OperatingSystem
                     };
 
-                    if (guid == Guid.Empty) guid = Guid.Parse(response.Uuid);
+                    if (guid == Guid.Empty)
+                    {
+                        guid = Guid.Parse(response.Uuid);
+                        DeviceHelper.OnDeviceConnected(guid);
+                    }
                     switch (request.PayloadCase)
                     {
                         case TelemetryRequest.PayloadOneofCase.Network:

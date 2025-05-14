@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Grpc.Core;
+using Microsoft.AspNetCore.Mvc;
 using System.Security;
 using webapi.Helpers;
 using webapi.Helpers.DBconnection;
@@ -15,15 +16,55 @@ namespace webapi.Controllers.http.user
         public class addAccessController : Controller
         {
             [HttpPost]
-            public IActionResult Post([FromBody] addAccessRequestModel user)
+            public IActionResult Post([FromBody] addAccessRequestModel addAccessRequest)
             {
                 var authRes = Utils.Authenticate(Request);
                 if (authRes.res != null) return authRes.res;
 
-                bool? permissionCheckRes = PermissionHelper.checkIfUserHasPermissions(authRes.payload.id, (int) Permissions.modifyAccessPermission);
-                if (permissionCheckRes == null) return Utils.returnVal(500);
-                if (permissionCheckRes == false) return Utils.returnVal(403, "you don't have permission to modify access to resources");
-                return Utils.returnVal(501, "you can modify the permissions, but that action is not yet implemented"); // TODO: implement 
+                string? username = userHelper.getUsername(addAccessRequest.userID);
+                if (string.IsNullOrEmpty(username)) return Utils.returnVal(400, "user doesn't exist");
+
+                int? granterPermission = PermissionHelper.UserPermission(authRes.payload.id);
+                if (granterPermission == null) return Utils.returnVal(500);
+
+                Permissions RequestedActionPermission = PermissionHelper.getPermissionBit(addAccessRequest.access);
+                if (RequestedActionPermission == Permissions.defaultPermission) return Utils.returnVal(400, "unknown action");
+                if (RequestedActionPermission == Permissions.seeSelectedPermission && ((granterPermission & (int)Permissions.seeAllPermission)==0))
+                {
+                    return Utils.returnVal(403, "you cannot add access to devices if you don't have access to see all devices. (how did you even send this request???) (this is probably a bug, please report it)");
+                }
+                if ((granterPermission & (int)RequestedActionPermission) == 0) return Utils.returnVal(403, "you cannot give others permissions you don't have yourself");
+
+
+                // actually give the permission
+                if (RequestedActionPermission != Permissions.seeSelectedPermission)
+                {
+                    bool? addPermRes = PermissionHelper.addPermissionToUser(addAccessRequest.userID, RequestedActionPermission);
+                    if (addPermRes == null) return Utils.returnVal(500);
+                    else if (addPermRes == false) return Utils.returnVal(400, "user not found");
+                    else return Utils.returnVal(200, "permission added succesfully");
+                }
+                else
+                {
+                    if (addAccessRequest.devicesIDs == null || addAccessRequest.devicesIDs.Count == 0) return Utils.returnVal(400, "you have to specify the devices you'd like to add access to.");
+                    List<Guid> madeUpDevices = new List<Guid>();
+                    foreach (var deviceID in addAccessRequest.devicesIDs)
+                    {
+                        // TODO
+                        // check if device really exist/ is active
+                    }
+
+                    var existingDevices = addAccessRequest.devicesIDs.Except(madeUpDevices).ToList();
+
+                    if (PermissionHelper.addAccessToMachines(addAccessRequest.userID, existingDevices) == null) return Utils.returnVal(500);
+
+                    if (madeUpDevices.Count != 0)
+                    {
+                        var data = new { Message = "The requested machines do not exist (the access to the existing devices has been added)", Machines = madeUpDevices };
+                        return new ObjectResult(data) { StatusCode = 400 };
+                    }
+                    return Utils.returnVal(200, "access to devices granted");
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
@@ -16,24 +17,25 @@ namespace webapi.Monitoring
     public class NetworkResponse
     {
         public int montoredDevicesCount { get; set; } = 0;
-        public List<NetworkDeviceInfo> monitoredDevices { get; set; } = new();
+        public ConcurrentDictionary<Guid, NetworkDeviceInfo> monitoredDevices { get; set; } = new();
         public int autoDevicesCount { get; set; } = 0;
-        public List<NetworkDeviceInfo> autoDevices { get; set; } = new();
+        public ConcurrentDictionary<Guid, NetworkDeviceInfo> autoDevices { get; set; } = new();
     }
     public class NetworkMonit : Monit
     {
         public static NetworkMonit Instance = new NetworkMonit();
 
+        public int NextAutoRequestedCount { get; set; } = 0;
+
         private NetworkMonit() {
             StartMonitoring(5000);
         }
 
-        static NetworkInfoModel networkDeviceInfos = new();
+        public static NetworkInfoModel networkDeviceInfos { get; set; } = new();
         public override void UpdateGeneralData()
         {
             // caluculate the AUTO best candidates, as well as the overall warnings and errors.
-            
-            NetworkInfo.Instance.CalculateBestAutoCandidates(10);
+            NetworkInfo.Instance.CalculateBestAutoCandidates(NextAutoRequestedCount);
 
             // create snapshot
             networkDeviceInfos = NetworkInfo.Instance.GetSnapshot(); 
@@ -45,14 +47,14 @@ namespace webapi.Monitoring
             for (int i = 0; i < ((subber.autoDevicesCount < networkDeviceInfos.MonitoredDevices.Count) ? subber.autoDevicesCount: networkDeviceInfos.MonitoredDevices.Count); i++)
             {
                 nr.autoDevicesCount++;
-                nr.autoDevices.Add(networkDeviceInfos.MonitoredDevices[networkDeviceInfos.AutoCandidates[i]]);
+                nr.autoDevices[networkDeviceInfos.AutoCandidates[i]] = (networkDeviceInfos.MonitoredDevices[networkDeviceInfos.AutoCandidates[i]]);
             }
             
             return JsonSerializer.Serialize(nr);
         }
         public override async void sendData()
         {
-            var tasks = subscribers.Values.Select(async sub =>
+            var tasks = subscribers.Select(async sub =>
             {
                 string customMessage = subscriberUpdateMessage(sub); 
 
@@ -74,6 +76,11 @@ namespace webapi.Monitoring
 
         public override void onSubscribe(Subscriber subber)
         {
+            if (subber.autoDevicesCount> NextAutoRequestedCount)
+            {
+                NextAutoRequestedCount = subber.autoDevicesCount;
+                UpdateGeneralData();
+            }
             // check if user has permission to view all the requested devices
             if ((subber.userPermissions & (int)Permissions.seeAllPermission) != (int)Permissions.seeAllPermission)
             {

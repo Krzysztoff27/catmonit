@@ -4,6 +4,8 @@
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using webapi.Monitoring;
 using webapi.Websocket;
+using gRPC.telemetry.Server.webapi.Services;
+
 #if CM_GENERATE_SWAGGER
 using Microsoft.OpenApi.Models;
 #endif
@@ -15,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 #if CM_RUN_ALL
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
+builder.Services.AddHostedService<CleanupService>();
 #endif
 #if CM_GENERATE_SWAGGER
 builder.Services.AddSwaggerGen(c =>

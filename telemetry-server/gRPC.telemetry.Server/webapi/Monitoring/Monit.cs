@@ -7,21 +7,25 @@ namespace webapi.Monitoring
     {
 
         public int requestTimeout;
-        public readonly ConcurrentDictionary<Guid, Subscriber> subscribers = new ConcurrentDictionary<Guid, Subscriber>(); // index is id in db (and in token)
+        public readonly List<Subscriber> subscribers = new List<Subscriber>(); // index is id in db (and in token)
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
         public CancellationTokenSource cancellationTokenSource;
         public Task monitorTask;
 
         public void Subscribe(Subscriber sub)
         {
-            if (subscribers.IsEmpty) NetworkMonit.Instance.UpdateGeneralData();
-            subscribers.TryAdd(sub.userID, sub);
+            if (subscribers.Count == 0)
+            {
+                NetworkMonit.Instance.NextAutoRequestedCount = sub.autoDevicesCount;
+                NetworkMonit.Instance.UpdateGeneralData();
+            }
+                subscribers.Add( sub);
             onSubscribe(sub);
         }
 
         public void Unsubscribe(Subscriber sub)
         {
-            subscribers.TryRemove(sub.userID, out _);
+            subscribers.Remove(sub);
             onUnsubscribe(sub);
         }
 
