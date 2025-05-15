@@ -65,7 +65,7 @@ namespace webapi.Monitoring
                 {
                     await sub.WebSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Utils.assert(false);
                 }

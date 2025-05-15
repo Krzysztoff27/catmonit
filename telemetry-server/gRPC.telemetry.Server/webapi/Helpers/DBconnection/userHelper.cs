@@ -1,4 +1,5 @@
-﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+﻿using gRPC.telemetry.Server.webapi;
+using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using System;
 
 
@@ -39,53 +40,63 @@ namespace webapi.Helpers.DBconnection
         }
 
 
-        // returns user id (starting from 1)
-        // 0 is reserved for user not found / incorrect password
         public static (userAuthStatus status, Guid userID) userAuth(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return (userAuthStatus.IncorrectPassword, Guid.Empty);
-            using (var reader = ConHelper.ExecuteReader("SELECT id, password_hash, salt FROM users WHERE username = @username", new Dictionary<string, object> { { "@username", username } }))
+            try
             {
-                if (reader == null)
+                using (var reader = ConHelper.ExecuteReader("SELECT id, password_hash, salt FROM users WHERE username = @username", new Dictionary<string, object> { { "@username", username } }))
                 {
-                    return (userAuthStatus.InternalServerError, Guid.Empty);
-                }
-                if (reader.Read())
-                {
-                    byte[] storedHash = (byte[])reader["password_hash"];
-                    byte[] salt = (byte[])reader["salt"];
-                    if (PasswordHelper.VerifyPassword(password, salt, storedHash))
+                    if (reader == null)
                     {
-                        return (userAuthStatus.Success, (Guid)reader["id"]);
+                        return (userAuthStatus.UserDoesntExist, Guid.Empty);
+                    }
+                    if (reader.Read())
+                    {
+                        byte[] storedHash = (byte[])reader["password_hash"];
+                        byte[] salt = (byte[])reader["salt"];
+                        if (PasswordHelper.VerifyPassword(password, salt, storedHash))
+                        {
+                            return (userAuthStatus.Success, (Guid)reader["id"]);
+                        }
+                        else
+                        {
+                            return (userAuthStatus.IncorrectPassword, Guid.Empty);
+                        }
+                        ;
                     }
                     else
                     {
-                        return (userAuthStatus.IncorrectPassword, Guid.Empty);
-                    };
+                        return (userAuthStatus.UserDoesntExist, Guid.Empty);
+                    }
                 }
-                else
-                {
-                    return (userAuthStatus.UserDoesntExist, Guid.Empty);
-                }
+            }catch (InternalServerError)
+            {
+                return (userAuthStatus.InternalServerError, Guid.Empty);
             }
         }
 
         public static userCreateStatus createUser(string username, string password, int permBitmask = (int) Permissions.defaultPermission)
         {
-            int? count = ConHelper.execCountQuery(
-                $"SELECT count(id) FROM users where username = @username;",
-                new Dictionary<string, object> { { "@username", username } }
-            );
-            if (count == null) return userCreateStatus.InternalServerError;
-            if (count != 0) return userCreateStatus.UserAlreadyExists;
-
-            byte[] salt = PasswordHelper.GenerateSalt();
-            bool? res = ConHelper.execNonQuery(
-                "insert into users (username, password_hash, salt, permissions) values (@username, @hash, @salt, @permission);", 
-                new Dictionary<string, object> { { "@username", username }, { "@hash", PasswordHelper.HashPassword(password, salt) }, { "@salt", salt }, { "@permission", permBitmask } }
+            try
+            {
+                int count = ConHelper.execCountQuery(
+                    $"SELECT count(id) FROM users where username = @username;",
+                    new Dictionary<string, object> { { "@username", username } }
                 );
-            if (res == null) return userCreateStatus.InternalServerError;
-            return userCreateStatus.Success;
+                if (count != 0) return userCreateStatus.UserAlreadyExists;
+
+                byte[] salt = PasswordHelper.GenerateSalt();
+                bool res = ConHelper.execNonQuery(
+                    "insert into users (username, password_hash, salt, permissions) values (@username, @hash, @salt, @permission);",
+                    new Dictionary<string, object> { { "@username", username }, { "@hash", PasswordHelper.HashPassword(password, salt) }, { "@salt", salt }, { "@permission", permBitmask } }
+                    );
+                return userCreateStatus.Success;
+            }
+            catch (InternalServerError)
+            {
+                return userCreateStatus.InternalServerError;
+            }
         }
 
         public static string? getUsername(Guid userID)
@@ -127,7 +138,6 @@ namespace webapi.Helpers.DBconnection
         {
             using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
             {
-                if (reader == null) return null;
                 if (!reader.Read()) return null;
                 return (int)reader["permissions"];
             }
@@ -137,7 +147,6 @@ namespace webapi.Helpers.DBconnection
 
             using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
             {
-                if (reader == null) return null;
                 if (!reader.Read()) return null;
                 return (((int)reader["permissions"]) & permissions) == permissions;
             }
@@ -145,21 +154,23 @@ namespace webapi.Helpers.DBconnection
         public static bool? addPermissionToUser(Guid guid, Permissions permissions)
         {
             int? currentPermission = UserPermission(guid);
-            if (currentPermission == null) return null;
+            if (currentPermission == null) return null; // user doesn't exist
             int addedPermission = currentPermission.Value | (int)permissions;
             return ConHelper.execNonQuery("UPDATE users SET permissions = @perms WHERE id = @userID", new Dictionary<string, object> { { "@perms", addedPermission }, { "@userID", guid } });
         }
-        public static bool? addAccessToMachines(Guid userID, List<Guid> machines)
+        public static void addAccessToMachines(Guid userID, List<Guid> machines)
         {
-            bool? res = true;
             foreach (var machine in machines)
             {
-                if (ConHelper.execNonQuery(
-                      "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID)",
-                    new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } }
-                    )==null) res = null;
+                ConHelper.execNonQuery(
+                        "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID)",
+                    new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } });
             }
-            return res;
+            
+        }
+        public static void removeSpecificMachinesAccess(Guid userID)
+        {
+            ConHelper.execNonQuery("REMOVE FROM users_devices where user_id = @userID", new Dictionary<string, object> { { "@userID", userID } });
         }
     }
 }
