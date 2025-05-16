@@ -4,7 +4,7 @@ import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceSto
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
 import { WidgetsConfig } from "../types/config.types";
-import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
+// import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
 import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";

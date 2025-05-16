@@ -35,6 +35,7 @@ function DetailedDeviceStorageWidget({ data, settings, className, ...props }: Wi
             ref={ref}
             {...props}
             className={`${classes.container} ${className}`}
+            withBorder
         >
             <Stack className={classes.stack}>
                 <Title

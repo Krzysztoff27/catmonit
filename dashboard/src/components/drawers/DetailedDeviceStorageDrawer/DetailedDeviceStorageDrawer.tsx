@@ -7,11 +7,89 @@ import { Disk } from "../../../types/api.types";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
 import { safeObjectValues } from "../../../utils/object";
 
+<<<<<<< HEAD
 function DetailedDeviceStorageDrawer({ index }) {
     const { widgets, setWidgetSettings, getWidgetData, getData, getWidget } = useWidgets();
     const widget = getWidget(index);
     const widgetData = getWidgetData(widget);
     const selectedDevice = widget?.settings?.target;
+=======
+const devices: DeviceDiskData[] = [
+    {
+        uuid: "1234",
+        hostname: "Tux",
+        ip: "192.168.1.1",
+        mask: "24",
+        disks: [
+            {
+                path: "/dev/sda",
+                storageLimit: 100,
+                storageCurrent: 50,
+            },
+            {
+                path: "/dev/sdb",
+                storageLimit: 100,
+                storageCurrent: 80,
+            },
+            {
+                path: "/dev/sdc",
+                storageLimit: 50,
+                storageCurrent: 15,
+            },
+        ],
+    },
+    {
+        uuid: "5678",
+        hostname: "Kamel",
+        ip: "192.168.1.2",
+        mask: "24",
+        disks: [
+            {
+                path: "/dev/sda",
+                storageLimit: 500,
+                storageCurrent: 200,
+            },
+            {
+                path: "/dev/sdb",
+                storageLimit: 1000,
+                storageCurrent: 800,
+            },
+            {
+                path: "/dev/sdc",
+                storageLimit: 2000,
+                storageCurrent: 1500,
+            },
+        ],
+    },
+    {
+        uuid: "91011",
+        hostname: "Bro",
+        ip: "192.168.1.3",
+        mask: "/25",
+        disks: [
+            {
+                path: "/dev/sda",
+                storageLimit: 16000,
+                storageCurrent: 200,
+            },
+            {
+                path: "/dev/sdb",
+                storageLimit: 12200,
+                storageCurrent: 800,
+            },
+            {
+                path: "/dev/sdc",
+                storageLimit: 22000,
+                storageCurrent: 1500,
+            },
+        ],
+    },
+];
+const selectDeviceData = devices.map((device) => ({
+    value: device.uuid,
+    label: `${device.hostname} (${device.ip}${device.mask})`,
+}));
+>>>>>>> 01e978a1117b1d97ba2ee33f2604ffb484310a83
 
     const changeDevice = (target: string | undefined) => {
         let newDiskSettings = {};
