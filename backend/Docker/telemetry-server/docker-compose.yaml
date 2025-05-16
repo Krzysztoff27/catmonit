@@ -15,7 +15,7 @@ services:
     networks:
       - catmonit-network
     volumes:
-      - "/opt/catmonit-telemetry-server/backend/backend/Docker/telemetry-server/certs/server.pfx:/app/SSL/server.pfx:ro"
+      - "/opt/catmonit/backend/backend/Docker/telemetry-server/certs/server.pfx:/app/SSL/server.pfx:ro"
 
 networks:
   catmonit-network:
