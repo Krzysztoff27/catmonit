@@ -10,12 +10,9 @@ namespace webapi.Helpers
     {
         public static Subscriber createSubscriber(Guid userID, WebSocket webSocket)
         {
-            int? perms = PermissionHelper.UserPermission(userID);
             return new Subscriber(
                 userID, 
-                webSocket, 
-                (perms.HasValue) ? perms.Value:(int)Permissions.defaultPermission, 
-                DeviceHelper.GetDevicesUserHasAccessTo(userID)
+                webSocket
                 );
         }
     }

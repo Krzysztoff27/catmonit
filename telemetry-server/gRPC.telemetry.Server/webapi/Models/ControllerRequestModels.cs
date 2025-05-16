@@ -17,7 +17,7 @@
     {
         public string username { get; set; }
         public string password { get; set; }
-        public List<string>? permissions { get; set; } // to be the string representation of Permission enum (eg. "seeAll")
+        // public List<string>? permissions { get; set; } // to be the string representation of Permission enum (eg. "seeAll")
     }
 
     // login request model is userModel

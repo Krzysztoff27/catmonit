@@ -19,7 +19,7 @@ namespace webapi.Monitoring
                 NetworkMonit.Instance.NextAutoRequestedCount = sub.autoDevicesCount;
                 NetworkMonit.Instance.UpdateGeneralData();
             }
-                subscribers.Add( sub);
+            subscribers.Add(sub);
             onSubscribe(sub);
         }
 
