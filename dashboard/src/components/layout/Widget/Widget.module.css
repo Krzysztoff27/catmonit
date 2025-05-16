@@ -11,7 +11,6 @@
     background-color: var(--background-color-6);
     overflow: hidden;
     padding: var(--mantine-spacing-md);
-    padding-bottom: var(--mantine-spacing-xl);
 }
 
 .timeout {

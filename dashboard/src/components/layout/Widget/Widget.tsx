@@ -6,7 +6,7 @@ import { forwardRef } from "react";
 import { WidgetData } from "../../../types/api.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import TimeoutRingProgress from "../../display/TimeoutRingProgress/TimeoutRingProgress";
-import DUMMIES from "../WidgetMenu/dummies";
+import { data } from "../../../pages/Editor/dummies";
 
 interface WidgetProps extends FlexProps {
     index: number; // if index = -1 then its a ghost component
@@ -21,6 +21,8 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
         const { getWidgetConfig, getWidgetData, getWidgetContent } = useWidgets();
         const WidgetContent = getWidgetContent(widget);
         const config = getWidgetConfig(widget);
+        const showTimestamp = config.isReferingToSingularResource && !widget?.settings?.automatic;
+
         return (
             <Flex
                 data-grid={dataGrid}
@@ -41,14 +43,15 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                 <Paper
                     {...paperProps}
                     className={`drag-handle ${classes.paper} ${paperProps?.className ?? ""}`}
+                    pb={showTimestamp ? "xl" : "md"}
                     withBorder
                 >
                     <WidgetContent
                         index={index}
-                        data={index !== -1 ? getWidgetData(widget) : DUMMIES[widget.type]}
+                        data={index !== -1 ? getWidgetData(widget) : data[widget.type]}
                         settings={widget?.settings}
                     />
-                    {config.isReferingToSingularResource && !widget?.settings?.automatic && (
+                    {showTimestamp && (
                         <TimeoutRingProgress
                             timestamp={new Date().toISOString()}
                             className={classes.timeout}
