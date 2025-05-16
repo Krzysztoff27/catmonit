@@ -15,17 +15,22 @@ export interface UrlConfig {
     staging?: UrlNode;
 }
 
+export interface WidgetLimits {
+    minH: number;
+    minW: number;
+    maxH: number;
+    maxW: number;
+}
+
 export interface WidgetConfig {
     name: string;
+    dataSource: string;
+    isReferingToSingularResource: boolean;
     icon: TablerIcon;
     component: WidgetComponent;
     drawer: ComponentType<any>; // TODO specify the props
-    limits: {
-        minH: number;
-        minW: number;
-        maxH: number;
-        maxW: number;
-    };
+    limits: WidgetLimits;
+    initialSettings: any;
 }
 
 export interface WidgetsConfig {

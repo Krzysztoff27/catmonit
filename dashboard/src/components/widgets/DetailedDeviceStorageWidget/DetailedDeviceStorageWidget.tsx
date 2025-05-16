@@ -6,17 +6,29 @@ import { WidgetComponentProps } from "../../../types/components.types";
 import DiskProgress from "../../display/DiskProgress/DiskProgress";
 import classes from "./DeviceDisksWidget.module.css";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
+import { isEmpty } from "lodash";
+import { safeObjectValues } from "../../../utils/object";
 
 function DetailedDeviceStorageWidget({ data, settings, className, ...props }: WidgetComponentProps) {
     let { height, ref } = useElementSize();
 
     const prepareData = () => {
-        if (!height) return data.disks ?? [];
-        return data?.disks?.slice?.(0, Math.floor((height - 118) / 44)) ?? [];
+        if (!height || !data.disks) return data.disks ?? [];
+
+        const numberOfSlots = Math.floor((height - 118) / 44);
+        const visibleDisks = settings.disks.filter(({ hidden }) => !hidden).map(({ path }) => path);
+        const diskData = visibleDisks.map((path: string) => data.disks[path]);
+
+        if (settings.automatic) {
+            return diskData
+                .sort((a: Disk, b: Disk) => (a.storageCurrent / a.storageLimit < b.storageCurrent / b.storageLimit ? 1 : -1))
+                .slice(0, numberOfSlots);
+        }
+
+        return diskData.slice(0, numberOfSlots);
     };
 
     const disksData = prepareData();
-    console.log(data, disksData);
 
     return (
         <Paper

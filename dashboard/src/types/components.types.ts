@@ -1,6 +1,7 @@
 import { ComponentType } from "react";
 import { WidgetData } from "./api.types";
-import { ItemCallback, Layout, LayoutItem } from "./reactGridLayout.types";
+import { ItemCallback, Layout, LayoutItem, Rect } from "./reactGridLayout.types";
+import { DrawerProps } from "@mantine/core";
 
 export interface WidgetComponentProps {
     data: any;
@@ -11,12 +12,14 @@ export interface WidgetComponentProps {
 
 export type WidgetComponent = ComponentType<WidgetComponentProps>;
 
+export interface DrawerComponentProps {
+    index: number | string;
+    [key: string]: any;
+}
+
+export type DrawerComponent = ComponentType<DrawerComponentProps>;
+
 export interface WidgetLayoutProps {
-    widgets: WidgetData[];
-    getComponent: (widget: WidgetData) => WidgetComponent;
-    deleteWidget: (index: string | number) => void;
-    layout: Layout;
-    updateLayout: (layout: Layout) => void;
     selected?: string | null;
     onDragStart?: ItemCallback;
     onDrag?: ItemCallback;

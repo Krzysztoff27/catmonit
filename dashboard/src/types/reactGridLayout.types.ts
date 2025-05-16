@@ -16,6 +16,13 @@ export interface LayoutItem {
     resizeHandles?: any;
 }
 
+export interface Rect {
+    w: number;
+    h: number;
+    y: number;
+    x: number;
+}
+
 export type Layout = LayoutItem[];
 
 export type ItemCallback = (layout: Layout, oldItem: LayoutItem, newItem: LayoutItem, placeholder: LayoutItem, e: MouseEvent, element: HTMLElement) => void;
