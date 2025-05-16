@@ -9,6 +9,7 @@ services:
       - POSTGRES_PASSWORD=${PASSWORD}
     volumes:
       - dbvolume:/var/lib/postgresql/data
+      - /opt/catmonit-telemetry-server/telemetry-server/telemetry-server/Database/db:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d/:ro
     networks:
         - catmonit-network
