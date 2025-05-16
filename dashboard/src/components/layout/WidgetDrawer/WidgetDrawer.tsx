@@ -1,4 +1,4 @@
-import { Drawer, DrawerProps, Space, Title } from "@mantine/core";
+import { Drawer, DrawerProps, Space } from "@mantine/core";
 import React from "react";
 import { DrawerContent, DrawerContentProps } from "../../../types/components.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
