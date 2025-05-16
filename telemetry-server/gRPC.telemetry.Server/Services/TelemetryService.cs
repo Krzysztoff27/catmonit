@@ -73,6 +73,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     responses.Add(response);
                     _logger.LogInformation("Processed message from {Hostname}", request.Hostname);
                     //DEBUG
+                    Console.OutputEncoding = System.Text.Encoding.UTF8;
                     Console.WriteLine(JsonSerializer.Serialize(response));
                     //DEBUG
                 }

@@ -33,6 +33,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddGrpc();
 
 // Configure Kestrel to listen on two HTTPS ports
+AppContext.SetSwitch("System.Text.Encoding.CodePages", true);
 builder.WebHost.ConfigureKestrel(options =>
 {
     // WebAPI on 5172 (HTTPS)
