@@ -94,7 +94,7 @@ namespace webapi.Websocket
                         }
                     }
                 }
-                catch (WebSocketException ex)
+                catch (WebSocketException)
                 {
                     if (potentialSubscriber.WebSocket.State != WebSocketState.Closed)
                     {

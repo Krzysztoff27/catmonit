@@ -1,4 +1,5 @@
 ﻿
+using gRPC.telemetry.Server.webapi;
 using JWT.Algorithms;
 using JWT.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,15 @@ namespace webapi.Controllers.http.user
             {
                 return auth.res;
             }
-            string? un = userHelper.getUsername(auth.payload.id);
-            return (un == null ? Utils.returnVal(500) : Json(new { uuid= auth.payload.id.ToString() ,username = un }));
+            try
+            {
+                string? un = userHelper.getUsername(auth.payload.id);
+                return (un == null ? Utils.returnVal(400, "user doesn't exist") : Json(new { uuid = auth.payload.id.ToString(), username = un }));
+            }
+            catch (InternalServerError)
+            {
+                return Utils.returnVal(500);
+            }
         }
         [HttpPost]
         public IActionResult Post([FromBody] UserModel user)
@@ -54,7 +62,7 @@ namespace webapi.Controllers.http.user
             {
                 if (loginInfo.status == userAuthStatus.InternalServerError)
                 {
-                    return Utils.returnVal(500, "Cannot connect to database");
+                    return Utils.returnVal(500);
 
                 }
                 return Utils.returnVal(401, "user doesn't exist or password is incorrect");
