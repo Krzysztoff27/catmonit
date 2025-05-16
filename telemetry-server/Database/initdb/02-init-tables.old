@@ -1,5 +1,7 @@
 \c catmonit_base;
 
+CREATE USER "catmonit_worker" IF NOT EXISTS; 
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE users (
@@ -26,3 +28,4 @@ CREATE TABLE devices (
     device_id UUID PRIMARY KEY,
     last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
+
