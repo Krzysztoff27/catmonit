@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { WidgetData } from "../types/api.types";
-import { Layout, LayoutItem } from "../types/reactGridLayout.types";
+import { Layout, LayoutItem, Rect } from "../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../config/widgets.config";
 import { isEmpty } from "lodash";
+
 export default function useWidgetLayout(name: string) {
     const path = encodeURI(name);
     const [widgets, setWidgets] = useState<WidgetData[]>([]);
@@ -20,17 +21,15 @@ export default function useWidgetLayout(name: string) {
         w: item.w,
     });
 
-    const getDisplayableLayoutData = (): Layout =>
-        widgets.map(
-            (widget: WidgetData, i) =>
-                ({
-                    i: `${i}`,
-                    ...widget.rect,
-                    ...getLimits(widget),
-                } as LayoutItem)
-        );
+    const layout = widgets.map(
+        (widget: WidgetData, i): LayoutItem => ({
+            i: `${i}`,
+            ...widget.rect,
+            ...getLimits(widget),
+        })
+    );
 
-    const setWidgetPositions = (newLayout: Layout) => {
+    const setWidgetRects = (newLayout: Layout) => {
         if (isEmpty(newLayout)) return;
         setWidgets((prev: WidgetData[]) =>
             prev.map((widget: WidgetData, i) => {
@@ -47,11 +46,12 @@ export default function useWidgetLayout(name: string) {
         saveStateToDatabase();
     };
 
-    const setWidgetData = (index: number, newData: any) => {
+    const setWidgetRect = (index: number, rect: Rect) => {
         setWidgets((prev: WidgetData[]) => {
-            prev[index].data = newData;
+            prev[index].rect = rect;
             return prev;
         });
+        console.log(index);
         saveStateToDatabase();
     };
 
@@ -69,7 +69,6 @@ export default function useWidgetLayout(name: string) {
             ...prev,
             {
                 type,
-                data: {},
                 settings: {},
                 rect: getItemRect(layoutItem),
             } as WidgetData,
@@ -85,9 +84,9 @@ export default function useWidgetLayout(name: string) {
         widgets,
         getLimits,
         getComponent,
-        getDisplayableLayoutData,
-        setWidgetPositions,
-        setWidgetData,
+        layout,
+        setWidgetRects,
+        setWidgetRect,
         setWidgetSettings,
         createWidget,
         deleteWidget,

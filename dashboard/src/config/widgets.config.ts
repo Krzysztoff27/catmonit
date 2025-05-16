@@ -1,13 +1,13 @@
 import { Box } from "@mantine/core";
-import { IconDatabase, IconProgressCheck, IconStorm, IconDatabaseX, IconFile } from "@tabler/icons-react";
+import { IconDatabase, IconDatabaseX, IconNetwork, IconChartDonut, IconFiles } from "@tabler/icons-react";
 import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
 import { WidgetsConfig } from "../types/config.types";
 // import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
-import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
+import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 import FileshareWidget from "../components/widgets/FileshareWidget/FileshareWidget";
 
 export const GRID_SIZE_PX = 128;
@@ -17,7 +17,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
         icon: IconDatabase,
-        component: DetailedDeviceStorageWidget,
+        content: DetailedDeviceStorageWidget,
         drawer: DetailedDeviceStorageDrawer,
         limits: {
             minH: 2,
@@ -25,23 +25,18 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 2,
             maxW: 4,
         },
+        initialSettings: {
+            target: undefined,
+            automatic: true,
+            disks: [],
+        },
+        dataSource: "storage",
+        isReferingToSingularResource: true,
     },
-    // SERVICE_STATUS: {
-    //     name: "device's status ",
-    //     icon: IconProgressCheck,
-    //     component: ServiceStatusWidget,
-    //     drawer: ServiceStatusDrawer, //TODO change it
-    //     limits: {
-    //         minH: 2,
-    //         maxH: 5,
-    //         minW: 2,
-    //         maxW: 4,
-    //     },
-    // },
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
-        icon: IconStorm,
-        component: OverallDeviceStorageWidget,
+        icon: IconChartDonut,
+        content: OverallDeviceStorageWidget,
         drawer: OverallDeviceStorageDrawer,
         limits: {
             minH: 2,
@@ -49,11 +44,17 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 2,
             maxW: 4,
         },
+        initialSettings: {
+            target: undefined,
+            automatic: true,
+        },
+        dataSource: "storage",
+        isReferingToSingularResource: true,
     },
     STORAGE_ALERTS: {
         name: "storage alerts widget",
         icon: IconDatabaseX,
-        component: AlertWidget,
+        content: AlertWidget,
         drawer: Box,
         limits: {
             minH: 2,
@@ -64,7 +65,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     },
     FILESHARE: {
         name: "fileshare widget",
-        icon: IconFile,
+        icon: IconFiles,
         component: FileshareWidget,
         drawer: Box,
         limits: {
@@ -73,11 +74,12 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 3,
             maxW: 5,
         },
-    }
-    //! TODON BRING BACK DeviceStorageWidget
-    // DEVICE_STORAGE: {
-    //     component: DeviceStorageWidget,
-    //     drawer: DeviceStorageDrawer,
+    },
+    // SERVICE_STATUS: {
+    //     name: "device's status ",
+    //     icon: IconProgressCheck,
+    //     content: Box,
+    //     drawer: ServiceStatusDrawer, //@TODO change it
     //     limits: {
     //         minH: 2,
     //         maxH: 5,
@@ -85,6 +87,18 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     //         maxW: 4,
     //     },
     // },
+    NETWORK_THROUGHPUT: {
+        name: "network throughput",
+        icon: IconNetwork,
+        content: NetworkThroughputWidget,
+        drawer: Box,
+        limits: {
+            minH: 2,
+            maxH: 6,
+            minW: 3,
+            maxW: 6,
+        },
+    },
 };
 
 export default WIDGETS_CONFIG;

@@ -5,6 +5,7 @@ import { capitalize } from "lodash";
 import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../../config/widgets.config";
 import { safeObjectEntries } from "../../../utils/object";
 import DUMMIES from "./dummies";
+import Widget from "../Widget/Widget";
 
 interface WidgetMenuProps extends PaperProps {
     currentDropType: string | null;
@@ -44,17 +45,20 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
     return (
         <>
             {currentConfiguration && (
-                <currentConfiguration.component
-                    data={currentDropType ? DUMMIES[currentDropType] : {}}
-                    settings={{}}
-                    ref={ref}
+                <Widget
+                    className={classes.ghost}
                     style={{
                         width: currentConfiguration.limits.minW * GRID_SIZE_PX,
                         height: currentConfiguration.limits.minH * GRID_SIZE_PX,
                         visibility: isDragging ? "visible" : "hidden",
                     }}
-                    className={classes.ghost}
-                />
+                    ref={ref}
+                >
+                    <currentConfiguration.content
+                        data={currentDropType ? DUMMIES[currentDropType] : {}}
+                        settings={{}}
+                    />
+                </Widget>
             )}
             <Box className={classes.positioner}>
                 <Paper

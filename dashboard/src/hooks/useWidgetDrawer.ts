@@ -2,11 +2,11 @@ import { useState } from "react";
 import WIDGETS_CONFIG from "../config/widgets.config";
 import { Layout, LayoutItem } from "../types/reactGridLayout.types";
 import { WidgetData } from "../types/api.types";
-import { Box } from "@mantine/core";
+import { DrawerContent } from "../types/components.types";
 
 export default function useWidgetDrawer(widgets: WidgetData[]) {
-    const [isOpened, setIsOpened] = useState<boolean>(false);
-    const [selected, setSelected] = useState<string | null>(null);
+    const [isOpened, setIsOpened] = useState<boolean>(true);
+    const [selected, setSelected] = useState<number | null>(0);
 
     let clicked = false;
 
@@ -17,7 +17,7 @@ export default function useWidgetDrawer(widgets: WidgetData[]) {
 
     const onWidgetDragStop = (_: Layout, before: LayoutItem, after: LayoutItem) => {
         if (!clicked || JSON.stringify(before) !== JSON.stringify(after)) return;
-        setSelected(after.i);
+        setSelected(parseInt(after.i));
         setIsOpened(true);
     };
 
@@ -26,7 +26,7 @@ export default function useWidgetDrawer(widgets: WidgetData[]) {
         setSelected(null);
     };
 
-    const DrawerComponent = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : Box;
+    const DrawerContent: DrawerContent | null = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : null;
 
-    return { isOpened, selected, onWidgetDragStart, onWidgetDragStop, closeWidgetDrawer, DrawerComponent };
+    return { isOpened, selected, onWidgetDragStart, onWidgetDragStop, closeWidgetDrawer, DrawerContent };
 }

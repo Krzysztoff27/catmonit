@@ -17,7 +17,7 @@ export interface Disk {
 }
 
 export interface DeviceDiskData extends Device {
-    disks: Disk[];
+    disks: { [key: string]: Disk };
 }
 
 // export interface OverallDeviceStorageData { //extends Device
@@ -38,7 +38,7 @@ export interface WidgetData {
         w: number;
         h: number;
     };
-    data: any;
     settings: any;
+    version: number;
 }
 

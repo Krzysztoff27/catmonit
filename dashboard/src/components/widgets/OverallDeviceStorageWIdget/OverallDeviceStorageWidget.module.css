@@ -3,7 +3,7 @@
 /* Container for the entire widget */
 .container {
     flex: 1;
-    background-color: var(--background-color-6);
+    height: 100%;
     overflow: hidden;
     padding: var(--mantine-spacing-md);
 }

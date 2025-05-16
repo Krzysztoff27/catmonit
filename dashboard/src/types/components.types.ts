@@ -1,23 +1,24 @@
 import { ComponentType } from "react";
-import { WidgetData } from "./api.types";
 import { ItemCallback, Layout, LayoutItem } from "./reactGridLayout.types";
 
-export interface WidgetComponentProps {
+export interface WidgetContentProps {
+    index: number;
     data: any;
     settings: any;
-    className: string;
     [key: string]: any;
 }
 
-export type WidgetComponent = ComponentType<WidgetComponentProps>;
+export type WidgetContent = ComponentType<WidgetContentProps>;
+
+export interface DrawerContentProps {
+    index: number;
+    [key: string]: any;
+}
+
+export type DrawerContent = ComponentType<DrawerContentProps>;
 
 export interface WidgetLayoutProps {
-    widgets: WidgetData[];
-    getComponent: (widget: WidgetData) => WidgetComponent;
-    deleteWidget: (index: string | number) => void;
-    layout: Layout;
-    updateLayout: (layout: Layout) => void;
-    selected?: string | null;
+    selected?: number | null;
     onDragStart?: ItemCallback;
     onDrag?: ItemCallback;
     onDragStop?: ItemCallback;

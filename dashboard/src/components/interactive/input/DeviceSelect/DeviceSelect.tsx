@@ -1,23 +1,26 @@
-import { Flex, Select, SelectProps, Text, Title } from "@mantine/core";
+import { Flex, Select, SelectProps, Stack, Text, Title } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-import { DeviceDiskData } from "../../../../types/api.types";
+import { useWidgets } from "../../../../contexts/WidgetContext/WidgetContext";
+import { safeObjectValues } from "../../../../utils/object";
 
-type DeviceSelectProps = {
-    title?: string;
-    placeholder: string;
-    data: DeviceDiskData[];
-    value: string | null;
-    onChange: (value: string | null) => void;
-};
+export default function DeviceSelect({ value = "", onChange }) {
+    const { getData } = useWidgets();
 
-export default function DeviceSelect({ title = "Target", placeholder, data, value, onChange }: DeviceSelectProps) {
-    const selectData = data.map((device) => ({
-        value: device.uuid,
-        label: `${device.hostname} (${device.ip}${device.mask})`,
-    }));
+    const data = getData("storage");
+
+    const selectData = [
+        { value: "", label: "Automatic selection" },
+        ...safeObjectValues(data).map((device) => ({
+            value: device.uuid,
+            label: `${device.hostname} (${device.ip}${device.mask})`,
+        })),
+    ];
 
     const renderOption: SelectProps["renderOption"] = ({ option, checked }) => {
-        const device = data.find((d) => d.uuid === option.value);
+        const device = data[option.value];
+
+        if (!device) return <i>{option.label}</i>;
+
         return (
             <Flex
                 align="center"
@@ -43,20 +46,16 @@ export default function DeviceSelect({ title = "Target", placeholder, data, valu
     };
 
     return (
-        <>
-            <Title
-                order={4}
-                mb="sm"
-            >
-                {title}
-            </Title>
+        <Stack gap="4">
+            <Title order={4}>Target</Title>
             <Select
-                placeholder={placeholder}
+                unselectable="off"
+                placeholder="Auto"
                 data={selectData}
                 value={value}
                 onChange={onChange}
                 renderOption={renderOption}
             />
-        </>
+        </Stack>
     );
 }

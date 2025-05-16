@@ -1,0 +1,13 @@
+.deleteButton {
+    position: absolute !important;
+    right: 2px !important;
+    top: 8px !important;
+    z-index: 1000;
+}
+
+.paper {
+    flex: 1;
+    background-color: var(--background-color-6);
+    overflow: hidden;
+    padding: var(--mantine-spacing-md);
+}

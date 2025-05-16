@@ -1,4 +1,4 @@
-import { Box, BoxComponentProps, PolymorphicComponentProps, Space, Text } from "@mantine/core";
+import { Box } from "@mantine/core";
 import classes from "./ScrollingText.module.css";
 import { useElementSize } from "@mantine/hooks";
 import { useEffect, useState } from "react";

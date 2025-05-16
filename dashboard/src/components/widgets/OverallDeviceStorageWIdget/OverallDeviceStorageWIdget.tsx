@@ -1,42 +1,24 @@
-import { Paper, Text, Flex } from "@mantine/core";
+import { Text, Flex, Box } from "@mantine/core";
 import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
-import { WidgetComponentProps } from "../../../types/components.types";
+import { WidgetContentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
 import classes from "./OverallDeviceStorageWidget.module.css";
 import { DeviceDiskData } from "../../../types/api.types";
 import { useEffect } from "react";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
+import { safeObjectValues } from "../../../utils/object";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
-const devices: DeviceDiskData = {
-    uuid: "1234",
-    hostname: "Tux",
-    ip: "192.168.1.1",
-    mask: "/24",
-    disks: [
-        {
-            path: "/dev/sda",
-            storageLimit: 100,
-            storageCurrent: 50,
-        },
-        {
-            path: "/dev/sdb",
-            storageLimit: 100,
-            storageCurrent: 80,
-        },
-        {
-            path: "/dev/sdc",
-            storageLimit: 50,
-            storageCurrent: 15,
-        },
-    ],
-};
-function OverallDeviceStorageWidget({ data, className, settings, ...props }: WidgetComponentProps) {
+function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     // DATA CALCULAIONS ETC.
-    const { hostname, ip, disks } = devices as DeviceDiskData; //TODO rename to data later
+    const { getWidget } = useWidgets();
+    console.log(getWidget(index));
+    const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-    const total = disks?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
-    const used = disks?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
+    const disksArray = safeObjectValues(disks);
+    const total = disksArray?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
+    const used = disksArray?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
     const free = total - used;
 
     const formattedData = [
@@ -78,28 +60,22 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
     const layoutDirection = width == 3 && height == 2 ? "row" : "column"; // column for under each other, row for side by side
     console.log(layoutDirection);
     return (
-        <Paper
+        <Box
             ref={ref}
+            className={classes.container}
             {...props}
-            className={`${classes.container} ${className}`}
-            withBorder
         >
-            {/* Title at the top */}
-            <DeviceTitleOneLine data={devices} />
-
-            {/* <div
-    style={{
-      display: "flex",
-      flexDirection: "column", // Align items vertically
-      justifyContent: "center", // Vertically center the items
-      alignItems: "center", // Horizontally center the items
-      flexGrow: 1, // Allow this wrapper to take up the remaining space
-      marginTop: "20px", // Add top margin to give breathing room from the title
-      marginBottom: "20px", // Add bottom margin to keep some space between the elements and the bottom
-    }}
-  > */}
-            {/* Flex container for centering elements horizontally and spacing them evenly */}
-            <Flex className={classes.centeredContainer}>
+            <DeviceTitleOneLine
+                data={data}
+                mb="md"
+            />
+            <Flex
+                align="center"
+                direction={layoutDirection}
+                justify="space-evenly"
+                // {/* Flex container for centering elements horizontally and spacing them evenly */}
+                className={classes.centeredContainer}
+            >
                 <DonutChart
                     data={formattedData}
                     withTooltip={false}
@@ -107,7 +83,7 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
                     h={170} // Height of the chart
                     w={170} // Width of the chart
                     chartLabel={`${used}GB/${total}GB`}
-                    className={`${classes.chart} ${className}`}
+                    className={classes.chart}
                 />
                 <Flex
                     display={height < 3 && width < 3 ? "none" : "initial"}
@@ -132,8 +108,7 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
                     ))}
                 </Flex>
             </Flex>
-            {/* </div> */}
-        </Paper>
+        </Box>
     );
 }
 
