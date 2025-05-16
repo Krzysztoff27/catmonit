@@ -62,6 +62,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 6,
             maxW: 10,
         },
+        initialSettings: {},
     },
     FILESHARE: {
         name: "fileshare widget",
@@ -74,6 +75,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 3,
             maxW: 5,
         },
+        initialSettings: {},
     },
     // SERVICE_STATUS: {
     //     name: "device's status ",
@@ -98,6 +100,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 3,
             maxW: 6,
         },
+        initialSettings: {},
     },
 };
 

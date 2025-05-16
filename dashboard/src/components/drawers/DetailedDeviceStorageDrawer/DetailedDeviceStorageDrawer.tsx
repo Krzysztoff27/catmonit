@@ -1,24 +1,23 @@
 import { Button, Flex, Group, NumberInput, Stack, TextInput, Title } from "@mantine/core";
 import { IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
-import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import { Disk } from "../../../types/api.types";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
 import { safeObjectValues } from "../../../utils/object";
 import { DrawerContentProps } from "../../../types/components.types";
+import TargetSelect from "../../interactive/input/TargetSelect/TargetSelect";
 
 function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
-    const { widgets, setWidgetSettings, getWidgetData, getData, getWidget } = useWidgets();
+    const { setWidgetSettings, getWidgetData, getData, getWidget } = useWidgets();
     const widget = getWidget(index);
     const widgetData = getWidgetData(widget);
     const selectedDevice = widget?.settings?.target;
 
-    const changeDevice = (target: string | undefined) => {
-        let newDiskSettings = {};
-        if (target) {
-            const newData = getData("storage")[target];
-            newDiskSettings = safeObjectValues(newData.disks).map((disk: Disk) => ({ path: disk.path, hidden: false }));
-        }
+    const onDeviceChange = (target: string | null) => {
+        if (!target) return;
+        const newData = getData("storage")[target];
+        const newDisks = safeObjectValues(newData.disks);
+        const newDiskSettings = newDisks.map(({ path }: Disk) => ({ path, hidden: false }));
         setWidgetSettings(index, { ...widget.settings, target, disks: newDiskSettings });
     };
 
@@ -41,9 +40,10 @@ function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
 
     return (
         <Stack gap="sm">
-            <DeviceSelect
-                value={widget?.settings?.target}
-                onChange={changeDevice}
+            <TargetSelect
+                index={index}
+                widget={widget}
+                onChange={onDeviceChange}
             />
             {selectedDevice && widgetData && (
                 <>

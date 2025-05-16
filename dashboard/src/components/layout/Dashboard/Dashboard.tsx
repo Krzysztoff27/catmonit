@@ -23,6 +23,8 @@ const Dashboard = (): React.JSX.Element => {
         return { i: "__droppable__", w: minW, h: minH };
     }, [currentDropType]);
 
+    console.log(selected, DrawerContent);
+
     return (
         <Flex
             flex={1}

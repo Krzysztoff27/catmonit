@@ -3,13 +3,6 @@
     flex: 1;
 }
 
-.deleteButton {
-    position: absolute !important;
-    right: 2px !important;
-    top: 8px !important;
-    z-index: 100;
-}
-
 .widget {
     cursor: pointer;
 }

@@ -23,7 +23,6 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                     c="var(--background-color-2)"
                     variant="transparent"
                     onClick={(event) => {
-                        console.log("a");
                         event.stopPropagation();
                         onDelete?.();
                     }}
@@ -32,7 +31,7 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                 </ActionIcon>
                 <Paper
                     {...paperProps}
-                    className={`${classes.paper} ${paperProps?.className ?? ""}`}
+                    className={`drag-handle ${classes.paper} ${paperProps?.className ?? ""}`}
                     withBorder
                 >
                     {children}
