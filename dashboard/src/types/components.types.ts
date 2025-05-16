@@ -1,26 +1,24 @@
 import { ComponentType } from "react";
-import { WidgetData } from "./api.types";
-import { ItemCallback, Layout, LayoutItem, Rect } from "./reactGridLayout.types";
-import { DrawerProps } from "@mantine/core";
+import { ItemCallback, Layout, LayoutItem } from "./reactGridLayout.types";
 
-export interface WidgetComponentProps {
+export interface WidgetContentProps {
+    index: number;
     data: any;
     settings: any;
-    className: string;
     [key: string]: any;
 }
 
-export type WidgetComponent = ComponentType<WidgetComponentProps>;
+export type WidgetContent = ComponentType<WidgetContentProps>;
 
-export interface DrawerComponentProps {
-    index: number | string;
+export interface DrawerContentProps {
+    index: number;
     [key: string]: any;
 }
 
-export type DrawerComponent = ComponentType<DrawerComponentProps>;
+export type DrawerContent = ComponentType<DrawerContentProps>;
 
 export interface WidgetLayoutProps {
-    selected?: string | null;
+    selected?: number | null;
     onDragStart?: ItemCallback;
     onDrag?: ItemCallback;
     onDragStop?: ItemCallback;

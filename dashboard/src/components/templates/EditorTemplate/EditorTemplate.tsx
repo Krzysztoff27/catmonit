@@ -11,7 +11,7 @@ const EditorTemplate = (): React.JSX.Element => {
                 width: navbarExpanded ? 240 : 74,
                 breakpoint: "sm",
             }}
-            withBorder={false}
+            // withBorder={false}
         >
             <AppShell.Navbar bg="transparent">
                 <Navbar

@@ -1,15 +1,14 @@
 import { LineChart } from "@mantine/charts";
-import { Paper, Stack, Title } from "@mantine/core";
+import { Box, Stack, Title } from "@mantine/core";
 import classes from "./NetworkThroughputWidget.module.css";
+import { WidgetContentProps } from "../../../types/components.types";
 
-const NetworkThroughputWidget = ({ data, settings, className, ...props }): React.JSX.Element => {
+const NetworkThroughputWidget = ({ data, settings, ...props }: WidgetContentProps): React.JSX.Element => {
     return (
-        <Paper
+        <Box
             flex="1"
-            bg=" var(--background-color-7)"
-            p="lg"
+            h="100%"
             {...props}
-            className={`${className}`}
         >
             <Stack h="100%">
                 <Title
@@ -43,7 +42,7 @@ const NetworkThroughputWidget = ({ data, settings, className, ...props }): React
                     withPointLabels={false}
                 />
             </Stack>
-        </Paper>
+        </Box>
     );
 };
 

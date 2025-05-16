@@ -1,8 +1,9 @@
-import { Group, Paper, ScrollArea, Stack } from "@mantine/core";
+import { Box, Group, Paper, ScrollArea, Stack } from "@mantine/core";
 import { useState } from "react";
 import AlertCount from "../../display/AlertCount/AlertCount";
 import classes from "./AlertWidget.module.css";
 import AlertListElement from "../../display/AlertListElement/AlertListElement";
+import { WidgetContentProps } from "../../../types/components.types";
 
 type Alert = {
     id: number;
@@ -22,7 +23,7 @@ const initialAlerts: Alert[] = [
     { id: 10, isWarning: false },
 ];
 
-function AlertWidget({ data, settings, className, ...props }) {
+function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
     const [alerts, setAlerts] = useState(initialAlerts);
 
     const handleRemove = (idToRemove: number) => {
@@ -30,42 +31,37 @@ function AlertWidget({ data, settings, className, ...props }) {
     };
 
     return (
-        <Paper
-            {...props}
-            className={`${className} ${classes.container}`}
+        <Group
+            gap="sm"
+            h="100%"
+            wrap="nowrap"
+            align="start"
         >
-            <Group
-                gap="sm"
+            <AlertCount
+                criticalCount={3}
+                mediumCount={10}
+                isWarning={false}
+            />
+            <ScrollArea
+                maw="calc(100% - 256px)"
+                w="100%"
                 h="100%"
-                wrap="nowrap"
-                align="start"
+                scrollbarSize="0.625rem"
             >
-                <AlertCount
-                    criticalCount={3}
-                    mediumCount={10}
-                    isWarning={false}
-                />
-                <ScrollArea
-                    maw="calc(100% - 256px)"
-                    w="100%"
-                    h="100%"
-                    scrollbarSize="0.625rem"
-                >`  `
-                    <Stack
-                        gap="xs"
-                        pr="lg"
-                    >
-                        {alerts.map((alert) => (
-                            <AlertListElement
-                                key={alert.id}
-                                isWarning={alert.isWarning}
-                                onRemove={() => handleRemove(alert.id)}
-                            />
-                        ))}
-                    </Stack>
-                </ScrollArea>
-            </Group>
-        </Paper>
+                <Stack
+                    gap="xs"
+                    pr="lg"
+                >
+                    {alerts.map((alert) => (
+                        <AlertListElement
+                            key={alert.id}
+                            isWarning={alert.isWarning}
+                            onRemove={() => handleRemove(alert.id)}
+                        />
+                    ))}
+                </Stack>
+            </ScrollArea>
+        </Group>
     );
 }
 

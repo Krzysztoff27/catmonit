@@ -10,7 +10,7 @@ import WidgetDrawer from "../WidgetDrawer/WidgetDrawer";
 
 const Dashboard = (): React.JSX.Element => {
     const { widgets, createWidget } = useWidgets();
-    const { DrawerComponent, closeWidgetDrawer, isOpened, onWidgetDragStart, onWidgetDragStop, selected } = useWidgetDrawer(widgets);
+    const { DrawerContent, closeWidgetDrawer, isOpened, onWidgetDragStart, onWidgetDragStop, selected } = useWidgetDrawer(widgets);
 
     const [currentDropType, setCurrentDropType] = useState<string | null>(null);
     const onDrop = (layout: Layout, item: LayoutItem) => {
@@ -31,7 +31,7 @@ const Dashboard = (): React.JSX.Element => {
         >
             {
                 <WidgetDrawer
-                    component={DrawerComponent!}
+                    component={DrawerContent!}
                     index={selected!}
                     position="right"
                     size="sm"

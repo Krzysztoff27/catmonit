@@ -1,11 +1,10 @@
 .container {
     flex: 1;
-    background-color: var(--background-color-6);
+    height: 100%;
     overflow: hidden;
 }
 
 .stack {
-    padding: var(--mantine-spacing-md);
     gap: var(--mantine-spacing-xs);
     height: 100%;
     position: relative;

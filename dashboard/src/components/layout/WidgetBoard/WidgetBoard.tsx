@@ -1,15 +1,14 @@
-import { ActionIcon, Flex } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { IconX } from "@tabler/icons-react";
 import GridLayout from "react-grid-layout";
 import { GRID_MARGIN_PX, GRID_SIZE_PX } from "../../../config/widgets.config";
 import { WidgetData } from "../../../types/api.types";
 import { WidgetLayoutProps } from "../../../types/components.types";
 import classes from "./WidgetBoard.module.css";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import Widget from "../Widget/Widget";
 
 function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop, onDrop, droppingItem }: WidgetLayoutProps) {
-    const { widgets, layout, getWidgetData, deleteWidget, setWidgetRects, getWidgetComponent } = useWidgets();
+    const { widgets, layout, getWidgetData, deleteWidget, setWidgetRects, getWidgetContent } = useWidgets();
 
     const { width, ref } = useElementSize();
     const cols = Math.floor(width / GRID_SIZE_PX);
@@ -20,29 +19,20 @@ function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart,
     const elements =
         width && layout ? (
             widgets.map((widget: WidgetData, i) => {
-                const WidgetComponent = getWidgetComponent(widget);
+                const WidgetContent = getWidgetContent(widget);
                 return (
-                    <Flex
+                    <Widget
                         key={i}
                         data-grid={layout[i]}
+                        onDelete={() => deleteWidget(i)}
+                        className={`drag-handle ${classes.widget} ${selected === i ? classes.selected : ""}`}
                     >
-                        <ActionIcon
-                            className={classes.deleteButton}
-                            c="var(--background-color-2)"
-                            variant="transparent"
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                deleteWidget(i);
-                            }}
-                        >
-                            <IconX size={18} />
-                        </ActionIcon>
-                        <WidgetComponent
-                            className={`drag-handle ${classes.widget} ${selected === `${i}` ? classes.selected : ""}`}
+                        <WidgetContent
+                            index={i}
                             data={getWidgetData(widget)}
                             settings={widget.settings}
                         />
-                    </Flex>
+                    </Widget>
                 );
             })
         ) : (

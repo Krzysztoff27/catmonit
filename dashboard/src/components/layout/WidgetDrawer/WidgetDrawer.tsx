@@ -1,12 +1,12 @@
 import { Drawer, DrawerProps, Space, Title } from "@mantine/core";
 import React from "react";
-import { DrawerComponent, DrawerComponentProps } from "../../../types/components.types";
+import { DrawerContent, DrawerContentProps } from "../../../types/components.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import WIDGETS_CONFIG from "../../../config/widgets.config";
 import classes from "./WidgetDrawer.module.css";
 
-interface WidgetDrawerProps extends DrawerProps, DrawerComponentProps {
-    component: DrawerComponent | null;
+interface WidgetDrawerProps extends DrawerProps, DrawerContentProps {
+    component: DrawerContent | null;
 }
 
 const WidgetDrawer = ({ component: Component, index, ...props }: WidgetDrawerProps): React.JSX.Element => {

@@ -3,7 +3,7 @@ import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
 import { isEmpty } from "lodash";
-import { WidgetComponent } from "../../types/components.types";
+import { WidgetContent } from "../../types/components.types";
 import { WidgetLimits } from "../../types/config.types";
 
 interface WidgetContextType {
@@ -18,7 +18,7 @@ interface WidgetContextType {
     setWidgetSettings: (index: number, newSettings: any) => void;
     getWidgetData: (widget: WidgetData) => any;
     getWidgetLimits: (widget: WidgetData) => WidgetLimits;
-    getWidgetComponent: (widget: WidgetData) => WidgetComponent;
+    getWidgetContent: (widget: WidgetData) => WidgetContent;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -43,7 +43,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const getWidgetLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
 
-    const getWidgetComponent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].component;
+    const getWidgetContent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].content;
 
     const getItemRect = (item: LayoutItem) => ({
         x: item.x,
@@ -118,6 +118,11 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         const isSingular = config.isReferingToSingularResource;
         const source = config.dataSource;
 
+        if (!source) {
+            console.warn("Cannot use getWidgetData() in a widget type that doesn't have dataSource property set.");
+            return;
+        }
+
         if (!isSingular) return data[source] ?? {};
 
         const target = widget?.settings?.target;
@@ -135,7 +140,6 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     const layout = useMemo(
         () =>
             widgets.map((widget: WidgetData, i): LayoutItem => {
-                console.log(widget.type, widgets);
                 return {
                     i: `${i}`,
                     ...widget.rect,
@@ -156,7 +160,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         setWidgetRect,
         setWidgetSettings,
         getWidgetData,
-        getWidgetComponent,
+        getWidgetContent,
         getWidgetLimits,
     };
 

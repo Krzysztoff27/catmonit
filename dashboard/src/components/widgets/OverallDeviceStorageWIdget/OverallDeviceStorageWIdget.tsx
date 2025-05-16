@@ -1,42 +1,24 @@
-import { Paper, Text, Flex } from "@mantine/core";
+import { Text, Flex, Box } from "@mantine/core";
 import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
-import { WidgetComponentProps } from "../../../types/components.types";
+import { WidgetContentProps } from "../../../types/components.types";
 import { GRID_SIZE_PX } from "../../../config/widgets.config";
 import classes from "./OverallDeviceStorageWidget.module.css";
 import { DeviceDiskData } from "../../../types/api.types";
 import { useEffect } from "react";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
+import { safeObjectValues } from "../../../utils/object";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
-const devices: DeviceDiskData = {
-    uuid: "1234",
-    hostname: "Tux",
-    ip: "192.168.1.1",
-    mask: "/24",
-    disks: [
-        {
-            path: "/dev/sda",
-            storageLimit: 100,
-            storageCurrent: 50,
-        },
-        {
-            path: "/dev/sdb",
-            storageLimit: 100,
-            storageCurrent: 80,
-        },
-        {
-            path: "/dev/sdc",
-            storageLimit: 50,
-            storageCurrent: 15,
-        },
-    ],
-};
-function OverallDeviceStorageWidget({ data, className, settings, ...props }: WidgetComponentProps) {
+function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     // DATA CALCULAIONS ETC.
-    const { hostname, ip, disks } = devices as DeviceDiskData; //rename to data later
+    const { getWidget } = useWidgets();
+    console.log(getWidget(index));
+    const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-    const total = disks?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
-    const used = disks?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
+    const disksArray = safeObjectValues(disks);
+    const total = disksArray?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
+    const used = disksArray?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
     const free = total - used;
 
     const formattedData = [
@@ -76,16 +58,13 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
     }, [num_cols]);
     console.log("chasrtsize: " + chartSize);
     return (
-        <Paper
+        <Box
             ref={ref}
+            className={classes.container}
             {...props}
-            // py="md"
-            // px="md"
-            className={`${classes.container} ${className}`}
-            withBorder
         >
             <DeviceTitleOneLine
-                data={devices} //rename to data
+                data={data}
                 mb="md"
             />
             <Flex
@@ -142,7 +121,7 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
                     ))}
                 </Flex>
             </Flex>
-        </Paper>
+        </Box>
     );
 }
 

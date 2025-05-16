@@ -7,8 +7,8 @@ import { WidgetsConfig } from "../types/config.types";
 // import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -17,7 +17,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
         icon: IconDatabase,
-        component: DetailedDeviceStorageWidget,
+        content: DetailedDeviceStorageWidget,
         drawer: DetailedDeviceStorageDrawer,
         limits: {
             minH: 2,
@@ -36,7 +36,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
         icon: IconStorm,
-        component: OverallDeviceStorageWidget,
+        content: OverallDeviceStorageWidget,
         drawer: OverallDeviceStorageDrawer,
         limits: {
             minH: 2,
@@ -54,7 +54,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     STORAGE_ALERTS: {
         name: "storage alerts widget",
         icon: IconDatabaseX,
-        component: AlertWidget,
+        content: AlertWidget,
         drawer: Box,
         limits: {
             minH: 2,
@@ -66,7 +66,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     SERVICE_STATUS: {
         name: "device's status ",
         icon: IconProgressCheck,
-        component: ServiceStatusWidget,
+        content: Box,
         drawer: ServiceStatusDrawer, //@TODO change it
         limits: {
             minH: 2,
@@ -78,8 +78,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     NETWORK_THROUGHPUT: {
         name: "network throughput",
         icon: IconNetwork,
-        component: NetworkThroughputWidget,
-
+        content: NetworkThroughputWidget,
         drawer: Box,
         limits: {
             minH: 2,

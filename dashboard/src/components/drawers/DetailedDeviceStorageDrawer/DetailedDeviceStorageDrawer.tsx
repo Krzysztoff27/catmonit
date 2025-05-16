@@ -5,8 +5,9 @@ import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import { Disk } from "../../../types/api.types";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
 import { safeObjectValues } from "../../../utils/object";
+import { DrawerContentProps } from "../../../types/components.types";
 
-function DetailedDeviceStorageDrawer({ index }) {
+function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
     const { widgets, setWidgetSettings, getWidgetData, getData, getWidget } = useWidgets();
     const widget = getWidget(index);
     const widgetData = getWidgetData(widget);
