@@ -21,11 +21,19 @@ namespace gRPC.telemetry.Server.webapi.Services
             {
                 await Task.Delay(TimeUntilNextRun(), stoppingToken);
 
-                // TODO: deletion logic
+                // update those devices which are active at the moment
                 foreach (Guid deviceID in NetworkInfo.Instance.GetAllDevicesUUIDs())
                 {
-                    DeviceHelper.updateLastSeen(deviceID);
+                    try
+                    {
+                        DeviceHelper.updateLastSeen(deviceID);
+                    }catch (InternalServerError)
+                    {
+                        // ignore
+                    }
                 }
+
+                // actually remove those which are unused
                 DeviceHelper.RemoveUnusedDevicesAndPermissions();
             }
         }

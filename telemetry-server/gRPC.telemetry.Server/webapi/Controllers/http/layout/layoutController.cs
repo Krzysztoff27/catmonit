@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using gRPC.telemetry.Server.webapi;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using webapi.Helpers;
@@ -25,8 +26,15 @@ namespace webapi.Controllers.http.layout
         {
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
-            List<string>? layoutNames = LayoutHelper.getLayoutNames(authRes.payload.id);
-            return (layoutNames == null ? Utils.returnVal(500) : Json(layoutNames));
+            try
+            {
+                List<string> layoutNames = LayoutHelper.getLayoutNames(authRes.payload.id);
+                return Json(layoutNames);
+            }
+            catch (InternalServerError)
+            {
+                return Utils.returnVal(500);
+            }
         }
         [HttpGet]
         [Route("layout/{name}")]
@@ -35,8 +43,15 @@ namespace webapi.Controllers.http.layout
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
-            (int errCode, JsonElement? json) layout = LayoutHelper.getLayout(authRes.payload.id, name);
-            return (layout.json == null ? Utils.returnVal(layout.errCode, ((layout.errCode == 400) ? "layout doesn't exist" : "")):Json(layout.json));
+            try
+            {
+                JsonElement? json = LayoutHelper.getLayout(authRes.payload.id, name);
+                return (json == null ? Utils.returnVal(400, "layout doesn't exist") : Json(json));
+            }
+            catch (InternalServerError)
+            {
+                return Utils.returnVal(500);
+            }
         }
         [HttpPut]
         [Route("update/{layoutName}")]
@@ -47,25 +62,30 @@ namespace webapi.Controllers.http.layout
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
+            
             using (var reader = new StreamReader(Request.Body))
             {
-                var layoutJson = await reader.ReadToEndAsync();
-                bool? res = LayoutHelper.addOrUpdateLayout(authRes.payload.id, layoutName, layoutJson);
-                if (res == true)
+                try
                 {
-                    var data = new { Message = "layout created" };
-                    return Json(data);
+                    var layoutJson = await reader.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(layoutName) || string.IsNullOrEmpty(layoutJson))
+                    {
+                        return Utils.returnVal(400, "layout name or data is empty");
+                    }
+                    bool res = LayoutHelper.addOrUpdateLayout(authRes.payload.id, layoutName, layoutJson);
+                    if (res)
+                    {
+                        return Utils.returnVal(200, "layout created");
+                    }
+                    else
+                    {
+                        return Utils.returnVal(200, "layout updated");
+                    }
+                    ;
+                }catch (InternalServerError) 
+                {  
+                    return Utils.returnVal(500); 
                 }
-                else if (res == false)
-                {
-                    var data = new { Message = "layout updated" };
-                    return Json(data);
-                }
-                else
-                {
-                    return Utils.returnVal(500, "error updating layout");
-                };
-
             }
         }
         [HttpPut]
@@ -88,8 +108,14 @@ namespace webapi.Controllers.http.layout
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
-            bool? res = LayoutHelper.deleteLayout(authRes.payload.id, layoutName);
-            return (res == null ? Utils.returnVal(500) : ((res.Value)?Json( new { message = "removed successfuly" }): Utils.returnVal(400, "layout doesn't exist")));
+            try
+            {
+                bool res = LayoutHelper.deleteLayout(authRes.payload.id, layoutName);
+                return res ? Utils.returnVal(200, "removed successfuly") : Utils.returnVal(400, "layout doesn;t exist");
+            }catch (InternalServerError)
+            {
+                return Utils.returnVal(500);
+            }
         }
     }
 }

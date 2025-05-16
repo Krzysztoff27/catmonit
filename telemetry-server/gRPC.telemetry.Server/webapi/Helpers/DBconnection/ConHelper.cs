@@ -1,21 +1,34 @@
-﻿using Npgsql;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Npgsql;
 using System.Data;
+using webapi.webapi;
 namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 {
     public class ConHelper
     {
-        public static int? execCountQuery(string query, Dictionary<string, object> parameters)
-        {
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+        private static void openConnection(NpgsqlConnection conn) {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+
+            try
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (NpgsqlException)
-                {
-                    return null;
-                }
+                conn.OpenAsync(cts.Token).GetAwaiter().GetResult();
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Connection attempt timed out.");
+                throw new InternalServerError(); // or a timeout-specific exception
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw new InternalServerError();
+            }
+        }
+        public static int execCountQuery(string query, Dictionary<string, object> parameters)
+        {
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
+            {
+                openConnection(conn);
 
                 int count = 0;
                 using (var cmd = new NpgsqlCommand(query, conn))
@@ -24,29 +37,29 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                     {
                         cmd.Parameters.AddWithValue(param.Key, param.Value);
                     }
-
-                    using (var reader = cmd.ExecuteReader())
+                    try
                     {
-                        reader.Read();
-                        count = reader.GetInt32(0);
-                        return count;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            reader.Read();
+                            count = reader.GetInt32(0);
+                            return count;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Utils.assert(false);
+                        throw new InternalServerError();
                     }
                 }
             }
         }
 
-        public static bool? execNonQuery(string query, Dictionary<string, object> parameters)
+        public static bool execNonQuery(string query, Dictionary<string, object> parameters)
         {
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (NpgsqlException)
-                {
-                    return null;
-                }
+                openConnection(conn);
 
                 using (var cmd = new NpgsqlCommand(query, conn))
                 {
@@ -54,47 +67,44 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                     {
                         cmd.Parameters.AddWithValue(param.Key, param.Value);
                     }
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    return rowsAffected > 0;
+                    try
+                    {
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        return rowsAffected > 0;
+                    } 
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        throw new InternalServerError();
+                    }
                 }
             }
         }
-        public static NpgsqlDataReader? ExecuteReader(string query, Dictionary<string, object> parameters)
+        public static NpgsqlDataReader ExecuteReader(string query, Dictionary<string, object> parameters)
         {
-            var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING);
-
-            try
-            {
-                conn.Open();
-            }
-            catch (NpgsqlException)
-            {
-                return null;
-            }
+            var conn = new NpgsqlConnection(Config.GetConnectionString());
+            openConnection(conn);
             var cmd = new NpgsqlCommand(query, conn);
 
             foreach (var param in parameters)
             {
                 cmd.Parameters.AddWithValue(param.Key, param.Value);
             }
-
-            return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            try
+            {
+                return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            }
+            catch (Exception)
+            {
+                throw new InternalServerError();
+            }
         }
-        public static bool? execTransactionWithNoArgs(string query0, string query1)
+        public static bool execTransactionWithNoArgs(string query0, string query1)
         {
 
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
-
-                try
-                {
-                    conn.Open();
-                }
-                catch (NpgsqlException)
-                {
-                    return null;
-                }
+                openConnection(conn);
                 using (var transaction = conn.BeginTransaction())
                 {
                     try
@@ -112,7 +122,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                         transaction.Commit();
                         return true;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         return false;
@@ -120,20 +130,13 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 }
             }
         }
-        public static bool? execTransactionWithArgs(string query0, Dictionary<string, object> query0Args, string query1, Dictionary<string, object> query1Args)
+        public static bool execTransactionWithArgs(string query0, Dictionary<string, object> query0Args, string query1, Dictionary<string, object> query1Args)
         {
 
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
+                openConnection(conn);
 
-                try
-                {
-                    conn.Open();
-                }
-                catch (NpgsqlException)
-                {
-                    return null;
-                }
                 using (var transaction = conn.BeginTransaction())
                 {
                     try
@@ -161,7 +164,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                         transaction.Commit();
                         return true;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         return false;
