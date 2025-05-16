@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import { IconDatabase, IconProgressCheck, IconStorm, IconDatabaseX } from "@tabler/icons-react";
+import { IconDatabase, IconProgressCheck, IconStorm, IconDatabaseX, IconFile } from "@tabler/icons-react";
 import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
@@ -7,7 +7,8 @@ import { WidgetsConfig } from "../types/config.types";
 // import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
+import FileshareWidget from "../components/widgets/FileshareWidget/FileshareWidget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -29,7 +30,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     //     name: "device's status ",
     //     icon: IconProgressCheck,
     //     component: ServiceStatusWidget,
-    //     drawer: ServiceStatusDrawer, //@TODO change it
+    //     drawer: ServiceStatusDrawer, //TODO change it
     //     limits: {
     //         minH: 2,
     //         maxH: 5,
@@ -44,7 +45,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         drawer: OverallDeviceStorageDrawer,
         limits: {
             minH: 2,
-            maxH: 5,
+            maxH: 4,
             minW: 2,
             maxW: 4,
         },
@@ -61,7 +62,19 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 10,
         },
     },
-    //! @TODON BRING BACK DeviceStorageWidget
+    FILESHARE: {
+        name: "fileshare widget",
+        icon: IconFile,
+        component: FileshareWidget,
+        drawer: Box,
+        limits: {
+            minH: 2,
+            maxH: 4,
+            minW: 3,
+            maxW: 5,
+        },
+    }
+    //! TODON BRING BACK DeviceStorageWidget
     // DEVICE_STORAGE: {
     //     component: DeviceStorageWidget,
     //     drawer: DeviceStorageDrawer,

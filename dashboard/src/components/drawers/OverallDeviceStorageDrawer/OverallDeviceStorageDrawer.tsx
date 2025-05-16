@@ -162,4 +162,4 @@ function OverallDeviceStorageDrawer() {
     );
 }
 
-export default OverallDeviceStorageDrawer; // ! @TODO napisac ile dyskow sie wywietli przy tym rozmiarze
+export default OverallDeviceStorageDrawer; // ! TODO napisac ile dyskow sie wywietli przy tym rozmiarze
