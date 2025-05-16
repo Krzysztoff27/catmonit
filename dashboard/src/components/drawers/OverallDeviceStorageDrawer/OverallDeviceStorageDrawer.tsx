@@ -1,6 +1,3 @@
-import { Grid, NumberInput, Title } from "@mantine/core";
-import { useState } from "react";
-import { DeviceDiskData } from "../../../types/api.types";
 import TargetSelect from "../../interactive/input/TargetSelect/TargetSelect";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
@@ -10,12 +7,6 @@ function OverallDeviceStorageDrawer({ index }) {
 
     return (
         <>
-            <Title
-                order={4}
-                mb="md"
-            >
-                Widget properties
-            </Title>
             <TargetSelect
                 index={index}
                 widget={widget}
