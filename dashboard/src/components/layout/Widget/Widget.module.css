@@ -2,7 +2,8 @@
     position: absolute !important;
     right: 2px !important;
     top: 8px !important;
-    z-index: 1000;
+    /* important for logic - it cannot be clicked without it: */
+    z-index: 100;
 }
 
 .paper {

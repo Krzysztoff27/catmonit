@@ -25,7 +25,7 @@ function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart,
                         key={i}
                         data-grid={layout[i]}
                         onDelete={() => deleteWidget(i)}
-                        className={`drag-handle ${classes.widget} ${selected === i ? classes.selected : ""}`}
+                        className={`${classes.widget} ${selected === i ? classes.selected : ""}`}
                     >
                         <WidgetContent
                             index={i}

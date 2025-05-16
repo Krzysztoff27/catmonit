@@ -119,7 +119,9 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         const source = config.dataSource;
 
         if (!source) {
-            console.warn("Cannot use getWidgetData() in a widget type that doesn't have dataSource property set.");
+            console.warn(
+                `Using getWidgetData() with a widget of type ${widget.type} will always return undefined, since its configuration's dataSource property is undefined.`
+            );
             return;
         }
 
