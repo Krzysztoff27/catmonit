@@ -12,7 +12,7 @@ END $$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = 'catmonit_worker') THEN
-        CREATE USER catmonit_worker WITH PASSWORD 'password';
+        CREATE USER catmonit_worker WITH PASSWORD 'password'; 
     END IF;
     
     CREATE EXTENSION IF NOT EXISTS pgcrypto;
