@@ -1,7 +1,42 @@
+/* OverallDeviceStorageWidget.module.css */
+
+/* Container for the entire widget */
 .container {
     flex: 1;
     background-color: var(--background-color-6);
     overflow: hidden;
-    /* border-radius: var(--mantine-radius-md); */
     padding: var(--mantine-spacing-md);
+}
+
+/* Flex container for centering the chart and the separator Paper */
+.centeredContainer {
+    display: flex;
+    flex-direction: row;          /* Keeps elements side by side */
+    justify-content: space-evenly;/* Adds space between the elements */
+    align-items: center;         /* Vertically centers the elements */
+    width: 100%;
+    height: auto;                /* Adjusts height according to content */
+    padding-top: 20px;           /* Add some padding to separate from title */
+    padding-bottom: 20px;        /* Add some space at the bottom */
+}
+
+/* Separator Paper element between the DonutChart */
+.separator {
+    background-color: blue;
+    width: 10%;
+    height: 30px;
+}
+
+/* Flex container for the text, ensuring it aligns vertically */
+.textContainer {
+    display: flex;
+    /*flex-direction: column;        Stack the text vertically */
+    align-items: center;          /* Center the text horizontally */
+    justify-content: center;      /* Center the text vertically within its container */
+    margin-left: 20px;            /* Optional: Adds some space between the chart and text */
+}
+
+/* Style for the chart label text */
+.chart :global(text) {
+    fill: var(--background-color-1);  /* This makes the text color the same as background color 1 */
 }

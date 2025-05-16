@@ -33,7 +33,7 @@ const devices: DeviceDiskData = {
 };
 function OverallDeviceStorageWidget({ data, className, settings, ...props }: WidgetComponentProps) {
     // DATA CALCULAIONS ETC.
-    const { hostname, ip, disks } = devices as DeviceDiskData; //rename to data later
+    const { hostname, ip, disks } = devices as DeviceDiskData; //TODO rename to data later
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
     const total = disks?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
     const used = disks?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
@@ -44,104 +44,95 @@ function OverallDeviceStorageWidget({ data, className, settings, ...props }: Wid
             name: "Used",
             value: used,
             color: "blue",
-            //label: `${used} GB (${((used / total) * 100).toFixed(1)}%)`,
         },
         {
             name: "Free",
             value: free,
             color: "var(--background-color-3)",
-            //label: `${free} GB (${((free / total) * 100).toFixed(1)}%)`,
         },
     ];
-    //funckja na procenty
+    // creating labels, calculating % etc.
     const chartLabel = formattedData.map((item) => `${item.name}\n ${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`).join("\n");
-
-    // const prepareLabel = (label, value) => `${label}\n ${value}GB (${(value / total * 100).toFixed(1)}%)`;
-    // const chartLabel
 
     // RESPONSIVENESS
     const { ref, width, height } = useElementSize();
-    const num_cols = Math.round(width / GRID_SIZE_PX);
-    const num_rows = Math.round(height / GRID_SIZE_PX);
-    const baseChartSize = 170;
-    const chartScale = Math.min(num_cols, num_rows);
-    const scaleMultiplier = chartScale <= 2 ? 1 : 1 + (chartScale - 2) * 0.25;
-    const chartSize = baseChartSize * scaleMultiplier;
-    useEffect(() => {
-        console.log("Num cols:" + num_cols); // Logs every time num_cols changes
-        console.log("Num rows:" + num_rows); // Logs every time num_cols changes
-        console.log("Height:" + height); // Logs every time num_cols changes
-        console.log("WIdth:" + width); // Logs every time num_cols changes
-        console.log("grid size: " + GRID_SIZE_PX);
-    }, [num_cols]);
-    console.log("chasrtsize: " + chartSize);
+    // console.log("width" + getWidgetSize(width));
+    // console.log("height" + getWidgetSize(height));
+
+    //     const num_cols = Math.round(width / GRID_SIZE_PX);
+    //     const num_rows = Math.round(height / GRID_SIZE_PX);
+    //     const baseChartSize = 170;
+    //     const chartScale = Math.min(num_cols, num_rows);
+    //     const scaleMultiplier = chartScale <= 2 ? 1 : 1 + (chartScale - 2) * 0.25;
+    //     const chartSize = baseChartSize * scaleMultiplier;
+    //     useEffect(() => {
+    //         console.log("Num cols:" + num_cols); // Logs every time num_cols changes
+    //         console.log("Num rows:" + num_rows); // Logs every time num_cols changes
+    //         console.log("Height:" + height); // Logs every time num_cols changes
+    //         console.log("WIdth:" + width); // Logs every time num_cols changes
+    //         console.log("grid size: " + GRID_SIZE_PX);
+    //         console.log("function get size width: " + getWidgetSize(width));
+    //         console.log("function get size height: " + getWidgetSize(height));
+    //     }, [num_cols]);
+    //     // console.log("chasrtsize: " + chartSize);
+    const layoutDirection = width == 3 && height == 2 ? "row" : "column"; // column for under each other, row for side by side
+    console.log(layoutDirection);
     return (
         <Paper
             ref={ref}
             {...props}
-            // py="md"
-            // px="md"
             className={`${classes.container} ${className}`}
             withBorder
         >
-            <DeviceTitleOneLine
-                data={devices} //rename to data
-                mb="md"
-            />
-            <Flex
-                align="center"
-                direction={num_cols > num_rows ? "row" : "column"}
-                justify="space-evenly"
-            >
+            {/* Title at the top */}
+            <DeviceTitleOneLine data={devices} />
+
+            {/* <div
+    style={{
+      display: "flex",
+      flexDirection: "column", // Align items vertically
+      justifyContent: "center", // Vertically center the items
+      alignItems: "center", // Horizontally center the items
+      flexGrow: 1, // Allow this wrapper to take up the remaining space
+      marginTop: "20px", // Add top margin to give breathing room from the title
+      marginBottom: "20px", // Add bottom margin to keep some space between the elements and the bottom
+    }}
+  > */}
+            {/* Flex container for centering elements horizontally and spacing them evenly */}
+            <Flex className={classes.centeredContainer}>
                 <DonutChart
                     data={formattedData}
                     withTooltip={false}
-                    size={chartSize}
-                    w={chartSize}
-                    h={chartSize}
-                    // mx="md"
-                    mt="sm"
+                    size={170} // Increased size for example
+                    h={170} // Height of the chart
+                    w={170} // Width of the chart
                     chartLabel={`${used}GB/${total}GB`}
-                    styles={{
-                        label: {
-                            fill: "var(--background-color-1)",
-                            whiteSpace: "pre-line",
-                            //change font size later
-                        },
-                    }}
+                    className={`${classes.chart} ${className}`}
                 />
-                {/* flex justify space evenly */}
-                {/* @TODO center voth horizontyally and vbertically, also the chart */}
                 <Flex
-                    mt="md"
-                    c="var(--background-color-1)"
-                    justify="space-evenly"
+                    display={height < 3 && width < 3 ? "none" : "initial"}
+                    direction={layoutDirection}
                     align="center"
-                    direction={num_cols == 3 && num_rows >= 3 ? "row" : "column"}
-                    wrap="wrap"
-                    w="100%"
-                    style={{
-                        // width: num_cols !== 3 || num_rows !== 2 ? "100%" : "auto",
-                        maxWidth: `calc(100% - ${chartSize}px - 2rem)`, // prevents overlap
-                        flexShrink: 1,
-                    }}
+                    justify="center"
+                    className={classes.textContainer}
                 >
                     {formattedData.map((item, index) => (
                         <Text
-                            display={height < 300 && width < 300 ? "none" : "initial"}
+                            
                             key={index}
                             ta="center"
-                            style={{ whiteSpace: "pre-line" }}
+                            // style={{ whiteSpace: "pre-line" }}
                         >
                             <span style={{ fontWeight: 600 }}>{item.name}</span>
                             {"\n"}
                             <span>{`${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`}</span>
-                            {"\n"}
-                            {"\n"}
+                            {/* {"\n"}
+                        {"\n"} */}
                         </Text>
                     ))}
                 </Flex>
             </Flex>
+            {/* </div> */}
         </Paper>
     );
 }
