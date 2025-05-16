@@ -1,9 +1,84 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36" version="27.0.5">
   <diagram name="Strona-1" id="X_vzxvI6--LjzuWVdXkQ">
-    <mxGraphModel dx="1426" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1826" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-2" value="Bare Metal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-40" y="380" width="530" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-3" value="Proxmox" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-40" y="350" width="530" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-4" value="Ubuntu Server" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-40" y="280" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;startFill=0;" edge="1" parent="1" source="Ca1JfIbStGswnUVAKlKM-9" target="Ca1JfIbStGswnUVAKlKM-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-9" value="catmonit-&lt;div&gt;telemetry-&lt;/div&gt;&lt;div&gt;server&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="60" y="120" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-11" value="catmonit-db" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="60" y="210" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;startFill=0;" edge="1" parent="1" source="Ca1JfIbStGswnUVAKlKM-12" target="Ca1JfIbStGswnUVAKlKM-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-12" value="catmonit-proxy" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="-40" y="210" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-18" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="430" y="250" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-16" value="Guest VM" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-18">
+          <mxGeometry y="30" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-17" value="&amp;nbsp;catmonit-client" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-18">
+          <mxGeometry width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-20" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="290" y="250" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-21" value="Guest VM" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-20">
+          <mxGeometry y="30" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-22" value="&amp;nbsp;catmonit-client" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-20">
+          <mxGeometry width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-23" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="360" y="250" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-24" value="Guest VM" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-23">
+          <mxGeometry y="30" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-25" value="&amp;nbsp;catmonit-client" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Ca1JfIbStGswnUVAKlKM-23">
+          <mxGeometry width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-26" value="" style="endArrow=none;html=1;rounded=0;startArrow=classic;startFill=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120" y="150" as="sourcePoint" />
+            <mxPoint x="460" y="149.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-27" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="320" y="150" as="sourcePoint" />
+            <mxPoint x="320" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-28" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="Ca1JfIbStGswnUVAKlKM-25">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="150" as="sourcePoint" />
+            <mxPoint x="230" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ca1JfIbStGswnUVAKlKM-29" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="Ca1JfIbStGswnUVAKlKM-17">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="150" as="sourcePoint" />
+            <mxPoint x="230" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
