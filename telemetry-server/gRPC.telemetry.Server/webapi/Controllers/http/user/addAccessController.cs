@@ -20,7 +20,7 @@ namespace webapi.Controllers.http.user
         {
             [HttpPost]
             public IActionResult Post([FromBody] addAccessRequestModel addAccessRequest)
-            {
+            {/*
                 // Permissions are stored in db as a bitmask in users table in a column 'permissions'.
                 // if the permission is 0 (default) the user needs to have access to specific resources to view them. then they are stored in table users_devices.
                 // IF THE PERMISSION GIVEN IS THE 'seeAll' PERMISSION, THE PERMISSION TO SEE SPECIFIC MACHINES THE USER HAD BEFORE WILL BE REMOVED.
@@ -91,6 +91,51 @@ namespace webapi.Controllers.http.user
                 {
                     return Utils.returnVal(500);
                 }
+                */
+                return Utils.returnVal(501);
+            }
+
+            [HttpGet]
+            [Route("getPossibleDevices")]
+            public IActionResult GetUsersPossibleDevices([FromQuery] bool? showCurrentlyDisconnected = null)
+            {
+                /*
+                var authRes = Utils.Authenticate(Request);
+                if (authRes.res != null) return authRes.res;
+
+
+                try
+                {
+                    int? posPerms = PermissionHelper.UserPermission(authRes.payload.id);
+                    if (posPerms == null) return Utils.returnVal(400, "user doesn't exist");
+                    if ((posPerms & (int)Permissions.seeAllPermission) == (int)Permissions.seeAllPermission)
+                    {
+                        if (showCurrentlyDisconnected == true)
+                        {
+                            return Json(DeviceHelper.getAllDevicesIDs());
+                        }
+                        else
+                        {
+                            return Json(NetworkMonit.networkDeviceInfos.MonitoredDevices.Keys);
+                        }
+
+                    }
+                    else
+                    {
+                        if (showCurrentlyDisconnected == true)
+                        {
+                            return Json(DeviceHelper.GetDevicesUserHasAccessTo(authRes.payload.id));
+                        }
+                        else
+                        {
+                            return Json(NetworkMonit.networkDeviceInfos.MonitoredDevices.Keys.ToList().Intersect(DeviceHelper.GetDevicesUserHasAccessTo(authRes.payload.id)));
+                        }
+                    }
+                }catch (InternalServerError)
+                {
+                    return Utils.returnVal(500);
+                }*/
+                return Utils.returnVal(501);
             }
         }
     }

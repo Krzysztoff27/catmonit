@@ -22,12 +22,13 @@ namespace gRPC.telemetry.Server.webapi.Services
                 await Task.Delay(TimeUntilNextRun(), stoppingToken);
 
                 // update those devices which are active at the moment
-                foreach (Guid deviceID in NetworkInfo.Instance.GetAllDevicesUUIDs())
+                foreach ((Guid deviceID, DateTime lastSeen) in NetworkInfo.Instance.GetAllDevicesUUIDsAndLastSeen())
                 {
                     try
                     {
-                        DeviceHelper.updateLastSeen(deviceID);
-                    }catch (InternalServerError)
+                        DeviceHelper.updateLastSeen(deviceID, lastSeen);
+                    }
+                    catch (InternalServerError)
                     {
                         // ignore
                     }

@@ -74,7 +74,7 @@ namespace webapi.Websocket
                                         .Where(d => d.ValueKind == JsonValueKind.String && Guid.TryParse(d.GetString(), out _))
                                         .Select(d => Guid.Parse(d.GetString()!))
                                         .ToList();
-                                    potentialSubscriber.userPossibleMonitoredDevices = devices;
+                                    potentialSubscriber.monitoredDevicesIndexes = devices;
                                 }
 
                                 if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
@@ -108,6 +108,7 @@ namespace webapi.Websocket
                         }
                         catch (Exception)
                         {
+                            // ignore
                         }
                     }
                     onWebsocketClose(potentialSubscriber);
