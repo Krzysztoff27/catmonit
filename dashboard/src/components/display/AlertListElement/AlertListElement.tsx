@@ -14,7 +14,7 @@ function AlertListElement({ isWarning, onRemove }: AlertListElementProps) {
         <Paper
             maw="100%"
             bg="var(--background-color-6)"
-            h="53"
+            h="51"
             miw="0"
             style={{ overflow: "hidden" }}
         >

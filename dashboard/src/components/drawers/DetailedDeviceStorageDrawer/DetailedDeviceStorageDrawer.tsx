@@ -18,7 +18,7 @@ function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
         const newData = getData("storage")[target];
         const newDisks = safeObjectValues(newData.disks);
         const newDiskSettings = newDisks.map(({ path }: Disk) => ({ path, hidden: false }));
-        setWidgetSettings(index, { ...widget.settings, target, disks: newDiskSettings });
+        setWidgetSettings(index, { target, disks: newDiskSettings, automatic: !target });
     };
 
     const isDiskHidden = (path: string) => {

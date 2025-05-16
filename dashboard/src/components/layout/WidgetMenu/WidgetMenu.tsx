@@ -2,22 +2,23 @@ import { Box, Center, Group, Paper, PaperProps, Tooltip } from "@mantine/core";
 import { useRef, useState } from "react";
 import classes from "./WidgetMenu.module.css";
 import { capitalize } from "lodash";
-import WIDGETS_CONFIG, { GRID_SIZE_PX } from "../../../config/widgets.config";
+import WIDGETS_CONFIG, { GRID_MARGIN_PX, GRID_SIZE_PX } from "../../../config/widgets.config";
 import { safeObjectEntries } from "../../../utils/object";
-import DUMMIES from "./dummies";
 import Widget from "../Widget/Widget";
+import { WidgetData } from "../../../types/api.types";
 
 interface WidgetMenuProps extends PaperProps {
     currentDropType: string | null;
     setCurrentDropType: (type: string) => void;
 }
 
-const DRAG_OFFSET = 24;
+const DRAG_OFFSET = 12;
 
 const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }: WidgetMenuProps): React.JSX.Element => {
-    const ref = useRef<HTMLDivElement>(null);
-
     const [isDragging, setIsDragging] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const currentConfiguration = currentDropType ? WIDGETS_CONFIG[currentDropType] : undefined;
+    const { minW, minH } = currentConfiguration?.limits || { minW: 0, minH: 0 };
 
     const img = new Image();
     img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
@@ -26,8 +27,6 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
         if (!ref.current) return;
         ref.current!.style.transform = `translate(${x - DRAG_OFFSET}px, ${y - DRAG_OFFSET}px)`;
     };
-
-    const currentConfiguration = currentDropType ? WIDGETS_CONFIG[currentDropType] : undefined;
 
     const onDragStart = (e) => {
         setCurrentDropType(e.target.id);
@@ -46,20 +45,17 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
         <>
             {currentConfiguration && (
                 <Widget
+                    index={-1}
+                    // @ts-ignore
+                    widget={{ type: currentDropType!, settings: currentConfiguration.initialSettings }}
                     className={classes.ghost}
                     style={{
-                        width: currentConfiguration.limits.minW * GRID_SIZE_PX,
-                        height: currentConfiguration.limits.minH * GRID_SIZE_PX,
+                        width: minW * GRID_SIZE_PX + (minW - 1) * GRID_MARGIN_PX,
+                        height: minH * GRID_SIZE_PX + (minH - 1) * GRID_MARGIN_PX,
                         visibility: isDragging ? "visible" : "hidden",
                     }}
                     ref={ref}
-                >
-                    <currentConfiguration.content
-                        index={-1}
-                        data={currentDropType ? DUMMIES[currentDropType] : {}}
-                        settings={{}}
-                    />
-                </Widget>
+                />
             )}
             <Box className={classes.positioner}>
                 <Paper

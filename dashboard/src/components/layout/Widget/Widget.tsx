@@ -3,15 +3,24 @@ import { IconX } from "@tabler/icons-react";
 import classes from "./Widget.module.css";
 import { LayoutItem } from "../../../types/reactGridLayout.types";
 import { forwardRef } from "react";
+import { WidgetData } from "../../../types/api.types";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import TimeoutRingProgress from "../../display/TimeoutRingProgress/TimeoutRingProgress";
+import DUMMIES from "../WidgetMenu/dummies";
 
 interface WidgetProps extends FlexProps {
+    index: number; // if index = -1 then its a ghost component
+    widget: WidgetData;
     "data-grid"?: LayoutItem;
     onDelete?: () => void;
     paperProps?: PaperProps;
 }
 
 const Widget = forwardRef<HTMLDivElement, WidgetProps>(
-    ({ "data-grid": dataGrid, onDelete, children, paperProps, ...props }: WidgetProps, ref): React.JSX.Element => {
+    ({ index, widget, "data-grid": dataGrid, onDelete, children, paperProps, ...props }: WidgetProps, ref): React.JSX.Element => {
+        const { getWidgetConfig, getWidgetData, getWidgetContent } = useWidgets();
+        const WidgetContent = getWidgetContent(widget);
+        const config = getWidgetConfig(widget);
         return (
             <Flex
                 data-grid={dataGrid}
@@ -34,7 +43,21 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                     className={`drag-handle ${classes.paper} ${paperProps?.className ?? ""}`}
                     withBorder
                 >
-                    {children}
+                    <WidgetContent
+                        index={index}
+                        data={index !== -1 ? getWidgetData(widget) : DUMMIES[widget.type]}
+                        settings={widget?.settings}
+                    />
+                    {config.isReferingToSingularResource && !widget?.settings?.automatic && (
+                        <TimeoutRingProgress
+                            timestamp={new Date().toISOString()}
+                            className={classes.timeout}
+                        />
+                    )}
+                    {
+                        // children MUST be here for the resize handle to append FOR SOME REASON???"???????"
+                        children
+                    }
                 </Paper>
             </Flex>
         );

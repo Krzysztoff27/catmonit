@@ -47,6 +47,7 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
                 w="100%"
                 h="100%"
                 scrollbarSize="0.625rem"
+                type="auto"
             >
                 <Stack
                     gap="xs"

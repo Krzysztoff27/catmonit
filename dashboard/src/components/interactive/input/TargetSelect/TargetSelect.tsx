@@ -53,7 +53,7 @@ function TargetSelect({ index, widget, onChange, overridenDataSource = "" }: Tar
     };
 
     const changeTarget = (target: string | null) => {
-        setWidgetSettings(index, { ...widget.settings, target });
+        setWidgetSettings(index, { ...widget.settings, target, automatic: !target });
         onChange?.(target);
     };
 

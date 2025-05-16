@@ -11,7 +11,7 @@ function AlertCount({ criticalCount, mediumCount, isWarning }: AlertCountProps) 
     return (
         <Paper
             radius="md"
-            h="242"
+            h="234"
             w="224"
             bg="var(--background-color-6)"
             p="16"

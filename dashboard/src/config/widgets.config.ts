@@ -28,7 +28,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         initialSettings: {
             target: undefined,
             automatic: true,
-            disks: [],
+            disks: undefined,
         },
         dataSource: "storage",
         isReferingToSingularResource: true,
