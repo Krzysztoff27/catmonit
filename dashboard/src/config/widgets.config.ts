@@ -8,7 +8,7 @@ import { WidgetsConfig } from "../types/config.types";
 import ServiceStatusDrawer from "../components/drawers/ServiceStatusDrawer/ServiceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget.tsx";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -62,6 +62,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 6,
             maxW: 10,
         },
+        initialSettings: {},
     },
     SERVICE_STATUS: {
         name: "device's status ",
@@ -74,6 +75,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 2,
             maxW: 4,
         },
+        initialSettings: {},
     },
     NETWORK_THROUGHPUT: {
         name: "network throughput",
@@ -86,6 +88,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 3,
             maxW: 6,
         },
+        initialSettings: {},
     },
 };
 
