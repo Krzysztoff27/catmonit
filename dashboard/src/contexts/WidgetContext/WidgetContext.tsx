@@ -4,7 +4,7 @@ import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
 import { isEmpty } from "lodash";
 import { WidgetContent } from "../../types/components.types";
-import { WidgetLimits } from "../../types/config.types";
+import { WidgetConfig, WidgetLimits } from "../../types/config.types";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -19,6 +19,7 @@ interface WidgetContextType {
     getWidgetData: (widget: WidgetData) => any;
     getWidgetLimits: (widget: WidgetData) => WidgetLimits;
     getWidgetContent: (widget: WidgetData) => WidgetContent;
+    getWidgetConfig: (widget: WidgetData) => WidgetConfig;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -41,9 +42,11 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const saveStateToDatabase = () => {};
 
-    const getWidgetLimits = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].limits;
+    const getWidgetConfig = (widget: WidgetData) => WIDGETS_CONFIG[widget.type];
 
-    const getWidgetContent = (widget: WidgetData) => WIDGETS_CONFIG[widget.type].content;
+    const getWidgetLimits = (widget: WidgetData) => getWidgetConfig(widget).limits;
+
+    const getWidgetContent = (widget: WidgetData) => getWidgetConfig(widget).content;
 
     const getItemRect = (item: LayoutItem) => ({
         x: item.x,
@@ -164,6 +167,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         getWidgetData,
         getWidgetContent,
         getWidgetLimits,
+        getWidgetConfig,
     };
 
     return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;

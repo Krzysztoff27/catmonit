@@ -186,12 +186,12 @@ function DetailedDeviceStorageDrawer() {
                     />
                 </Grid.Col>
             </Grid>
-            <DeviceSelect
+            {/* <DeviceSelect
                 placeholder="Choose device"
                 data={devices}
                 value={selectedDevice}
                 onChange={handleDeviceChange}
-            />
+            /> */}
             {selectedDevice && selectedDeviceData && (
                 <>
                     <Title
@@ -215,78 +215,77 @@ function DetailedDeviceStorageDrawer() {
            <Text w={22}>Error</Text>
         </Group> */}
 
+                    {selectedDeviceData.disks.map((disk) => {
+                        const key = `${selectedDeviceData.uuid}-${disk.path}`;
+                        const isVisible = visibilityState[key];
+                        return (
+                            <Flex
+                                key={disk.path}
+                                align="center"
+                                justify="space-between"
+                                w="100%"
+                            >
+                                <IconGripVertical color="var(--background-color-3)" />
 
-                        {selectedDeviceData.disks.map((disk) => {
-                            const key = `${selectedDeviceData.uuid}-${disk.path}`;
-                            const isVisible = visibilityState[key];
-                            return (
-                                <Flex
-                                    key={disk.path}
-                                    align="center"
-                                    justify="space-between"
-                                    w="100%"
+                                <Paper
+                                    w="40%"
+                                    bg="var(--background-color-6)"
+                                    radius="8"
+                                    bd="1px solid var(--background-color-5)"
                                 >
-                                    <IconGripVertical color="var(--background-color-3)" />
-
-                                    <Paper
-                                        w="40%"
-                                        bg="var(--background-color-6)"
-                                        radius="8"
-                                        bd="1px solid var(--background-color-5)"
+                                    <Group
+                                        gap="0"
+                                        px="10"
+                                        py="6"
                                     >
-                                        <Group
-                                            gap="0"
-                                            px="10"
-                                            py="6"
-                                        >
-                                            <Text fz="xs">{disk.path}</Text>
-                                        </Group>
-                                    </Paper>
+                                        <Text fz="xs">{disk.path}</Text>
+                                    </Group>
+                                </Paper>
 
-                                    <Paper
-                                        w="22%"
-                                        bg="var(--background-color-6)"
-                                        radius="8"
-                                        bd="1px solid var(--background-color-5)"
-                                    >
-                                        <NumberInput
-                                            defaultValue={75}
-                                            min={0}
-                                            max={100}
-                                            step={1}
-                                            suffix="%"
-                                        />
-                                    </Paper>
+                                <Paper
+                                    w="22%"
+                                    bg="var(--background-color-6)"
+                                    radius="8"
+                                    bd="1px solid var(--background-color-5)"
+                                >
+                                    <NumberInput
+                                        defaultValue={75}
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        suffix="%"
+                                    />
+                                </Paper>
 
-                                    <Paper
-                                        w="22%"
-                                        bg="var(--background-color-6)"
-                                        radius="8"
-                                        bd="1px solid var(--background-color-5)"
-                                    >
-                                        <NumberInput
-                                            defaultValue={90}
-                                            min={0}
-                                            max={100}
-                                            step={1}
-                                            suffix="%"
-                                        />
-                                    </Paper>
+                                <Paper
+                                    w="22%"
+                                    bg="var(--background-color-6)"
+                                    radius="8"
+                                    bd="1px solid var(--background-color-5)"
+                                >
+                                    <NumberInput
+                                        defaultValue={90}
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        suffix="%"
+                                    />
+                                </Paper>
 
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => handleToggleVisibility(selectedDeviceData.uuid, disk.path)}
-                                        color={isVisible ? "var(--background-color-0)" : "var(--background-color-3)"}
-                                        bd="0"
-                                        w="fit-content"
-                                        h="fit-content"
-                                        p="0"
-                                    >
-                                        {isVisible ? <IconEye size={16} /> : <IconEyeOff size={16} />}
-                                    </Button>
-                                </Flex>
-                            );
-                        })}
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handleToggleVisibility(selectedDeviceData.uuid, disk.path)}
+                                    color={isVisible ? "var(--background-color-0)" : "var(--background-color-3)"}
+                                    bd="0"
+                                    w="fit-content"
+                                    h="fit-content"
+                                    p="0"
+                                >
+                                    {isVisible ? <IconEye size={16} /> : <IconEyeOff size={16} />}
+                                </Button>
+                            </Flex>
+                        );
+                    })}
                 </>
             )}
         </>

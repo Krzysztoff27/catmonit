@@ -55,6 +55,7 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
                     ref={ref}
                 >
                     <currentConfiguration.content
+                        index={-1}
                         data={currentDropType ? DUMMIES[currentDropType] : {}}
                         settings={{}}
                     />

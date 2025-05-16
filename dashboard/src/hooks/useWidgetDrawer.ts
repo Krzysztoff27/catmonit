@@ -26,7 +26,7 @@ export default function useWidgetDrawer(widgets: WidgetData[]) {
         setSelected(null);
     };
 
-    const DrawerContent: DrawerContent | null = selected ? WIDGETS_CONFIG[widgets[selected].type].drawer : null;
+    const DrawerContent: DrawerContent | null = selected !== null ? WIDGETS_CONFIG[widgets[selected].type].drawer : null;
 
     return { isOpened, selected, onWidgetDragStart, onWidgetDragStop, closeWidgetDrawer, DrawerContent };
 }
