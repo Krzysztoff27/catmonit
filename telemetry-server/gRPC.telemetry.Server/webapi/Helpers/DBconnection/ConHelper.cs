@@ -26,7 +26,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         }
         public static int execCountQuery(string query, Dictionary<string, object> parameters)
         {
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
                 openConnection(conn);
 
@@ -57,7 +57,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 
         public static bool execNonQuery(string query, Dictionary<string, object> parameters)
         {
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
                 openConnection(conn);
 
@@ -82,7 +82,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         }
         public static NpgsqlDataReader ExecuteReader(string query, Dictionary<string, object> parameters)
         {
-            var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING);
+            var conn = new NpgsqlConnection(Config.GetConnectionString());
             openConnection(conn);
             var cmd = new NpgsqlCommand(query, conn);
 
@@ -102,7 +102,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         public static bool execTransactionWithNoArgs(string query0, string query1)
         {
 
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
                 openConnection(conn);
                 using (var transaction = conn.BeginTransaction())
@@ -133,7 +133,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         public static bool execTransactionWithArgs(string query0, Dictionary<string, object> query0Args, string query1, Dictionary<string, object> query1Args)
         {
 
-            using (var conn = new NpgsqlConnection(Config.CM_POSTGRES_CONNECTION_STRING))
+            using (var conn = new NpgsqlConnection(Config.GetConnectionString()))
             {
                 openConnection(conn);
 
