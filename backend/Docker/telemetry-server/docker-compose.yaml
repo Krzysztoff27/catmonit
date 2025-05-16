@@ -3,7 +3,7 @@ services:
     container_name: catmonit-telemetry-server
     image: "ghcr.io/krzysztoff27/catmonit-telemetry-server:latest"
     env_file:
-      - ../../.env
+      - ../../../../.env
     #environment:
       #- POSTGRES_SERVER=${POSTGRES_SERVER}
       #- POSTGRES_USER=${POSTGRES_USER}
