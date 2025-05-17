@@ -13,11 +13,16 @@ message TelemetryRequest {
   string ip_address = 2;
   string uuid = 3;
   string operating_system = 4;
+  string last_boot_timestamp = 5;
 
   oneof payload {
-    NetworkStatsList network = 5;
-    DiskStatsList disks = 6;
-    FileShareList shares = 7;
+    NetworkStatsList network = 6;
+    DiskStatsList disks = 7;
+    FileSharesList shares = 8;
+    DiskErrorsList disk_errors = 9;
+    SystemErrorsList system_errors = 10;
+    SystemUsage usage = 11;
+
   }
 }
 
@@ -49,18 +54,47 @@ message DiskStats {
 }
 
 //List of all fileshares on a machine
-message FileShareList {
-  repeated FileShare entries = 1;
+message FileSharesList {
+  repeated FileShares entries = 1;
 }
 
-message FileShare {
+message FileShares {
   string share_path = 1;
   int64 usage = 2;
   int64 capacity = 3;
+}
+
+//List of all disk related errors
+message DiskErrorsList {
+  repeated DiskErrors entries = 1;
+}
+
+message DiskErrors {
+  string message = 1;
+  string source = 2;
+  int64 timestamp = 3;
+  string mount_point = 4;
+}
+
+//List of all critical machine errors
+message SystemErrorsList {
+  repeated SystemErrors entries = 1;
+}
+
+message SystemErrors {
+  string message = 1;
+  string source = 2;
+  int64 timestamp = 3;
+}
+
+//List of all system usage telemetry
+message SystemUsage {
+  double cpu_usage_percent = 1;
+  uint64 ram_total_bytes = 2;
+  uint64 ram_used_bytes = 3;
 }
 
 //Server response
 message TelemetryResponse {
   string status = 1;
 }
-
