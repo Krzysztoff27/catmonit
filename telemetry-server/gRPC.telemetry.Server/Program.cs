@@ -3,8 +3,9 @@
 
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using webapi.Monitoring;
-using webapi.Websocket;
 using gRPC.telemetry.Server.webapi.Services;
+using gRPC.telemetry.Server.webapi.Websocket.Network;
+
 
 #if CM_GENERATE_SWAGGER
 using Microsoft.OpenApi.Models;

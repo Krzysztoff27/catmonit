@@ -1,5 +1,5 @@
 ﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
-using webapi.Models;
+using gRPC.telemetry.Server.webapi.Monitoring.Network;
 using webapi.Monitoring;
 
 namespace gRPC.telemetry.Server.webapi.Services
@@ -22,7 +22,7 @@ namespace gRPC.telemetry.Server.webapi.Services
                 await Task.Delay(TimeUntilNextRun(), stoppingToken);
 
                 // update those devices which are active at the moment
-                foreach ((Guid deviceID, DateTime lastSeen) in NetworkInfo.Instance.GetAllDevicesUUIDsAndLastSeen())
+                foreach ((Guid deviceID, DateTime lastSeen) in NetworkMonit.networkDeviceInfos.GetAllDevicesUUIDsAndLastSeen())
                 {
                     try
                     {
