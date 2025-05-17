@@ -8,7 +8,7 @@ import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import Widget from "../Widget/Widget";
 
 function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop, onDrop, droppingItem }: WidgetLayoutProps) {
-    const { widgets, layout, getWidgetData, deleteWidget, setWidgetRects, getWidgetContent } = useWidgets();
+    const { widgets, layout, deleteWidget, setWidgetRects } = useWidgets();
 
     const { width, ref } = useElementSize();
     const cols = Math.floor(width / GRID_SIZE_PX);
@@ -18,23 +18,16 @@ function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart,
 
     const elements =
         width && layout ? (
-            widgets.map((widget: WidgetData, i) => {
-                const WidgetContent = getWidgetContent(widget);
-                return (
-                    <Widget
-                        key={i}
-                        data-grid={layout[i]}
-                        onDelete={() => deleteWidget(i)}
-                        className={`${classes.widget} ${selected === i ? classes.selected : ""}`}
-                    >
-                        <WidgetContent
-                            index={i}
-                            data={getWidgetData(widget)}
-                            settings={widget.settings}
-                        />
-                    </Widget>
-                );
-            })
+            widgets.map((widget: WidgetData, i) => (
+                <Widget
+                    key={i}
+                    index={i}
+                    widget={widget}
+                    data-grid={layout[i]}
+                    onDelete={() => deleteWidget(i)}
+                    className={`${classes.widget} ${selected === i ? classes.selected : ""}`}
+                />
+            ))
         ) : (
             <div></div>
         );
@@ -56,6 +49,7 @@ function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart,
             onResizeStop={onResizeStop}
             onDrop={onDrop}
             isDroppable={true}
+            isResizable={true}
             droppingItem={droppingItem}
             innerRef={ref}
             margin={[GRID_MARGIN_PX, GRID_MARGIN_PX]}

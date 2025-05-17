@@ -1,7 +1,7 @@
 .container {
     flex: 1;
-    height: 100%;
     overflow: hidden;
+    height: 100%;
 }
 
 .stack {
@@ -17,5 +17,5 @@
 .progressBarStack {
     flex: 1;
     justify-content: start;
-    gap: 14;
+    gap: var(--mantine-spacing-sm) !important;
 }

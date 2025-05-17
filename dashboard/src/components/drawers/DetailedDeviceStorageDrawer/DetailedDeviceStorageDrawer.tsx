@@ -5,7 +5,7 @@ import { Disk } from "../../../types/api.types";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
 import { safeObjectValues } from "../../../utils/object";
 import { DrawerContentProps } from "../../../types/components.types";
-import TargetSelect from "../../interactive/input/TargetSelect/TargetSelect";
+import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 
 function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
     const { setWidgetSettings, getWidgetData, getData, getWidget } = useWidgets();
@@ -18,7 +18,7 @@ function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
         const newData = getData("storage")[target];
         const newDisks = safeObjectValues(newData.disks);
         const newDiskSettings = newDisks.map(({ path }: Disk) => ({ path, hidden: false }));
-        setWidgetSettings(index, { ...widget.settings, target, disks: newDiskSettings });
+        setWidgetSettings(index, { target, disks: newDiskSettings, automatic: !target });
     };
 
     const isDiskHidden = (path: string) => {
@@ -40,7 +40,7 @@ function DetailedDeviceStorageDrawer({ index }: DrawerContentProps) {
 
     return (
         <Stack gap="sm">
-            <TargetSelect
+            <DeviceSelect
                 index={index}
                 widget={widget}
                 onChange={onDeviceChange}

@@ -10,9 +10,9 @@ interface WidgetDrawerProps extends DrawerProps, DrawerContentProps {
 }
 
 const WidgetDrawer = ({ component: Component, index, ...props }: WidgetDrawerProps): React.JSX.Element => {
-    const { getWidget } = useWidgets();
+    const { getWidget, getWidgetConfig } = useWidgets();
     const widget = getWidget(index);
-    const name = WIDGETS_CONFIG?.[widget?.type]?.name;
+    const name = getWidgetConfig(widget).name;
 
     return (
         <Drawer

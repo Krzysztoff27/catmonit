@@ -42,7 +42,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const saveStateToDatabase = () => {};
 
-    const getWidgetConfig = (widget: WidgetData) => WIDGETS_CONFIG[widget.type];
+    const getWidgetConfig = (widget: WidgetData) => WIDGETS_CONFIG?.[widget?.type] ?? {};
 
     const getWidgetLimits = (widget: WidgetData) => getWidgetConfig(widget).limits;
 
@@ -117,14 +117,14 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     };
 
     const getWidgetData = (widget: WidgetData) => {
-        const config = WIDGETS_CONFIG[widget.type];
+        if (!widget) return {};
+
+        const config = getWidgetConfig(widget);
         const isSingular = config.isReferingToSingularResource;
         const source = config.dataSource;
 
         if (!source) {
-            console.warn(
-                `Using getWidgetData() with a widget of type ${widget.type} will always return undefined, since its configuration's dataSource property is undefined.`
-            );
+            console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
             return;
         }
 
@@ -148,7 +148,8 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
                 return {
                     i: `${i}`,
                     ...widget.rect,
-                    ...WIDGETS_CONFIG[widget.type].limits,
+                    ...getWidgetConfig(widget).limits,
+                    isResizable: true,
                 };
             }),
         [widgets]

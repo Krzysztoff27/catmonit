@@ -1,4 +1,4 @@
-import TargetSelect from "../../interactive/input/TargetSelect/TargetSelect";
+import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
 function OverallDeviceStorageDrawer({ index }) {
@@ -7,7 +7,7 @@ function OverallDeviceStorageDrawer({ index }) {
 
     return (
         <>
-            <TargetSelect
+            <DeviceSelect
                 index={index}
                 widget={widget}
             />

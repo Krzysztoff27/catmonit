@@ -1,4 +1,4 @@
-import { Box, Paper, Stack, Title } from "@mantine/core";
+import { Box, Stack, Title } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { Disk } from "../../../types/api.types";
 import { WidgetContentProps } from "../../../types/components.types";
@@ -11,9 +11,9 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
     let { height, ref } = useElementSize();
 
     const prepareData = () => {
-        if (!height || !data.disks) return data.disks ?? [];
+        if (!height || !data.disks) return safeObjectValues(data.disks) ?? [];
 
-        const numberOfSlots = Math.floor((height - 118) / 44);
+        const numberOfSlots = Math.floor((height + 12) / 44);
         const visibleDisks = settings?.disks?.filter(({ hidden }) => !hidden).map(({ path }) => path);
         const disksData = visibleDisks?.map((path: string) => data.disks[path]) ?? safeObjectValues(data.disks);
 
@@ -31,7 +31,6 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
     return (
         <Box
             className={classes.container}
-            ref={ref}
             {...props}
         >
             <Stack className={classes.stack}>
@@ -45,7 +44,10 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     data={data}
                     mb="6"
                 />
-                <Stack className={classes.progressBarStack}>
+                <Stack
+                    ref={ref}
+                    className={classes.progressBarStack}
+                >
                     {disksData.map((disk: Disk, i) => (
                         <DiskProgress
                             key={i}

@@ -69,6 +69,29 @@ export const data = {
                 },
             },
         },
+        "4": {
+            uuid: "4",
+            hostname: "Overkill",
+            ip: "192.168.1.4",
+            mask: "26",
+            disks: {
+                ...Object.fromEntries(
+                    Array.from({ length: 50 }, (_, i) => {
+                        const driveName = `/dev/ultra${i}`;
+                        const storageLimit = 1000 + i * 100; // e.g. 1000, 1100, 1200...
+                        const storageCurrent = Math.floor(storageLimit * 0.6); // 60% used
+                        return [
+                            driveName,
+                            {
+                                path: driveName,
+                                storageLimit,
+                                storageCurrent,
+                            },
+                        ];
+                    })
+                ),
+            },
+        },
     },
     network: {},
 };

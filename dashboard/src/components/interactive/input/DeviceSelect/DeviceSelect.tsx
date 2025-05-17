@@ -1,27 +1,25 @@
 import { Flex, Select, SelectProps, Stack, Text, Title } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { safeObjectValues } from "../../../../utils/object";
-import classes from "./TargetSelect.module.css";
+import classes from "./DeviceSelect.module.css";
 import { useWidgets } from "../../../../contexts/WidgetContext/WidgetContext";
 import { WidgetData } from "../../../../types/api.types";
 
-interface TargetSelectProps {
+interface DeviceSelectProps {
     index: number;
     widget: WidgetData;
     overridenDataSource?: string;
     onChange?: (target: string | null) => void;
 }
 
-function TargetSelect({ index, widget, onChange, overridenDataSource = "" }: TargetSelectProps) {
+function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: DeviceSelectProps) {
     const { setWidgetSettings, getData, getWidgetConfig } = useWidgets();
     const source = overridenDataSource || getWidgetConfig(widget).dataSource;
 
     if (!source) {
-        console.warn(
-            `[TargetSelect.tsx]\n
+        console.warn(`[DeviceSelect.tsx]\n
             Missing data source for the select component.
-            Widgets of type ${widget.type} have no default "dataSource" defined and "overridenDataSource" was not provided.`
-        );
+            Widgets of type ${widget.type} have no default "dataSource" defined and "overridenDataSource" was not provided.`);
     }
 
     const data = source ? getData(source) : {};
@@ -63,8 +61,8 @@ function TargetSelect({ index, widget, onChange, overridenDataSource = "" }: Tar
             <Select
                 unselectable="off"
                 placeholder="Auto"
-                value={widget.settings.target || ""}
                 data={selectData}
+                value={widget.settings.target}
                 onChange={changeTarget}
                 renderOption={renderOption}
             />
@@ -72,4 +70,4 @@ function TargetSelect({ index, widget, onChange, overridenDataSource = "" }: Tar
     );
 }
 
-export default TargetSelect;
+export default DeviceSelect;
