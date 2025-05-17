@@ -6,6 +6,7 @@ import json
 from typing import List
 from pydantic import BaseModel
 from functools import lru_cache
+import scripts
 import telemetry_pb2
 
 
@@ -14,32 +15,7 @@ class Base(BaseModel):
     ip_address: str
     uuid: str
     operating_system: str
-
-fileshares_extract_script = """
-    # Get all non-special shares (exclude administrative shares)
-    $shares = Get-SmbShare | Where-Object { 
-        $_.Path -ne $null -and 
-        $_.Name -notmatch '\\$$' -and 
-        $_.ShareType -eq 'FileSystemDirectory'
-    }
-
-    $result = @()
-
-    foreach ($share in $shares) {
-        $path = $share.Path
-        $drive = $path.Substring(0, 2)
-
-        $disk = Get-Volume -DriveLetter $drive[0] -ErrorAction SilentlyContinue
-        if ($disk) {
-            $result += [PSCustomObject]@{
-                share_path = $path
-                usage = $disk.Size - $disk.SizeRemaining
-                capacity = $disk.Size
-            }
-        }
-    }
-    $result | ConvertTo-Json -Depth 3
-    """
+    last_boot_timestamp: str
 
 def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
     message = telemetry_pb2.TelemetryRequest()
@@ -49,6 +25,7 @@ def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
     message.ip_address = base.ip_address
     message.uuid = base.uuid
     message.operating_system = base.operating_system
+    message.last_boot_timestamp = base.last_boot_timestamp
 
     if payload_type == "network":
         network_stats = telemetry_pb2.NetworkStatsList()
@@ -62,6 +39,17 @@ def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
         file_shares = telemetry_pb2.FileSharesList()
         file_shares.entries.extend(get_fileshares_payload())
         message.shares.CopyFrom(file_shares)
+    elif payload_type == "disk_errors":
+        errors = telemetry_pb2.DiskErrorsList()
+        errors.entries.extend(get_disk_errors_payload())
+        message.disk_errors.CopyFrom(errors)
+    elif payload_type == "system_errors":
+        errors = telemetry_pb2.SystemErrorsList()
+        errors.entries.extend(get_system_errors_payload())
+        message.system_errors.CopyFrom(errors)
+    elif payload_type == "usage":
+        usage = get_system_usage_payload()
+        message.usage.CopyFrom(usage)
 
     return message
 
@@ -125,7 +113,7 @@ def get_disks_payload() -> List[telemetry_pb2.DiskStats]:
 def get_fileshares_payload() -> List[telemetry_pb2.FileShares]:
     try:
         result = subprocess.run(
-            ["powershell", "-Command", fileshares_extract_script],
+            ["powershell", "-Command", scripts.fileshares_extract_script],
             capture_output=True,
             text=True,
             check=True
@@ -163,3 +151,60 @@ def get_fileshares_payload() -> List[telemetry_pb2.FileShares]:
     except Exception as e:
         print(f"Error getting fileshares: {e}")
     return []
+
+def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
+    try:
+        result = subprocess.run(
+            ["powershell", "-Command", scripts.disk_errors_script],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        events = json.loads(result.stdout.strip())
+        if isinstance(events, dict):
+            events = [events]
+
+        errors = []
+        for event in events:
+            err = telemetry_pb2.DiskErrors()
+            err.message = event.get("message", "")
+            err.source = event.get("source", "")
+            err.timestamp = int(event.get("timestamp", 0))
+            err.mount_point = event.get("mount_point", "")
+            errors.append(err)
+        return errors
+    except Exception as e:
+        print(f"Disk error fetch failed: {e}")
+        return []
+
+def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
+    try:
+        result = subprocess.run(
+            ["powershell", "-Command", scripts.system_errors_script],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        events = json.loads(result.stdout.strip())
+        if isinstance(events, dict):
+            events = [events]
+
+        errors = []
+        for event in events:
+            err = telemetry_pb2.SystemErrors()
+            err.message = event.get("message", "")
+            err.source = event.get("source", "")
+            err.timestamp = int(event.get("timestamp", 0))
+            errors.append(err)
+        return errors
+    except Exception as e:
+        print(f"System error fetch failed: {e}")
+        return []
+
+def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
+    usage = telemetry_pb2.SystemUsage()
+    usage.cpu_usage_percent = psutil.cpu_percent(interval=1)
+    mem = psutil.virtual_memory()
+    usage.ram_total_bytes = mem.total
+    usage.ram_used_bytes = mem.used
+    return usage

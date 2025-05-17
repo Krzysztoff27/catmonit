@@ -4,3 +4,4 @@ class Base(BaseModel):
     ip_address: str
     uuid: str
     operating_system: str
+    last_boot_timestamp: str
