@@ -1,6 +1,7 @@
 ﻿using gRPC.telemetry.Server.Models;
 using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
-using webapi.Models;
+using gRPC.telemetry.Server.webapi.Monitoring;
+using gRPC.telemetry.Server.webapi.Monitoring.Network;
 
 namespace gRPC.telemetry.Server.webapi.Websocket
 {
@@ -25,14 +26,13 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         {
                             if (pl.IsMain == true)
                             {
-                                di.InterfaceName = pl.InterfaceName;
-                                di.RxMbps = pl.RxMbps;
-                                di.TxMbps = pl.TxMbps;
+                                di.MainPayload = pl;
                                 break;
                             }
                         }
+                        di.Networks = ((List<NetworkPayload>)response.Payload).Except(new List<NetworkPayload>{di.MainPayload}).ToList();
 
-                        NetworkInfo.Instance.AddOrUpdateDevice(di);
+                        NetworkInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
 
                         return;
                     }

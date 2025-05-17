@@ -1,15 +1,14 @@
 ﻿using System.Net.WebSockets;
-using System.Text;
-using webapi.Monitoring;
-using webapi.Helpers;
 using System.Text.Json;
+using System.Text;
+using webapi.Helpers;
+using webapi.Monitoring;
 
-namespace webapi.Websocket
+namespace gRPC.telemetry.Server.webapi.Websocket
 {
-    public class NetworkMonitHandler // handler just for websockets. Delegates websockets to NetworkMonit
+    public abstract class MonitHandler // handler just for websockets. Delegates websockets to Monit
     {
-        public static NetworkMonitHandler instance { get; } = new NetworkMonitHandler();
-
+        public Monit MonitRef { get; set; }
         public async Task HandleRequestAsync(HttpContext context)
         {
             var token = context.Request.Query["Authentication"].ToString();
@@ -34,9 +33,8 @@ namespace webapi.Websocket
         private void onWebsocketClose(Subscriber subber)
         {
 
-            NetworkMonit.Instance.Unsubscribe(subber);
+            MonitRef.Unsubscribe(subber);
         }
-
         private async Task AddWebSocket(Subscriber potentialSubscriber)
         {
             var buffer = new byte[1024 * 4];
@@ -50,7 +48,7 @@ namespace webapi.Websocket
                     {
                         await potentialSubscriber.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                         onWebsocketClose(potentialSubscriber);
-                        return; 
+                        return;
                     }
                     var messageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     using var doc = JsonDocument.Parse(messageJson);
@@ -63,7 +61,7 @@ namespace webapi.Websocket
                         switch (messageType)
                         {
                             case "start":
-                                NetworkMonit.Instance.Unsubscribe(potentialSubscriber); 
+                                MonitRef.Unsubscribe(potentialSubscriber);
                                 List<Guid>? devices = new List<Guid>();
 
                                 int auto = 0;
@@ -80,14 +78,14 @@ namespace webapi.Websocket
                                 if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
                                 {
                                     auto = autoProp.GetInt32();
-                                    potentialSubscriber.autoDevicesCount = auto;
+                                    if (auto > 0)
+                                    {
+                                        potentialSubscriber.autoDevicesCount = auto;
+                                    }
                                 }
-                                NetworkMonit.Instance.Subscribe(potentialSubscriber);
+                                MonitRef.Subscribe(potentialSubscriber);
                                 break;
 
-                            case "stop":
-                                NetworkMonit.Instance.Unsubscribe(potentialSubscriber);
-                                break;
 
                             default:
                                 break;

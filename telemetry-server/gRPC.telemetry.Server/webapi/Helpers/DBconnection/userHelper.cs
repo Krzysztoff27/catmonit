@@ -113,75 +113,75 @@ namespace webapi.Helpers.DBconnection
         }
 
     }
+    
+    //public class PermissionHelper
+    //{
+    //    public static Permissions getPermissionBit(string permission)
+    //    {
+    //        switch (permission)
+    //        {
+    //            case "default": return Permissions.defaultPermission;
+    //            case "seeAll": return Permissions.seeAllPermission;
+    //            case "seeSelected": return Permissions.seeSelectedPermission;
+    //            case "modifyAccess": return Permissions.modifyAccessPermission;
+    //            default: return Permissions.defaultPermission;
+    //        }
+    //    }
+    //    public static int createPermissionBitmask(List<string> permissions)
+    //    {
+    //        int res = 0;
+    //        foreach (string perm in permissions)
+    //        {
+    //            res |= (int)getPermissionBit(perm);
+    //        }
+    //        return res;
+    //    }
+    //    public static int? UserPermission(Guid userID)
+    //    {
+    //        /*using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
+    //        {
+    //            if (!reader.Read()) return null;
+    //            return (int)reader["permissions"];
+    //        }*/
+    //        Utils.assert(false);
+    //        return 0;
+    //    }
+    //    public static bool? checkIfUserHasPermissions(Guid userID, int permissions)
+    //    {
+    //        /*
+    //        using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
+    //        {
+    //            if (!reader.Read()) return null;
+    //            return (((int)reader["permissions"]) & permissions) == permissions;
+    //        }*/
+    //        Utils.assert(false);
+    //        return false;
+    //    }
+    //    public static bool? addPermissionToUser(Guid guid, Permissions permissions)
+    //    {/*
+    //        int? currentPermission = UserPermission(guid);
+    //        if (currentPermission == null) return null; // user doesn't exist
+    //        int addedPermission = currentPermission.Value | (int)permissions;
+    //        return ConHelper.execNonQuery("UPDATE users SET permissions = @perms WHERE id = @userID", new Dictionary<string, object> { { "@perms", addedPermission }, { "@userID", guid } });*/
+    //        Utils.assert(false);
+    //        return false;
+    //    }
+    //    public static void addAccessToMachines(Guid userID, List<Guid> machines)
+    //    {
+    //        /*
+    //        foreach (var machine in machines)
+    //        {
+    //            ConHelper.execNonQuery(
+    //                    "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID)",
+    //                new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } });
+    //        }*/
+    //        Utils.assert(false);
 
-    public class PermissionHelper
-    {
-        public static Permissions getPermissionBit(string permission)
-        {
-            switch (permission)
-            {
-                case "default": return Permissions.defaultPermission;
-                case "seeAll": return Permissions.seeAllPermission;
-                case "seeSelected": return Permissions.seeSelectedPermission;
-                case "modifyAccess": return Permissions.modifyAccessPermission;
-                default: return Permissions.defaultPermission;
-            }
-        }
-        public static int createPermissionBitmask(List<string> permissions)
-        {
-            int res = 0;
-            foreach (string perm in permissions)
-            {
-                res |= (int)getPermissionBit(perm);
-            }
-            return res;
-        }
-        public static int? UserPermission(Guid userID)
-        {
-            /*using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
-            {
-                if (!reader.Read()) return null;
-                return (int)reader["permissions"];
-            }*/
-            Utils.assert(false);
-            return 0;
-        }
-        public static bool? checkIfUserHasPermissions(Guid userID, int permissions)
-        {
-            /*
-            using (var reader = ConHelper.ExecuteReader("SELECT permissions FROM users where id = @userID;", new Dictionary<string, object> { { "@userID", userID } }))
-            {
-                if (!reader.Read()) return null;
-                return (((int)reader["permissions"]) & permissions) == permissions;
-            }*/
-            Utils.assert(false);
-            return false;
-        }
-        public static bool? addPermissionToUser(Guid guid, Permissions permissions)
-        {/*
-            int? currentPermission = UserPermission(guid);
-            if (currentPermission == null) return null; // user doesn't exist
-            int addedPermission = currentPermission.Value | (int)permissions;
-            return ConHelper.execNonQuery("UPDATE users SET permissions = @perms WHERE id = @userID", new Dictionary<string, object> { { "@perms", addedPermission }, { "@userID", guid } });*/
-            Utils.assert(false);
-            return false;
-        }
-        public static void addAccessToMachines(Guid userID, List<Guid> machines)
-        {
-            /*
-            foreach (var machine in machines)
-            {
-                ConHelper.execNonQuery(
-                        "INSERT INTO users_devices (user_id, device_id) SELECT @userID, @machineID WHERE NOT EXISTS (SELECT 1 FROM users_devices WHERE user_id = @userID AND device_id = @machineID)",
-                    new Dictionary<string, object> { { "@userID", userID }, { "@machineID", machine } });
-            }*/
-            Utils.assert(false);
-
-        }
-        public static void removeSpecificMachinesAccess(Guid userID)
-        {
-            //ConHelper.execNonQuery("REMOVE FROM users_devices where user_id = @userID", new Dictionary<string, object> { { "@userID", userID } });
-            Utils.assert(false);
-        }
-    }
+    //    }
+    //    public static void removeSpecificMachinesAccess(Guid userID)
+    //    {
+    //        //ConHelper.execNonQuery("REMOVE FROM users_devices where user_id = @userID", new Dictionary<string, object> { { "@userID", userID } });
+    //        Utils.assert(false);
+    //    }
+    //}
 }

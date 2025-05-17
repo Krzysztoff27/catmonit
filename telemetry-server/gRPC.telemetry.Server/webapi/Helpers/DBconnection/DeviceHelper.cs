@@ -6,7 +6,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 {
     public class DeviceHelper
     {
-
+        /*
         public static List<Guid> GetDevicesUserHasAccessTo(Guid userID)
         {
             List<Guid> devices = new List<Guid>();
@@ -20,7 +20,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 }
             }
             return devices;
-        }
+        }*/
         public static List<Guid> getAllDevicesIDs ()
         {
             List<Guid> devices = new List<Guid>();
@@ -53,10 +53,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         {
             try
             {
-                return ConHelper.execTransactionWithNoArgs(
-                    $"WITH old_devices AS (SELECT device_id FROM devices WHERE last_seen < NOW() - INTERVAL '{tresholdDays} days' FOR UPDATE) DELETE FROM users_devices WHERE device_id IN (SELECT device_id FROM old_devices);",
-                    $"WITH old_devices AS (SELECT device_id FROM devices WHERE last_seen < NOW() - INTERVAL '{tresholdDays} days' FOR UPDATE) DELETE FROM devices WHERE device_id IN (SELECT device_id FROM old_devices);"
-                    );
+                return ConHelper.execNonQuery($"DELETE FROM devices WHERE last_seen < NOW() - INTERVAL '{tresholdDays} days';", new Dictionary<string, object>());
             }
             catch (InternalServerError)
             {
