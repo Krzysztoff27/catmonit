@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import { IconDatabase, IconDatabaseX, IconNetwork, IconChartDonut, IconFiles } from "@tabler/icons-react";
+import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertCircle, IconAlertCircleFilled } from "@tabler/icons-react";
 import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
@@ -7,8 +7,9 @@ import { WidgetsConfig } from "../types/config.types";
 // import ServiceStatusWidget from "../components/widgets/ServiceStatusWidget/ServiceStatusWidget";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 import FileshareWidget from "../components/widgets/FileshareWidget/FileshareWidget";
+import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -53,9 +54,9 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     },
     STORAGE_ALERTS: {
         name: "storage alerts widget",
-        icon: IconDatabaseX,
+        icon: IconAlertCircleFilled,
         content: AlertWidget,
-        drawer: Box,
+        drawer: AlertDrawer,
         limits: {
             minH: 2,
             maxH: 5,
@@ -67,7 +68,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     FILESHARE: {
         name: "fileshare widget",
         icon: IconFiles,
-        component: FileshareWidget,
+        content: FileshareWidget,
         drawer: Box,
         limits: {
             minH: 2,
