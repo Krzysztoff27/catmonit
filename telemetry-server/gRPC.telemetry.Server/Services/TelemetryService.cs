@@ -37,7 +37,8 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Hostname = request.Hostname,
                         IpAddress = request.IpAddress,
                         Uuid = request.Uuid,
-                        Os = request.OperatingSystem
+                        Os = request.OperatingSystem,
+                        LastBootupTime = request.LastBootupTime
                     };
 
                     if (guid == Guid.Empty)
@@ -61,6 +62,21 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         case TelemetryRequest.PayloadOneofCase.Shares:
                             response.PayloadType = PayloadType.Shares;
                             response.Payload = ProcessSharePayload(request.Shares);
+                            break;
+                        
+                        case TelemetryRequest.PayloadOneofCase.DiskErrors:
+                            response.PayloadType = PayloadType.DiskErrors;
+                            response.Payload = ProcessDiskErrorsPayload(request.DiskErrors);
+                            break;
+
+                        case TelemetryRequest.PayloadOneofCase.SystemErrors:
+                            response.PayloadType = PayloadType.SystemErrors;
+                            response.Payload = ProcessSystemErrorsPayload(request.SystemErrors);
+                            break;
+
+                        case TelemetryRequest.PayloadOneofCase.SystemUsage:
+                            response.PayloadType = PayloadType.SystemUsage;
+                            response.Payload = ProcessSystemUsagePayload(request.SystemUsage);
                             break;
 
                         default:
@@ -156,5 +172,46 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
             });
         }
         return result;
+    }
+    
+    private List<DiskErrorsPayload> ProcessDiskErrorsPayload(DiskErrorsList errorStats)
+    {
+        var result = new List<DiskErrorsPayload>();
+        foreach (var entry in errorStats.Entries)
+        {
+            result.Add(new DiskErrorsPayload
+            {
+                Message = entry.Message,
+                Source = entry.Source,
+                Timestamp = entry.Timestamp,
+                MountPoint = entry.MountPoint
+            });
+        }
+        return result;
+    }
+
+    private List<SystemErrorsPayload> ProcessSystemErrorsPayload(SystemErrorsList errorStats)
+    {
+        var result = new List<SystemErrorsPayload>();
+        foreach (var entry in errorStats.Entries)
+        {
+            result.Add(new SystemErrorsPayload
+            {
+                Message = entry.Message,
+                Source = entry.Source,
+                Timestamp = entry.Timestamp
+            });
+        }
+        return result;
+    }
+
+    private SystemUsagePayload ProcessSystemUsagePayload(SystemUsage entry)
+    {
+        return new SystemUsagePayload
+        {
+            CpuUsagePercent = entry.CpuUsagePercent,
+            RamTotalBytes = entry.RamTotalBytes,
+            RamUsedBytes = entry.RamUsedBytes
+        };
     }
 }
