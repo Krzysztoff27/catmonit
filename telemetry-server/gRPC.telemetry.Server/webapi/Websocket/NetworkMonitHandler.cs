@@ -3,6 +3,7 @@ using System.Text;
 using webapi.Monitoring;
 using webapi.Helpers;
 using System.Text.Json;
+using gRPC.telemetry.Server.webapi.Monitoring.Network;
 
 namespace webapi.Websocket
 {
@@ -80,7 +81,10 @@ namespace webapi.Websocket
                                 if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
                                 {
                                     auto = autoProp.GetInt32();
-                                    potentialSubscriber.autoDevicesCount = auto;
+                                    if (auto > 0)
+                                    {
+                                        potentialSubscriber.autoDevicesCount = auto;
+                                    }
                                 }
                                 NetworkMonit.Instance.Subscribe(potentialSubscriber);
                                 break;

@@ -9,6 +9,7 @@ using webapi.webapi;
 
 namespace webapi.Controllers.http.layout
 {
+    /*
     [ApiController]
     [Route("[controller]")]
     public class DeviceController : Controller
@@ -29,4 +30,5 @@ namespace webapi.Controllers.http.layout
             }
         }
     }
+    */
 }

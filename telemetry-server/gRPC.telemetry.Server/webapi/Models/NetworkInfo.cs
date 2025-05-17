@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using gRPC.telemetry.Server.Models;
+using System.Collections.Concurrent;
 
 namespace webapi.Models
 {
@@ -20,13 +21,21 @@ namespace webapi.Models
         public Guid Uuid { get; set; }
         public string Os { get; set; }
     }
-
+    public class NetworkResponse
+    {
+        public NetworkResponse()
+        {
+            responseTime = DateTime.UtcNow;
+        }
+        public DateTime responseTime { get; set; }
+        public ConcurrentDictionary<Guid, NetworkDeviceInfo?> monitoredDevices { get; set; } = new();
+        public ConcurrentDictionary<Guid, NetworkDeviceInfo> autoDevices { get; set; } = new();
+    }
     public class NetworkDeviceInfo
     {
         public DeviceInfo DeviceInfo { get; set; }
-        public string InterfaceName { get; set; }
-        public double RxMbps { get; set; }
-        public double TxMbps { get; set; }
+        public NetworkPayload MainPayload { get; set; }
+        public List<NetworkPayload> Networks { get; set; }
     }
     public class NetworkInfoModel
     {
@@ -42,7 +51,7 @@ namespace webapi.Models
         {
             AutoCandidates = MonitoredDevices
                 .Values
-                .OrderBy(device => device.RxMbps + device.TxMbps)
+                .OrderBy(device => device.MainPayload.RxMbps + device.MainPayload.TxMbps)
                 .Take(n)
                 .Select(device => device.DeviceInfo.Uuid)
                 .ToList();

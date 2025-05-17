@@ -25,12 +25,11 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         {
                             if (pl.IsMain == true)
                             {
-                                di.InterfaceName = pl.InterfaceName;
-                                di.RxMbps = pl.RxMbps;
-                                di.TxMbps = pl.TxMbps;
+                                di.MainPayload = pl;
                                 break;
                             }
                         }
+                        di.Networks = ((List<NetworkPayload>)response.Payload).Except(new List<NetworkPayload>{di.MainPayload}).ToList();
 
                         NetworkInfo.Instance.AddOrUpdateDevice(di);
 
