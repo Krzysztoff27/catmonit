@@ -37,8 +37,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Hostname = request.Hostname,
                         IpAddress = request.IpAddress,
                         Uuid = request.Uuid,
-                        Os = request.OperatingSystem,
-                        LastBootTimestamp = request.LastBootTimestamp
+                        Os = request.OperatingSystem
                     };
 
                     if (guid == Guid.Empty)
@@ -211,7 +210,10 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         {
             CpuUsagePercent = entry.CpuUsagePercent,
             RamTotalBytes = entry.RamTotalBytes,
-            RamUsedBytes = entry.RamUsedBytes
+            RamUsedBytes = entry.RamUsedBytes,
+            PagefileTotalBytes = entry.PagefileTotalBytes,
+            PagefileUsedBytes = entry.PagefileUsedBytes,
+            LastBootTimestamp = entry.LastBootTimestamp
         };
     }
 }
