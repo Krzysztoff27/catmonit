@@ -175,10 +175,10 @@ def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
             err.timestamp = int(event.get("timestamp", 0))
             err.mount_point = event.get("mount_point", "")
             errors.append(err)
-        return errors
+        return errors if errors else None
     except Exception as e:
         print(f"Disk error fetch failed: {e}")
-        return []
+        return None
 
 def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
     try:
@@ -199,10 +199,10 @@ def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
             err.source = event.get("source", "")
             err.timestamp = int(event.get("timestamp", 0))
             errors.append(err)
-        return errors
+        return errors if errors else None
     except Exception as e:
         print(f"System error fetch failed: {e}")
-        return []
+        return None
 
 def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
     usage = telemetry_pb2.SystemUsage()

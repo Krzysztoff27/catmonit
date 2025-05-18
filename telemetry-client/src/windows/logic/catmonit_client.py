@@ -75,7 +75,7 @@ class TelemetryStream:
                             if now - last_error_sent >= self.error_push_interval:
                                 for err_type in ["disk_errors", "system_errors"]:
                                     msg = data_retrieval.get_message(err_type)
-                                    if msg:
+                                    if msg is not None:
                                         await stream.write(msg)
                                 last_error_sent = now
 
