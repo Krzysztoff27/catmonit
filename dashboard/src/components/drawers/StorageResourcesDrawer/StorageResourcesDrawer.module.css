@@ -1,0 +1,50 @@
+.container {
+    gap: var(--mantine-spacing-sm);
+}
+
+.title {
+    margin-top: var(--mantine-spacing-lg);
+}
+
+.resourceList {
+    margin-top: var(--mantine-spacing-sm);
+    gap: var(--mantine-spacing-sm);
+    width: 100%;
+}
+
+.headerGroup {
+    width: 100%;
+    padding-right: var(--mantine-spacing-xl);
+}
+
+.headerLabel {
+    flex: 1;
+    font-size: var(--mantine-font-size-sm);
+}
+
+.resourceRow {
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--mantine-spacing-xs);
+}
+
+.iconGrip {
+    color: var(--background-color-3);
+}
+
+.percentInput {
+    width: 30%;
+}
+
+.toggleButton {
+    border: 0 !important;
+    width: fit-content !important;
+    height: fit-content;
+    padding: 4px !important;
+}
+
+.toggleButton:hover,
+.toggleButton:active {
+    background-color: transparent !important;
+}

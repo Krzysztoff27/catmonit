@@ -5,7 +5,7 @@
 }
 
 .title {
-    margin-bottom: var(--mantine-spacing-xs);
+    margin-bottom: var(--mantine-spacing-xs) !important;
     font-size: var(--mantine-font-size-md);
     font-weight: var(--mantine-font-weight-600);
 }

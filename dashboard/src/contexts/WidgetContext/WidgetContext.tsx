@@ -46,7 +46,11 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const getWidgetLimits = (widget: WidgetData) => getWidgetConfig(widget).limits;
 
-    const getWidgetContent = (widget: WidgetData) => getWidgetConfig(widget).content;
+    const getWidgetContent = (widget: WidgetData) => {
+        const content = getWidgetConfig(widget).content;
+        if (!content) console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+        return content;
+    };
 
     const getItemRect = (item: LayoutItem) => ({
         x: item.x,

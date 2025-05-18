@@ -1,6 +1,0 @@
-.container {
-    background-color: var(--background-color-8);
-    padding: var(--mantine-spacing-sm);
-    flex: 1 !important;
-    max-width: 100% !important;
-}

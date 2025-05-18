@@ -1,0 +1,21 @@
+.container {
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+}
+
+.stack {
+    gap: var(--mantine-spacing-xs);
+    height: 100%;
+    position: relative;
+}
+
+.title {
+    font-weight: 600;
+}
+
+.progressBarStack {
+    flex: 1;
+    justify-content: start;
+    gap: var(--mantine-spacing-sm) !important;
+}

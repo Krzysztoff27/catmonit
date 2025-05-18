@@ -1,34 +1,31 @@
 import { Box, Stack, Title } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { Disk } from "../../../types/api.types";
+import { Disk, FileShare } from "../../../types/api.types";
 import { WidgetContentProps } from "../../../types/components.types";
 import DiskProgress from "../../display/DiskProgress/DiskProgress";
-import classes from "./DetailedDeviceStorageWidget.module.css";
+import classes from "./FileSharesWidget.module.css";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
-import Widget from "../../layout/Widget/Widget";
 
-function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContentProps) {
+function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
 
     const prepareData = () => {
-        if (!height || !data?.disks) return safeObjectValues(data?.disks) ?? [];
-
+        if (!height || !data?.fileShares) return safeObjectValues(data?.fileShares) ?? [];
         const numberOfSlots = Math.floor((height + 12) / 44);
-        const visibleDisks = settings?.disks?.filter(({ hidden }) => !hidden).map(({ path }) => path);
-        const disksData = visibleDisks?.map((path: string) => data.disks[path]) ?? safeObjectValues(data.disks);
+        const visiblefileShares = settings?.fileShares?.filter(({ hidden }) => !hidden).map(({ path }) => path);
+        const fileSharesData = visiblefileShares?.map((path: string) => data.fileShares[path]) ?? safeObjectValues(data.fileShares);
 
         if (settings.automatic) {
-            return disksData
+            return fileSharesData
                 .sort((a: Disk, b: Disk) => (a.storageCurrent / a.storageLimit < b.storageCurrent / b.storageLimit ? 1 : -1))
                 .slice(0, numberOfSlots);
         }
 
-        return disksData.slice(0, numberOfSlots);
+        return fileSharesData.slice(0, numberOfSlots);
     };
 
-    const disksData = prepareData();
-
+    const fileSharesData = prepareData();
     return (
         <Box
             className={classes.container}
@@ -39,7 +36,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     order={3}
                     className={classes.title}
                 >
-                    Storage
+                    File Shares
                 </Title>
                 <DeviceTitleOneLine
                     data={data}
@@ -49,11 +46,11 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     ref={ref}
                     className={classes.progressBarStack}
                 >
-                    {disksData.map((disk: Disk, i) => (
+                    {fileSharesData.map((fileShare: FileShare, i) => (
                         <DiskProgress
                             key={i}
                             highlightStages={settings.highlightStages}
-                            {...disk}
+                            {...fileShare}
                         />
                     ))}
                 </Stack>
@@ -62,4 +59,4 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
     );
 }
 
-export default DetailedDeviceStorageWidget;
+export default FileSharesWidget;

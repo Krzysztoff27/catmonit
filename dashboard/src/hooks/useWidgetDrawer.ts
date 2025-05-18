@@ -5,8 +5,8 @@ import { WidgetData } from "../types/api.types";
 import { DrawerContent } from "../types/components.types";
 
 export default function useWidgetDrawer(widgets: WidgetData[]) {
-    const [isOpened, setIsOpened] = useState<boolean>(true);
-    const [selected, setSelected] = useState<number | null>(0);
+    const [isOpened, setIsOpened] = useState<boolean>(false);
+    const [selected, setSelected] = useState<number | null>(null);
 
     let clicked = false;
 
