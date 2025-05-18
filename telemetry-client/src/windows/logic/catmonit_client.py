@@ -1,13 +1,13 @@
-﻿import ssl
-
-import grpc
+﻿import grpc
 import asyncio
 import time
 #Local imports
 import data_retrieval
 import telemetry_pb2_grpc
 import utils
-
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class TelemetryStream:
     push_interval = 5.0
@@ -68,7 +68,15 @@ class TelemetryStream:
                             if now - last_usage_sent >= self.usage_push_interval:
                                 msg = data_retrieval.get_message("usage")
                                 if msg:
-                                    await stream.write(msg)
+                                    #await stream.write(msg)
+                                    try:
+                                        logger.debug("Writing to telemetry stream...")
+                                        await stream.write(msg)
+                                        logger.debug("SystemUsage payload written to stream.")
+                                    except grpc.RpcError as e:
+                                        logger.error(f"gRPC stream error: {e.code()} - {e.details()}")
+                                    except Exception as e:
+                                        logger.exception(f"Unexpected stream error: {e}")
                                 last_usage_sent = now
 
                             #Disk/System Errors

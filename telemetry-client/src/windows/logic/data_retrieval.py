@@ -3,10 +3,12 @@ import subprocess
 import platform
 import psutil
 import json
+import logging
 from typing import List
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic.dataclasses import dataclass
 from functools import lru_cache
-import numpy as np
 import scripts
 import telemetry_pb2
 
@@ -17,10 +19,9 @@ class Base(BaseModel):
     uuid: str
     operating_system: str
     last_boot_timestamp: int
-
 class SystemUsageCached(BaseModel):
-    ram_total_bytes: np.uint64
-    pagefile_total_bytes: np.uint64
+    ram_total_bytes: int
+    pagefile_total_bytes: int
     last_boot_timestamp: int
 
 #JSON output parser for unified error messages handling
@@ -41,42 +42,79 @@ def _parse_json_output(output: str, context: str):
     return events
 
 #Message model with changing payload
-def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
-    message = telemetry_pb2.TelemetryRequest()
-    #Use previously cached parameters
-    #base_data is retrieved only once - after the startup of the script
-    base = base_data
+def get_message(payload_type: str) -> [telemetry_pb2.TelemetryRequest]:
+    try:
+        message = telemetry_pb2.TelemetryRequest()
+        base = base_data
 
-    message.hostname = base.hostname
-    message.ip_address = base.ip_address
-    message.uuid = base.uuid
-    message.operating_system = base.operating_system
+        message.hostname = base.hostname
+        message.ip_address = base.ip_address
+        message.uuid = base.uuid
+        message.operating_system = base.operating_system
 
-    if payload_type == "network":
-        network_stats = telemetry_pb2.NetworkStatsList()
-        network_stats.entries.extend(get_network_payload())
-        message.network.CopyFrom(network_stats)
-    elif payload_type == "disks":
-        disk_stats = telemetry_pb2.DiskStatsList()
-        disk_stats.entries.extend(get_disks_payload())
-        message.disks.CopyFrom(disk_stats)
-    elif payload_type == "fileshares":
-        file_shares = telemetry_pb2.FileSharesList()
-        file_shares.entries.extend(get_fileshares_payload())
-        message.shares.CopyFrom(file_shares)
-    elif payload_type == "disk_errors":
-        errors = telemetry_pb2.DiskErrorsList()
-        errors.entries.extend(get_disk_errors_payload())
-        message.disk_errors.CopyFrom(errors)
-    elif payload_type == "system_errors":
-        errors = telemetry_pb2.SystemErrorsList()
-        errors.entries.extend(get_system_errors_payload())
-        message.system_errors.CopyFrom(errors)
-    elif payload_type == "usage":
-        usage = get_system_usage_payload()
-        message.usage.CopyFrom(usage)
+        if payload_type == "network":
+            try:
+                network_stats = telemetry_pb2.NetworkStatsList()
+                network_stats.entries.extend(get_network_payload())
+                message.network.CopyFrom(network_stats)
+            except Exception as e:
+                print(f"[get_message/network] Failed to retrieve network stats: {e}")
+                return None
 
-    return message
+        elif payload_type == "disks":
+            try:
+                disk_stats = telemetry_pb2.DiskStatsList()
+                disk_stats.entries.extend(get_disks_payload())
+                message.disks.CopyFrom(disk_stats)
+            except Exception as e:
+                print(f"[get_message/disks] Failed to retrieve disk stats: {e}")
+                return None
+
+        elif payload_type == "fileshares":
+            try:
+                file_shares = telemetry_pb2.FileSharesList()
+                file_shares.entries.extend(get_fileshares_payload())
+                message.shares.CopyFrom(file_shares)
+            except Exception as e:
+                print(f"[get_message/fileshares] Failed to retrieve fileshares: {e}")
+                return None
+
+        elif payload_type == "disk_errors":
+            try:
+                errors = telemetry_pb2.DiskErrorsList()
+                errors.entries.extend(get_disk_errors_payload())
+                message.disk_errors.CopyFrom(errors)
+            except Exception as e:
+                print(f"[get_message/disk_errors] Failed to retrieve disk errors: {e}")
+                return None
+
+        elif payload_type == "system_errors":
+            try:
+                errors = telemetry_pb2.SystemErrorsList()
+                errors.entries.extend(get_system_errors_payload())
+                message.system_errors.CopyFrom(errors)
+            except Exception as e:
+                print(f"[get_message/system_errors] Failed to retrieve system errors: {e}")
+                return None
+
+        elif payload_type == "usage":
+            try:
+                usage = get_system_usage_payload()
+                message.system_usage.CopyFrom(usage)
+            except Exception as e:
+                print(f"[get_message/usage] Failed to retrieve system usage: {e}")
+                return None
+
+        else:
+            print(f"[get_message] Unknown payload_type: {payload_type}")
+            return None
+
+        return message
+
+    except Exception as e:
+        print(f"[get_message] Unexpected error: {e}")
+        return None
+
 
 @lru_cache(maxsize=1)
 def get_base() -> Base:
@@ -96,7 +134,8 @@ def get_base() -> Base:
         hostname=hostname,
         ip_address=ip_address,
         uuid=uuid,
-        operating_system=operating_system
+        operating_system=operating_system,
+        last_boot_timestamp=last_boot_timestamp
     )
 
 base_data = get_base()
@@ -228,24 +267,53 @@ def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
 def get_system_usage_cached() -> SystemUsageCached:
     mem = psutil.virtual_memory()
     ram_total_bytes = mem.total
+
     pagefile = psutil.swap_memory()
     pagefile_total_bytes = pagefile.total
 
     return SystemUsageCached(
         ram_total_bytes=ram_total_bytes,
-        pagefile_total_bytes=np.uint64(pagefile_total_bytes),
+        pagefile_total_bytes=pagefile_total_bytes,
         last_boot_timestamp=base_data.last_boot_timestamp
     )
 
 system_usage_cached = get_system_usage_cached()
+
+
+logger = logging.getLogger(__name__)
+
 def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
-    usage = telemetry_pb2.SystemUsage()
-    usage.cpu_usage_percent = psutil.cpu_percent(interval=1)
-    mem = psutil.virtual_memory()
-    usage.ram_total_bytes = system_usage_cached.ram_total_bytes
-    usage.ram_used_bytes = mem.used
-    pagefile = psutil.swap_memory()
-    usage.pagefile_total_bytes = get_system_usage_cached().pagefile_total_bytes
-    usage.pagefile_used_bytes = pagefile.used
-    usage.last_boot_timestamp=base_data.last_boot_timestamp
-    return usage
+    logger.debug("Entering get_system_usage_payload()")
+
+    try:
+        usage = telemetry_pb2.SystemUsage()
+
+        # CPU usage
+        cpu_percent = psutil.cpu_percent(interval=1)
+        usage.cpu_usage_percent = cpu_percent
+        logger.debug(f"CPU usage percent: {cpu_percent}")
+
+        # RAM usage
+        mem = psutil.virtual_memory()
+        usage.ram_total_bytes = system_usage_cached.ram_total_bytes
+        usage.ram_used_bytes = mem.used
+        logger.debug(f"RAM total bytes (cached): {usage.ram_total_bytes}")
+        logger.debug(f"RAM used bytes: {usage.ram_used_bytes}")
+
+        # Pagefile usage
+        pagefile = psutil.swap_memory()
+        usage.pagefile_total_bytes = system_usage_cached.pagefile_total_bytes
+        usage.pagefile_used_bytes = pagefile.used
+        logger.debug(f"Pagefile total bytes (cached): {usage.pagefile_total_bytes}")
+        logger.debug(f"Pagefile used bytes: {usage.pagefile_used_bytes}")
+
+        # Last boot time
+        usage.last_boot_timestamp = system_usage_cached.last_boot_timestamp
+        logger.debug(f"Last boot timestamp: {usage.last_boot_timestamp}")
+
+        logger.debug("Successfully created SystemUsage payload.")
+        return usage
+
+    except Exception as e:
+        logger.exception("Failed to create SystemUsage payload.")
+        raise
