@@ -12,8 +12,8 @@ import utils
 class TelemetryStream:
     push_interval = 5.0
     network_push_interval = 30.0
-    disk_push_interval = 30.0
-    fileshares_push_interval = 30.0
+    disk_push_interval = 1200.0
+    fileshares_push_interval = 120.0
     usage_push_interval = 15.0
     error_push_interval = 120.0
 
@@ -74,9 +74,19 @@ class TelemetryStream:
                             #Disk/System Errors
                             if now - last_error_sent >= self.error_push_interval:
                                 for err_type in ["disk_errors", "system_errors"]:
-                                    msg = data_retrieval.get_message(err_type)
-                                    if msg is not None:
-                                        await stream.write(msg)
+                                    try:
+                                        msg_list = data_retrieval.get_message(err_type)
+                                        if not isinstance(msg_list, list):
+                                            print(
+                                                f"[{err_type}] Warning: Expected list but got {type(msg_list).__name__}")
+                                            continue
+
+                                        for msg in msg_list:
+                                            await stream.write(msg)
+
+                                    except Exception as e:
+                                        print(f"[{err_type}] Streaming failed: {str(e)}")
+
                                 last_error_sent = now
 
                             await asyncio.sleep(self.push_interval)

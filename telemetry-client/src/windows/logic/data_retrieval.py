@@ -18,6 +18,23 @@ class Base(BaseModel):
     operating_system: str
     last_boot_timestamp: str
 
+
+def _parse_json_output(output: str, context: str):
+    if not output.strip():
+        raise ValueError(f"{context}: PowerShell returned empty output.")
+
+    try:
+        events = json.loads(output.strip())
+    except json.JSONDecodeError as e:
+        raise ValueError(f"{context}: Failed to parse JSON output. Error: {str(e)}\nRaw output: {output.strip()[:300]}")
+
+    if isinstance(events, dict):
+        events = [events]
+    elif not isinstance(events, list):
+        raise ValueError(f"{context}: Parsed output is not a list or dict. Got: {type(events).__name__}")
+
+    return events
+
 def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
     message = telemetry_pb2.TelemetryRequest()
     base = base_data
@@ -164,22 +181,21 @@ def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
             text=True,
             check=True
         )
-        events = json.loads(result.stdout.strip())
-        if isinstance(events, dict):
-            events = [events]
+        events = _parse_json_output(result.stdout, "DiskErrors")
 
-        errors = []
-        for event in events:
-            err = telemetry_pb2.DiskErrors()
-            err.message = event.get("message", "")
-            err.source = event.get("source", "")
-            err.timestamp = int(event.get("timestamp", 0))
-            err.mount_point = event.get("mount_point", "")
-            errors.append(err)
-        return errors if errors else None
+        return [
+            telemetry_pb2.DiskErrors(
+                message=event.get("message", ""),
+                source=event.get("source", ""),
+                timestamp=int(event.get("timestamp", 0)),
+                mount_point=event.get("mount_point", "")
+            )
+            for event in events
+        ]
     except Exception as e:
-        print(f"Disk error fetch failed: {e}")
-        return None
+        print(f"[DiskErrors] Retrieval failed: {str(e)}")
+        return []  # Ensure this doesn't break your code
+
 
 def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
     try:
@@ -189,21 +205,19 @@ def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
             text=True,
             check=True
         )
-        events = json.loads(result.stdout.strip())
-        if isinstance(events, dict):
-            events = [events]
+        events = _parse_json_output(result.stdout, "SystemErrors")
 
-        errors = []
-        for event in events:
-            err = telemetry_pb2.SystemErrors()
-            err.message = event.get("message", "")
-            err.source = event.get("source", "")
-            err.timestamp = int(event.get("timestamp", 0))
-            errors.append(err)
-        return errors if errors else None
+        return [
+            telemetry_pb2.SystemErrors(
+                message=event.get("message", ""),
+                source=event.get("source", ""),
+                timestamp=int(event.get("timestamp", 0))
+            )
+            for event in events
+        ]
     except Exception as e:
-        print(f"System error fetch failed: {e}")
-        return None
+        print(f"[SystemErrors] Retrieval failed: {str(e)}")
+        return []
 
 def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
     usage = telemetry_pb2.SystemUsage()
