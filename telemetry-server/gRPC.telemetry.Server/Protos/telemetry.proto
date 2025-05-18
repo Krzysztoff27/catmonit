@@ -21,8 +21,7 @@ message TelemetryRequest {
     FileSharesList shares = 8;
     DiskErrorsList disk_errors = 9;
     SystemErrorsList system_errors = 10;
-    SystemUsage usage = 11;
-
+    SystemUsage system_usage = 11;
   }
 }
 

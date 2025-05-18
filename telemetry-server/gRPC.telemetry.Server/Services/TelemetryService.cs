@@ -38,7 +38,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         IpAddress = request.IpAddress,
                         Uuid = request.Uuid,
                         Os = request.OperatingSystem,
-                        LastBootupTime = request.LastBootupTime
+                        LastBootTimestamp = request.LastBootTimestamp
                     };
 
                     if (guid == Guid.Empty)
@@ -159,7 +159,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         return result;
     }
 
-    private List<SharePayload> ProcessSharePayload(FileShareList shareStats)
+    private List<SharePayload> ProcessSharePayload(FileSharesList shareStats)
     {
         var result = new List<SharePayload>();
         foreach (var entry in shareStats.Entries)

@@ -7,7 +7,7 @@ public class ResponseModel
     public string IpAddress { get; set; }
     public string Uuid { get; set; }
     public string Os { get; set; }
-    public string LastBootupTime { get; set; }
+    public string LastBootTimestamp { get; set; }
     public PayloadType PayloadType { get; set; }
     public object Payload { get; set; }
 }
