@@ -20,7 +20,7 @@ class Base(BaseModel):
 
 def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
     message = telemetry_pb2.TelemetryRequest()
-    base = get_base()
+    base = base_data
 
     message.hostname = base.hostname
     message.ip_address = base.ip_address
@@ -54,7 +54,7 @@ def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
 
     return message
 
-@lru_cache
+@lru_cache(maxsize=1)
 def get_base() -> Base:
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
@@ -76,6 +76,7 @@ def get_base() -> Base:
         last_boot_timestamp=last_boot_timestamp
     )
 
+base_data = get_base()
 
 def get_network_payload() -> List[telemetry_pb2.NetworkStats]:
     network_stats = psutil.net_io_counters(pernic=True)
