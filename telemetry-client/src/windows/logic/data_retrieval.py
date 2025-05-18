@@ -3,12 +3,10 @@ import subprocess
 import platform
 import psutil
 import json
-import logging
 from typing import List
 from pydantic import BaseModel
-from pydantic import ConfigDict
-from pydantic.dataclasses import dataclass
 from functools import lru_cache
+#Local imports
 import scripts
 import telemetry_pb2
 
@@ -19,6 +17,7 @@ class Base(BaseModel):
     uuid: str
     operating_system: str
     last_boot_timestamp: int
+
 class SystemUsageCached(BaseModel):
     ram_total_bytes: int
     pagefile_total_bytes: int
@@ -114,7 +113,6 @@ def get_message(payload_type: str) -> [telemetry_pb2.TelemetryRequest]:
     except Exception as e:
         print(f"[get_message] Unexpected error: {e}")
         return None
-
 
 @lru_cache(maxsize=1)
 def get_base() -> Base:
@@ -280,40 +278,24 @@ def get_system_usage_cached() -> SystemUsageCached:
 system_usage_cached = get_system_usage_cached()
 
 
-logger = logging.getLogger(__name__)
-
 def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
-    logger.debug("Entering get_system_usage_payload()")
-
     try:
         usage = telemetry_pb2.SystemUsage()
 
-        # CPU usage
         cpu_percent = psutil.cpu_percent(interval=1)
         usage.cpu_usage_percent = cpu_percent
-        logger.debug(f"CPU usage percent: {cpu_percent}")
 
-        # RAM usage
         mem = psutil.virtual_memory()
         usage.ram_total_bytes = system_usage_cached.ram_total_bytes
         usage.ram_used_bytes = mem.used
-        logger.debug(f"RAM total bytes (cached): {usage.ram_total_bytes}")
-        logger.debug(f"RAM used bytes: {usage.ram_used_bytes}")
 
-        # Pagefile usage
         pagefile = psutil.swap_memory()
         usage.pagefile_total_bytes = system_usage_cached.pagefile_total_bytes
         usage.pagefile_used_bytes = pagefile.used
-        logger.debug(f"Pagefile total bytes (cached): {usage.pagefile_total_bytes}")
-        logger.debug(f"Pagefile used bytes: {usage.pagefile_used_bytes}")
 
-        # Last boot time
         usage.last_boot_timestamp = system_usage_cached.last_boot_timestamp
-        logger.debug(f"Last boot timestamp: {usage.last_boot_timestamp}")
 
-        logger.debug("Successfully created SystemUsage payload.")
         return usage
 
     except Exception as e:
-        logger.exception("Failed to create SystemUsage payload.")
         raise

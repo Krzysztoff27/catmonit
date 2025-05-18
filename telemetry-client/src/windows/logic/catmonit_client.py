@@ -5,9 +5,6 @@ import time
 import data_retrieval
 import telemetry_pb2_grpc
 import utils
-import logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 class TelemetryStream:
     push_interval = 5.0
@@ -115,8 +112,6 @@ async def main():
     stream = TelemetryStream()
     try:
         config = utils.load_config()
-        print (config.get("server_address"))
-        print (config.get("server_port"))
         await stream.open_stream(config.get("server_address"), config.get("server_port"))
     except KeyboardInterrupt:
         print("Shutdown requested...exiting gracefully.")
