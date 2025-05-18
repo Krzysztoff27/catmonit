@@ -1,10 +1,13 @@
 ﻿import grpc
 import asyncio
 import time
+import logging
 #Local imports
 import data_retrieval
 import telemetry_pb2_grpc
 import utils
+
+logger = logging.getLogger(__name__)
 
 class TelemetryStream:
     push_interval = 5.0
