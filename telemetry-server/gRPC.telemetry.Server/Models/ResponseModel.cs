@@ -55,7 +55,9 @@ public class SystemUsagePayload
     public double RamUsedBytes { get; set; }
     public double PagefileTotalBytes { get; set; }
     public double PagefileUsedBytes { get; set; }
-    public string LastBootTimestamp { get; set; }
+    
+    //Cast to DateTime using: DateTimeOffset.FromUnixTimeSeconds(protoMsg.LastBootTimestamp).DateTime;
+    public double LastBootTimestamp { get; set; }
 }
 
 public enum PayloadType
