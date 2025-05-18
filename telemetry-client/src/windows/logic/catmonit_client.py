@@ -96,7 +96,10 @@ class TelemetryStream:
 async def main():
     stream = TelemetryStream()
     try:
-        await stream.open_stream("localhost", "5001")
+        config = utils.load_config()
+        print (config.get("server_address"))
+        print (config.get("server_port"))
+        await stream.open_stream(config.get("server_address"), config.get("server_port"))
     except KeyboardInterrupt:
         print("Shutdown requested...exiting gracefully.")
     except Exception as e:

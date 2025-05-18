@@ -6,6 +6,7 @@ import json
 from typing import List
 from pydantic import BaseModel
 from functools import lru_cache
+from datetime import datetime
 import scripts
 import telemetry_pb2
 
@@ -65,12 +66,14 @@ def get_base() -> Base:
     )
     uuid = uuid_raw.stdout.strip()
     operating_system = f"{platform.system()} {platform.release()}"
+    last_boot_timestamp = datetime.fromtimestamp(psutil.boot_time()).isoformat()
 
     return Base(
         hostname=hostname,
         ip_address=ip_address,
         uuid=uuid,
-        operating_system=operating_system
+        operating_system=operating_system,
+        last_boot_timestamp=last_boot_timestamp
     )
 
 
