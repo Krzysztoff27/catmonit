@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ftelemetry.proto\x12\ttelemetry\"\xa1\x03\n\x10TelemetryRequest\x12\x10\n\x08hostname\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x18\n\x10operating_system\x18\x04 \x01(\t\x12\x1b\n\x13last_boot_timestamp\x18\x05 \x01(\t\x12.\n\x07network\x18\x06 \x01(\x0b\x32\x1b.telemetry.NetworkStatsListH\x00\x12)\n\x05\x64isks\x18\x07 \x01(\x0b\x32\x18.telemetry.DiskStatsListH\x00\x12+\n\x06shares\x18\x08 \x01(\x0b\x32\x19.telemetry.FileSharesListH\x00\x12\x30\n\x0b\x64isk_errors\x18\t \x01(\x0b\x32\x19.telemetry.DiskErrorsListH\x00\x12\x34\n\rsystem_errors\x18\n \x01(\x0b\x32\x1b.telemetry.SystemErrorsListH\x00\x12\'\n\x05usage\x18\x0b \x01(\x0b\x32\x16.telemetry.SystemUsageH\x00\x42\t\n\x07payload\"<\n\x10NetworkStatsList\x12(\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x17.telemetry.NetworkStats\"m\n\x0cNetworkStats\x12\x16\n\x0einterface_name\x18\x01 \x01(\t\x12\x0f\n\x07rx_mbps\x18\x02 \x01(\x01\x12\x0f\n\x07tx_mbps\x18\x03 \x01(\x01\x12\x11\n\x07is_main\x18\x04 \x01(\x08H\x00\x42\x10\n\x0einterface_role\"6\n\rDiskStatsList\x12%\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x14.telemetry.DiskStats\"A\n\tDiskStats\x12\x13\n\x0bmount_point\x18\x01 \x01(\t\x12\r\n\x05usage\x18\x02 \x01(\x03\x12\x10\n\x08\x63\x61pacity\x18\x03 \x01(\x03\"8\n\x0e\x46ileSharesList\x12&\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x15.telemetry.FileShares\"A\n\nFileShares\x12\x12\n\nshare_path\x18\x01 \x01(\t\x12\r\n\x05usage\x18\x02 \x01(\x03\x12\x10\n\x08\x63\x61pacity\x18\x03 \x01(\x03\"8\n\x0e\x44iskErrorsList\x12&\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x15.telemetry.DiskErrors\"U\n\nDiskErrors\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\x12\x13\n\x0bmount_point\x18\x04 \x01(\t\"<\n\x10SystemErrorsList\x12(\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x17.telemetry.SystemErrors\"B\n\x0cSystemErrors\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\"Y\n\x0bSystemUsage\x12\x19\n\x11\x63pu_usage_percent\x18\x01 \x01(\x01\x12\x17\n\x0fram_total_bytes\x18\x02 \x01(\x04\x12\x16\n\x0eram_used_bytes\x18\x03 \x01(\x04\"#\n\x11TelemetryResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2b\n\x10TelemetryService\x12N\n\x0fStreamTelemetry\x12\x1b.telemetry.TelemetryRequest\x1a\x1c.telemetry.TelemetryResponse(\x01\x42\x11\xaa\x02\x0egRPC.telemetryb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ftelemetry.proto\x12\ttelemetry\"\x84\x03\n\x10TelemetryRequest\x12\x10\n\x08hostname\x18\x01 \x01(\t\x12\x12\n\nip_address\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x18\n\x10operating_system\x18\x04 \x01(\t\x12.\n\x07network\x18\x06 \x01(\x0b\x32\x1b.telemetry.NetworkStatsListH\x00\x12)\n\x05\x64isks\x18\x07 \x01(\x0b\x32\x18.telemetry.DiskStatsListH\x00\x12+\n\x06shares\x18\x08 \x01(\x0b\x32\x19.telemetry.FileSharesListH\x00\x12\x30\n\x0b\x64isk_errors\x18\t \x01(\x0b\x32\x19.telemetry.DiskErrorsListH\x00\x12\x34\n\rsystem_errors\x18\n \x01(\x0b\x32\x1b.telemetry.SystemErrorsListH\x00\x12\'\n\x05usage\x18\x0b \x01(\x0b\x32\x16.telemetry.SystemUsageH\x00\x42\t\n\x07payload\"<\n\x10NetworkStatsList\x12(\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x17.telemetry.NetworkStats\"m\n\x0cNetworkStats\x12\x16\n\x0einterface_name\x18\x01 \x01(\t\x12\x0f\n\x07rx_mbps\x18\x02 \x01(\x01\x12\x0f\n\x07tx_mbps\x18\x03 \x01(\x01\x12\x11\n\x07is_main\x18\x04 \x01(\x08H\x00\x42\x10\n\x0einterface_role\"6\n\rDiskStatsList\x12%\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x14.telemetry.DiskStats\"A\n\tDiskStats\x12\x13\n\x0bmount_point\x18\x01 \x01(\t\x12\r\n\x05usage\x18\x02 \x01(\x03\x12\x10\n\x08\x63\x61pacity\x18\x03 \x01(\x03\"8\n\x0e\x46ileSharesList\x12&\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x15.telemetry.FileShares\"A\n\nFileShares\x12\x12\n\nshare_path\x18\x01 \x01(\t\x12\r\n\x05usage\x18\x02 \x01(\x03\x12\x10\n\x08\x63\x61pacity\x18\x03 \x01(\x03\"8\n\x0e\x44iskErrorsList\x12&\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x15.telemetry.DiskErrors\"U\n\nDiskErrors\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\x12\x13\n\x0bmount_point\x18\x04 \x01(\t\"<\n\x10SystemErrorsList\x12(\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x17.telemetry.SystemErrors\"B\n\x0cSystemErrors\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\"\xb1\x01\n\x0bSystemUsage\x12\x19\n\x11\x63pu_usage_percent\x18\x01 \x01(\x01\x12\x17\n\x0fram_total_bytes\x18\x02 \x01(\x04\x12\x16\n\x0eram_used_bytes\x18\x03 \x01(\x04\x12\x1c\n\x14pagefile_total_bytes\x18\x04 \x01(\x04\x12\x1b\n\x13pagefile_used_bytes\x18\x05 \x01(\x04\x12\x1b\n\x13last_boot_timestamp\x18\x06 \x01(\x03\"#\n\x11TelemetryResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2b\n\x10TelemetryService\x12N\n\x0fStreamTelemetry\x12\x1b.telemetry.TelemetryRequest\x1a\x1c.telemetry.TelemetryResponse(\x01\x42\x11\xaa\x02\x0egRPC.telemetryb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,31 +33,31 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\016gRPC.telemetry'
   _globals['_TELEMETRYREQUEST']._serialized_start=31
-  _globals['_TELEMETRYREQUEST']._serialized_end=448
-  _globals['_NETWORKSTATSLIST']._serialized_start=450
-  _globals['_NETWORKSTATSLIST']._serialized_end=510
-  _globals['_NETWORKSTATS']._serialized_start=512
-  _globals['_NETWORKSTATS']._serialized_end=621
-  _globals['_DISKSTATSLIST']._serialized_start=623
-  _globals['_DISKSTATSLIST']._serialized_end=677
-  _globals['_DISKSTATS']._serialized_start=679
-  _globals['_DISKSTATS']._serialized_end=744
-  _globals['_FILESHARESLIST']._serialized_start=746
-  _globals['_FILESHARESLIST']._serialized_end=802
-  _globals['_FILESHARES']._serialized_start=804
-  _globals['_FILESHARES']._serialized_end=869
-  _globals['_DISKERRORSLIST']._serialized_start=871
-  _globals['_DISKERRORSLIST']._serialized_end=927
-  _globals['_DISKERRORS']._serialized_start=929
-  _globals['_DISKERRORS']._serialized_end=1014
-  _globals['_SYSTEMERRORSLIST']._serialized_start=1016
-  _globals['_SYSTEMERRORSLIST']._serialized_end=1076
-  _globals['_SYSTEMERRORS']._serialized_start=1078
-  _globals['_SYSTEMERRORS']._serialized_end=1144
-  _globals['_SYSTEMUSAGE']._serialized_start=1146
-  _globals['_SYSTEMUSAGE']._serialized_end=1235
-  _globals['_TELEMETRYRESPONSE']._serialized_start=1237
-  _globals['_TELEMETRYRESPONSE']._serialized_end=1272
-  _globals['_TELEMETRYSERVICE']._serialized_start=1274
-  _globals['_TELEMETRYSERVICE']._serialized_end=1372
+  _globals['_TELEMETRYREQUEST']._serialized_end=419
+  _globals['_NETWORKSTATSLIST']._serialized_start=421
+  _globals['_NETWORKSTATSLIST']._serialized_end=481
+  _globals['_NETWORKSTATS']._serialized_start=483
+  _globals['_NETWORKSTATS']._serialized_end=592
+  _globals['_DISKSTATSLIST']._serialized_start=594
+  _globals['_DISKSTATSLIST']._serialized_end=648
+  _globals['_DISKSTATS']._serialized_start=650
+  _globals['_DISKSTATS']._serialized_end=715
+  _globals['_FILESHARESLIST']._serialized_start=717
+  _globals['_FILESHARESLIST']._serialized_end=773
+  _globals['_FILESHARES']._serialized_start=775
+  _globals['_FILESHARES']._serialized_end=840
+  _globals['_DISKERRORSLIST']._serialized_start=842
+  _globals['_DISKERRORSLIST']._serialized_end=898
+  _globals['_DISKERRORS']._serialized_start=900
+  _globals['_DISKERRORS']._serialized_end=985
+  _globals['_SYSTEMERRORSLIST']._serialized_start=987
+  _globals['_SYSTEMERRORSLIST']._serialized_end=1047
+  _globals['_SYSTEMERRORS']._serialized_start=1049
+  _globals['_SYSTEMERRORS']._serialized_end=1115
+  _globals['_SYSTEMUSAGE']._serialized_start=1118
+  _globals['_SYSTEMUSAGE']._serialized_end=1295
+  _globals['_TELEMETRYRESPONSE']._serialized_start=1297
+  _globals['_TELEMETRYRESPONSE']._serialized_end=1332
+  _globals['_TELEMETRYSERVICE']._serialized_start=1334
+  _globals['_TELEMETRYSERVICE']._serialized_end=1432
 # @@protoc_insertion_point(module_scope)
