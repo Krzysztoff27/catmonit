@@ -13,7 +13,6 @@ message TelemetryRequest {
   string ip_address = 2;
   string uuid = 3;
   string operating_system = 4;
-  string last_boot_timestamp = 5;
 
   oneof payload {
     NetworkStatsList network = 6;
@@ -92,6 +91,10 @@ message SystemUsage {
   double cpu_usage_percent = 1;
   uint64 ram_total_bytes = 2;
   uint64 ram_used_bytes = 3;
+  uint64 pagefile_total_bytes = 4;
+  uint64 pagefile_used_bytes = 5;
+  int64 last_boot_timestamp = 6;
+
 }
 
 //Server response

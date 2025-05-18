@@ -6,19 +6,24 @@ import json
 from typing import List
 from pydantic import BaseModel
 from functools import lru_cache
-from datetime import datetime
+import numpy as np
 import scripts
 import telemetry_pb2
 
-
+#Pydantic model for unified data retrieval
 class Base(BaseModel):
     hostname: str
     ip_address: str
     uuid: str
     operating_system: str
-    last_boot_timestamp: str
+    last_boot_timestamp: int
 
+class SystemUsageCached(BaseModel):
+    ram_total_bytes: np.uint64
+    pagefile_total_bytes: np.uint64
+    last_boot_timestamp: int
 
+#JSON output parser for unified error messages handling
 def _parse_json_output(output: str, context: str):
     if not output.strip():
         raise ValueError(f"{context}: PowerShell returned empty output.")
@@ -35,15 +40,17 @@ def _parse_json_output(output: str, context: str):
 
     return events
 
+#Message model with changing payload
 def get_message(payload_type: str) -> telemetry_pb2.TelemetryRequest:
     message = telemetry_pb2.TelemetryRequest()
+    #Use previously cached parameters
+    #base_data is retrieved only once - after the startup of the script
     base = base_data
 
     message.hostname = base.hostname
     message.ip_address = base.ip_address
     message.uuid = base.uuid
     message.operating_system = base.operating_system
-    message.last_boot_timestamp = base.last_boot_timestamp
 
     if payload_type == "network":
         network_stats = telemetry_pb2.NetworkStatsList()
@@ -83,14 +90,13 @@ def get_base() -> Base:
     )
     uuid = uuid_raw.stdout.strip()
     operating_system = f"{platform.system()} {platform.release()}"
-    last_boot_timestamp = datetime.fromtimestamp(psutil.boot_time()).isoformat()
+    last_boot_timestamp = int(psutil.boot_time())
 
     return Base(
         hostname=hostname,
         ip_address=ip_address,
         uuid=uuid,
-        operating_system=operating_system,
-        last_boot_timestamp=last_boot_timestamp
+        operating_system=operating_system
     )
 
 base_data = get_base()
@@ -146,7 +152,6 @@ def get_fileshares_payload() -> List[telemetry_pb2.FileShares]:
 
         parsed = json.loads(raw_json)
 
-        # Ensure it's a list
         if isinstance(parsed, dict):
             parsed = [parsed]
         elif not isinstance(parsed, list):
@@ -194,7 +199,7 @@ def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
         ]
     except Exception as e:
         print(f"[DiskErrors] Retrieval failed: {str(e)}")
-        return []  # Ensure this doesn't break your code
+        return []
 
 
 def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
@@ -219,10 +224,28 @@ def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
         print(f"[SystemErrors] Retrieval failed: {str(e)}")
         return []
 
+@lru_cache(maxsize=1)
+def get_system_usage_cached() -> SystemUsageCached:
+    mem = psutil.virtual_memory()
+    ram_total_bytes = mem.total
+    pagefile = psutil.swap_memory()
+    pagefile_total_bytes = pagefile.total
+
+    return SystemUsageCached(
+        ram_total_bytes=ram_total_bytes,
+        pagefile_total_bytes=np.uint64(pagefile_total_bytes),
+        last_boot_timestamp=base_data.last_boot_timestamp
+    )
+
+system_usage_cached = get_system_usage_cached()
 def get_system_usage_payload() -> telemetry_pb2.SystemUsage:
     usage = telemetry_pb2.SystemUsage()
     usage.cpu_usage_percent = psutil.cpu_percent(interval=1)
     mem = psutil.virtual_memory()
-    usage.ram_total_bytes = mem.total
+    usage.ram_total_bytes = system_usage_cached.ram_total_bytes
     usage.ram_used_bytes = mem.used
+    pagefile = psutil.swap_memory()
+    usage.pagefile_total_bytes = get_system_usage_cached().pagefile_total_bytes
+    usage.pagefile_used_bytes = pagefile.used
+    usage.last_boot_timestamp=base_data.last_boot_timestamp
     return usage
