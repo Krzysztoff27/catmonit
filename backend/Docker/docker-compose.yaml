@@ -3,9 +3,6 @@ services:
     container_name: catmonit-proxy
     restart: always
     image: traefik:v3.0
-    labels:
-      com.docker.compose.project.hook.before_up: /bin/sh -c "[ -f traefik/certs/catmonit-CA.pem ] || \
-        (mkdir -p traefik/certs && chmod +x ./certs/generate-certs.sh && ./certs/generate-certs.sh)"
     command:
     - "--providers.docker=true"
     - "--providers.file.directory=/etc/traefik/dynamic"

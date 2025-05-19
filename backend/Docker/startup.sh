@@ -15,10 +15,10 @@ source .env
 set +a
 
 #Check if certs directory exists and is empty
-if [ ! -f traefik/certs/catmonit-CA.pem ]; then
-    echo "No CA present inside the /traefik/certs directory.\nCreating new certificates."
+if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
+    echo "No CA present inside the ./traefik/certs directory.\nCreating new certificates."
 
-    mkdir -p traefik/certs
+    mkdir -p ./traefik/certs
 
     #Certificate Authority
     openssl genrsa -out catmonit-CA.key 4096
@@ -38,15 +38,15 @@ if [ ! -f traefik/certs/catmonit-CA.pem ]; then
     gen_cert "$CERT_NAME" "$CERT_SUBJECT"
 
      # Copy/move cert files
-    cp ${CERT_NAME}.crt /traefik/certs/
-    mv ${CERT_NAME}.key /traefik/certs/
-    cp catmonit-CA.pem /traefik/certs/
-    mv catmonit-CA.key /traefik/certs/
+    cp ${CERT_NAME}.crt ./traefik/certs/
+    mv ${CERT_NAME}.key ./traefik/certs/
+    cp catmonit-CA.pem ./traefik/certs/
+    mv catmonit-CA.key ./traefik/certs/
 
     # Clean up temporary files
     rm ${CERT_NAME}.csr catmonit-CA.srl 2>/dev/null
 else
-    printf "CA present inside the /traefik/certs directory.\nSkipping creation."
+    printf "CA present inside the ./traefik/certs directory.\nSkipping creation."
 fi
 
 docker-compose up -d
