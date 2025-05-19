@@ -18,7 +18,7 @@ services:
 
      #Let's Encrypt certificate resolver
     - "--certificatesresolvers.le.acme.tlschallenge=true"
-    - "--certificatesresolvers.le.acme.email=root@example.com"
+    - "--certificatesresolvers.le.acme.email=krzysztof.kolasinski27@outlook.com"
     - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
 
     - "--api.dashboard=true" # Optional - comment to turn the dashboard off
