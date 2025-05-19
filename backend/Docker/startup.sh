@@ -27,7 +27,7 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     fi
 
      if ! openssl req -x509 -new -nodes -key catmonit-CA.key -sha256 -days 1825 -out catmonit-CA.pem \
-        -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA" >/dev/null 2>&1; then
+        -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA" >/dev/null 2>&1;
         printf "Failed to create CA certificate."
         exit 1
     fi
@@ -35,9 +35,9 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     gen_cert() {
       NAME=$1
       openssl genrsa -out ${NAME}.key 2048
-      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local" >/dev/null 2>&1; then
+      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local" >/dev/null 2>&1
       openssl x509 -req -in ${NAME}.csr -CA catmonit-CA.pem -CAkey catmonit-CA.key -CAcreateserial \
-        -out ${NAME}.crt -days 825 -sha256 >/dev/null 2>&1; then
+        -out ${NAME}.crt -days 825 -sha256
     }
 
     # Generate certificates using values from .env
