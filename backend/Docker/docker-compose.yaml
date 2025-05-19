@@ -54,7 +54,6 @@ services:
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
     - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines.tls=true"
-    - "traefik.http.routers.grpc-secure.service=grpc-svc"
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
     - "traefik.http.routers.api-mobile.rule=Host(`api-mobile.local`)"
