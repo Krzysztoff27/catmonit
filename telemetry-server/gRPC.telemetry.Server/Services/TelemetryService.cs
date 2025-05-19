@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using gRPC.telemetry;
 using gRPC.telemetry.Server.Models;
@@ -103,6 +104,45 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                 Status = JsonSerializer.Serialize(new
                 {
                     Status = "OK",
+                    Count = responses.Count,
+                    Data = responses
+                })
+            };
+        }
+        catch (IOException ex)
+        {
+            _logger.LogInformation("Client disconnected from stream: {Message}", ex.Message);
+            return new TelemetryResponse
+            {
+                Status = JsonSerializer.Serialize(new
+                {
+                    Status = "ClientDisconnected",
+                    Count = responses.Count,
+                    Data = responses
+                })
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Stream cancelled by client.");
+            return new TelemetryResponse
+            {
+                Status = JsonSerializer.Serialize(new
+                {
+                    Status = "Cancelled",
+                    Count = responses.Count,
+                    Data = responses
+                })
+            };
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+        {
+            _logger.LogInformation("gRPC stream cancelled: {Message}", ex.Message);
+            return new TelemetryResponse
+            {
+                Status = JsonSerializer.Serialize(new
+                {
+                    Status = "Cancelled",
                     Count = responses.Count,
                     Data = responses
                 })
