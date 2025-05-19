@@ -1,35 +1,22 @@
-.positioner {
-    width: 50vw;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: all !important;
-    z-index: 100;
-}
-
 .container {
-    width: 100%;
-    height: 50px;
-    background-color: var(--background-color-7) !important;
-    position: fixed;
-    bottom: 20px;
-
+    gap: 0;
     pointer-events: auto !important;
     overflow: hidden;
+    align-items: center !important;
+    margin-top: var(--mantine-spacing-xs);
 }
 
 .droppable {
-    width: 50px;
-    height: 50px;
     cursor: grab !important;
     user-select: none;
     background-color: var(--background-color-6);
+    z-index: 300;
+    width: 240px;
+    image-rendering: crisp-edges;
 }
 
-.droppable:hover,
-.droppable:active {
-    background-color: var(--background-color-5);
+.droppable * {
+    pointer-events: none;
 }
 
 .droppable:active {

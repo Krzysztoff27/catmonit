@@ -12,9 +12,9 @@ import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
 function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     // DATA CALCULAIONS ETC.
-    const { getWidget } = useWidgets();
-    console.log(getWidget(index));
-    const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
+    const { getWidget, getWidgetData } = useWidgets();
+    // const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
+    const { hostname, ip, disks } = data;
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
     const disksArray = safeObjectValues(disks);
     const total = disksArray?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
@@ -58,7 +58,6 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
     //     }, [num_cols]);
     //     // console.log("chasrtsize: " + chartSize);
     const layoutDirection = width == 3 && height == 2 ? "row" : "column"; // column for under each other, row for side by side
-    console.log(layoutDirection);
     return (
         <Box
             ref={ref}

@@ -1,4 +1,4 @@
-export const data = {
+export const dummies = {
     storage: {
         "1": {
             uuid: "1",

@@ -1,4 +1,4 @@
-import { Button, Flex, Group, NumberInput, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Flex, Group, NumberInput, ScrollArea, Stack, TextInput, Title } from "@mantine/core";
 import { IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
@@ -6,6 +6,7 @@ import { safeObjectValues } from "../../../utils/object";
 import { DrawerContentProps } from "../../../types/components.types";
 import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import classes from "./StorageResourcesDrawer.module.css";
+import { useMemo } from "react";
 
 const StorageResourcesDrawer = ({ index }: DrawerContentProps): React.JSX.Element => {
     const { setWidgetSettings, getWidgetData, getWidgetConfig, getData, getWidget } = useWidgets();
@@ -51,6 +52,54 @@ const StorageResourcesDrawer = ({ index }: DrawerContentProps): React.JSX.Elemen
         setWidgetSettings(index, newSettings);
     };
 
+    const resourceList = useMemo(
+        () =>
+            safeObjectValues(data[resourceKey]).map((resource, i: number) => {
+                const hidden = isResourceHidden(resource.path);
+                return (
+                    <Flex
+                        key={i}
+                        className={classes.resourceRow}
+                    >
+                        <IconGripVertical className={classes.iconGrip} />
+
+                        <TextInput
+                            value={resource.path}
+                            readOnly
+                        />
+                        <NumberInput
+                            defaultValue={widget.settings.highlightStages.yellow}
+                            onChange={(val: number | string) => modifyHighlightStage("yellow", val)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            suffix="%"
+                            className={classes.percentInput}
+                        />
+                        <NumberInput
+                            defaultValue={widget.settings.highlightStages.red}
+                            onChange={(val: number | string) => modifyHighlightStage("red", val)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            suffix="%"
+                            className={classes.percentInput}
+                        />
+
+                        <Button
+                            variant="outline"
+                            onClick={() => toggleResourceHidden(resource.path)}
+                            color={hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
+                            className={classes.toggleButton}
+                        >
+                            {hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
+                        </Button>
+                    </Flex>
+                );
+            }),
+        [widget?.settings?.target]
+    );
+
     return (
         <Stack className={classes.container}>
             <DeviceSelect
@@ -76,51 +125,8 @@ const StorageResourcesDrawer = ({ index }: DrawerContentProps): React.JSX.Elemen
                             <Flex className={classes.headerLabel}>Path</Flex>
                             <Flex className={classes.headerLabel}>Highlight stages</Flex>
                         </Group>
-
-                        {safeObjectValues(data[resourceKey]).map((resource, i: number) => {
-                            const hidden = isResourceHidden(resource.path);
-                            return (
-                                <Flex
-                                    key={i}
-                                    className={classes.resourceRow}
-                                >
-                                    <IconGripVertical className={classes.iconGrip} />
-
-                                    <TextInput
-                                        value={resource.path}
-                                        readOnly
-                                    />
-                                    <NumberInput
-                                        defaultValue={widget.settings.highlightStages.yellow}
-                                        onChange={(val: number | string) => modifyHighlightStage("yellow", val)}
-                                        min={0}
-                                        max={100}
-                                        step={1}
-                                        suffix="%"
-                                        className={classes.percentInput}
-                                    />
-                                    <NumberInput
-                                        defaultValue={widget.settings.highlightStages.red}
-                                        onChange={(val: number | string) => modifyHighlightStage("red", val)}
-                                        min={0}
-                                        max={100}
-                                        step={1}
-                                        suffix="%"
-                                        className={classes.percentInput}
-                                    />
-
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => toggleResourceHidden(resource.path)}
-                                        color={hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
-                                        className={classes.toggleButton}
-                                    >
-                                        {hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
-                                    </Button>
-                                </Flex>
-                            );
-                        })}
                     </Stack>
+                    {resourceList}
                 </>
             )}
         </Stack>

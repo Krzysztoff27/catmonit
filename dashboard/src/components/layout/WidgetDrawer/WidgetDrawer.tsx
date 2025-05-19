@@ -2,7 +2,6 @@ import { Drawer, DrawerProps, Space } from "@mantine/core";
 import React from "react";
 import { DrawerContent, DrawerContentProps } from "../../../types/components.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
-import WIDGETS_CONFIG from "../../../config/widgets.config";
 import classes from "./WidgetDrawer.module.css";
 
 interface WidgetDrawerProps extends DrawerProps, DrawerContentProps {
@@ -21,7 +20,6 @@ const WidgetDrawer = ({ component: Component, index, ...props }: WidgetDrawerPro
             classNames={{ title: classes.title }}
         >
             <Space h="lg" />
-            {Component && <Component index={index} />}
         </Drawer>
     );
 };

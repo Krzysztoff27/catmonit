@@ -1,8 +1,6 @@
 import { Box } from "@mantine/core";
 import { IconAlertSquareRounded, IconChartDonut, IconDatabase, IconFiles, IconNetwork } from "@tabler/icons-react";
 import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
-import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
-import FileSharesDrawer from "../components/drawers/FileSharesDrawer/FileSharesDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
@@ -20,7 +18,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         name: "alerts widget",
         icon: IconAlertSquareRounded,
         content: AlertWidget,
-        drawer: AlertDrawer,
+        propertiesContent: AlertDrawer,
         limits: {
             minH: 2,
             maxH: 5,
@@ -29,12 +27,13 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         initialSettings: {},
         isReferingToSingularResource: false,
+        image: "/images/widgets/alerts.png",
     },
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
         icon: IconDatabase,
         content: DetailedDeviceStorageWidget,
-        drawer: StorageResourcesDrawer,
+        propertiesContent: StorageResourcesDrawer,
         limits: {
             minH: 2,
             maxH: 5,
@@ -52,12 +51,13 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         dataSource: "storage",
         isReferingToSingularResource: true,
+        image: "/images/widgets/detailed_device_storage.png",
     },
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's storage",
         icon: IconChartDonut,
         content: OverallDeviceStorageWidget,
-        drawer: OverallDeviceStorageDrawer,
+        propertiesContent: OverallDeviceStorageDrawer,
         limits: {
             minH: 2,
             maxH: 4,
@@ -75,7 +75,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         name: "file share widget",
         icon: IconFiles,
         content: FileSharesWidget,
-        drawer: StorageResourcesDrawer,
+        propertiesContent: StorageResourcesDrawer,
         limits: {
             minH: 2,
             maxH: 5,
@@ -93,12 +93,13 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         dataSource: "fileShares",
         isReferingToSingularResource: true,
+        image: "/images/widgets/fileshares.png",
     },
     // SERVICE_STATUS: {
     //     name: "device's status ",
     //     icon: IconProgressCheck,
     //     content: Box,
-    //     drawer: ServiceStatusDrawer, //@TODO change it
+    //     1tiesContent: ServiceStatusDrawer, //@TODO change it
     //     limits: {
     //         minH: 2,
     //         maxH: 5,
@@ -110,7 +111,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         name: "network throughput",
         icon: IconNetwork,
         content: NetworkThroughputWidget,
-        drawer: Box,
+        propertiesContent: Box,
         limits: {
             minH: 2,
             maxH: 6,
@@ -118,6 +119,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 6,
         },
         initialSettings: {},
+        image: "/images/widgets/network_throughput.png",
     },
 };
 

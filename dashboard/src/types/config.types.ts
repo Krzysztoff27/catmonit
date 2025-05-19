@@ -25,7 +25,7 @@ export interface WidgetConfig {
     name: string;
     icon: TablerIcon;
     content: WidgetContent;
-    drawer: DrawerContent; // TODO specify the props
+    propertiesContent: DrawerContent; // TODO specify the props
     dataSource?: string;
     isReferingToSingularResource: boolean;
     limits: WidgetLimits;

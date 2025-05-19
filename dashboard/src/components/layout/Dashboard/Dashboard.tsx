@@ -5,7 +5,7 @@ import { Layout, LayoutItem } from "../../../types/reactGridLayout.types";
 import WidgetBoard from "../WidgetBoard/WidgetBoard";
 import WidgetMenu from "../WidgetMenu/WidgetMenu";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
-import useWidgetDrawer from "../../../hooks/useWidgetDrawer";
+import useWidgetDrawer from "../../../hooks/useWidgetProperties";
 import WidgetDrawer from "../WidgetDrawer/WidgetDrawer";
 
 const Dashboard = (): React.JSX.Element => {

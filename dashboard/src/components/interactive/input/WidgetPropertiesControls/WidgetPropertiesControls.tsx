@@ -13,7 +13,6 @@ const WidgetPropertiesControls = ({ widget, setWidgetRect }): React.JSX.Element 
             h: widget?.rect?.h ?? 0,
         },
         onValuesChange: (values) => {
-            console.log(values);
             setWidgetRect(values);
         },
     });

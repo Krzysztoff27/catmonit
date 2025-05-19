@@ -1,0 +1,7 @@
+.deleteButton {
+    position: absolute !important;
+    right: 2px !important;
+    top: 8px !important;
+    /* important for logic - it cannot be clicked without it: */
+    z-index: 100;
+}
