@@ -1,0 +1,4 @@
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/api-machines.crt
+      keyFile: /etc/traefik/certs/api-machines.key
