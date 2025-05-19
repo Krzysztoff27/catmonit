@@ -35,9 +35,9 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     gen_cert() {
       NAME=$1
       openssl genrsa -out ${NAME}.key 2048
-      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local"
+      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local" >/dev/null 2>&1; then
       openssl x509 -req -in ${NAME}.csr -CA catmonit-CA.pem -CAkey catmonit-CA.key -CAcreateserial \
-        -out ${NAME}.crt -days 825 -sha256
+        -out ${NAME}.crt -days 825 -sha256 >/dev/null 2>&1; then
     }
 
     # Generate certificates using values from .env
