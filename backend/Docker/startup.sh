@@ -34,15 +34,14 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
 
     gen_cert() {
       NAME=$1
-      SUBJECT=$2
       openssl genrsa -out ${NAME}.key 2048
-      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${SUBJECT}.local"
+      openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local"
       openssl x509 -req -in ${NAME}.csr -CA catmonit-CA.pem -CAkey catmonit-CA.key -CAcreateserial \
         -out ${NAME}.crt -days 825 -sha256
     }
 
     # Generate certificates using values from .env
-    if ! gen_cert "$CERT_NAME" "$CERT_SUBJECT"; then
+    if ! gen_cert "$CERT_NAME"; then
         printf "Failed to generate server certificates."
         exit 1
     fi
