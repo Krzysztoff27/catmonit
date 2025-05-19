@@ -16,14 +16,21 @@ set +a
 
 #Check if certs directory exists and is empty
 if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
-    echo "No CA present inside the ./traefik/certs directory.\nCreating new certificates."
+    printf 'No CA present inside the ./traefik/certs directory.\nCreating new certificates.'
 
     mkdir -p ./traefik/certs
 
     #Certificate Authority
-    openssl genrsa -out catmonit-CA.key 4096
-    openssl req -x509 -new -nodes -key catmonit-CA.key -sha256 -days 1825 -out catmonit-CA.pem \
-      -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA"
+     if ! openssl genrsa -out catmonit-CA.key 4096; then
+        printf "Failed to generate CA private key."
+        exit 1
+    fi
+
+     if ! openssl req -x509 -new -nodes -key catmonit-CA.key -sha256 -days 1825 -out catmonit-CA.pem \
+        -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA" >/dev/null 2>&1; then
+        printf "Failed to create CA certificate."
+        exit 1
+    fi
 
     gen_cert() {
       NAME=$1
@@ -35,7 +42,10 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     }
 
     # Generate certificates using values from .env
-    gen_cert "$CERT_NAME" "$CERT_SUBJECT"
+    if ! gen_cert "$CERT_NAME" "$CERT_SUBJECT"; then
+        printf "Failed to generate server certificates."
+        exit 1
+    fi
 
      # Copy/move cert files
     cp ${CERT_NAME}.crt ./traefik/certs/
@@ -44,9 +54,12 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     mv catmonit-CA.key ./traefik/certs/
 
     # Clean up temporary files
-    rm ${CERT_NAME}.csr catmonit-CA.srl 2>/dev/null
+    rm ${CERT_NAME}.csr catmonit-CA.srl >/dev/null 2>&1
+
+    printf "Certificates created successfully."
 else
-    printf "CA present inside the ./traefik/certs directory.\nSkipping creation."
+    printf 'CA present inside the ./traefik/certs directory.\nSkipping creation.'
 fi
 
-docker-compose up -d
+echo "Starting Docker Compose..."
+docker compose up -d
