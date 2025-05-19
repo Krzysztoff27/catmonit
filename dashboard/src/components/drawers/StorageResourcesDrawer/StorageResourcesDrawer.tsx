@@ -3,12 +3,12 @@ import { IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
 import { safeObjectValues } from "../../../utils/object";
-import { DrawerContentProps } from "../../../types/components.types";
+import { WidgetPropertiesContentProps } from "../../../types/components.types";
 import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import classes from "./StorageResourcesDrawer.module.css";
 import { useMemo } from "react";
 
-const StorageResourcesDrawer = ({ index }: DrawerContentProps): React.JSX.Element => {
+const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.JSX.Element => {
     const { setWidgetSettings, getWidgetData, getWidgetConfig, getData, getWidget } = useWidgets();
     const widget = getWidget(index);
     const data = getWidgetData(widget);

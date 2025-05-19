@@ -1,4 +1,4 @@
-import { DrawerContent, DrawerContentProps, WidgetContent } from "./components.types";
+import { WidgetPropertiesContent, WidgetPropertiesContentProps, WidgetContent } from "./components.types";
 import { TablerIcon } from "@tabler/icons-react";
 
 export interface UrlNode {
@@ -23,13 +23,14 @@ export interface WidgetLimits {
 
 export interface WidgetConfig {
     name: string;
+    image: string;
     icon: TablerIcon;
     content: WidgetContent;
-    propertiesContent: DrawerContent; // TODO specify the props
-    dataSource?: string;
-    isReferingToSingularResource: boolean;
+    propertiesContent: WidgetPropertiesContent; // TODO specify the props
     limits: WidgetLimits;
     initialSettings: any;
+    dataSource?: string;
+    isReferingToSingularResource: boolean;
 }
 
 export interface WidgetsConfig {

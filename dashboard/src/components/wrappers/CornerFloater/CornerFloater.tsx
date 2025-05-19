@@ -80,7 +80,6 @@ function CornerFloater({ id, width, height, hide = false, children, style, ...pr
 
             const currentCorner = corner as Corner;
             const occupyingId = cornerMap[nearestCorner];
-            console.log(cornerMap);
 
             if (occupyingId && occupyingId !== id) {
                 swapCorners(currentCorner, nearestCorner);

@@ -3,7 +3,7 @@ import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
 import { isEmpty } from "lodash";
-import { DrawerContent, WidgetContent } from "../../types/components.types";
+import { WidgetPropertiesContent, WidgetContent } from "../../types/components.types";
 import { WidgetConfig, WidgetLimits } from "../../types/config.types";
 
 interface WidgetContextType {
@@ -22,7 +22,7 @@ interface WidgetContextType {
     getWidgetLimits: (widget: WidgetData) => WidgetLimits;
     getWidgetContent: (widget: WidgetData) => WidgetContent;
     getWidgetConfig: (widget: WidgetData) => WidgetConfig;
-    getWidgetPropertiesContent: (widget: WidgetData) => DrawerContent;
+    getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);

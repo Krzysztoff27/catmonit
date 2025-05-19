@@ -26,7 +26,7 @@ const Editor = (): React.JSX.Element => {
             h="100vh"
         >
             {/* <WidgetDrawer
-                component={DrawerContent!}
+                component={WidgetPropertiesContent!}
                 index={selected!}
                 position="right"
                 size="sm"

@@ -14,11 +14,8 @@ const WidgetProperties = ({}): React.JSX.Element => {
 
     const Content = useMemo(() => {
         if (selected === null) return undefined;
-        console.log(selected, getWidgetPropertiesContent(getWidget(selected)));
         return getWidgetPropertiesContent(getWidget(selected));
     }, [selected]);
-
-    console.log(Content);
 
     return (
         <CornerFloater
