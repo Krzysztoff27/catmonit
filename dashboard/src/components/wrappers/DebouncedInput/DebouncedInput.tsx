@@ -1,4 +1,5 @@
 import { useDebouncedCallback } from "@mantine/hooks";
+import React from "react";
 
 const DebouncedInput = ({ defaultValue, onChange, children }): React.JSX.Element => {
     const debounceOnChange = useDebouncedCallback(onChange, 500);

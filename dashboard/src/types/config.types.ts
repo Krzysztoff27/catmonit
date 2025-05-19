@@ -1,4 +1,4 @@
-import { WidgetPropertiesContent, WidgetPropertiesContentProps, WidgetContent } from "./components.types";
+import { WidgetPropertiesContent, WidgetContent } from "./components.types";
 import { TablerIcon } from "@tabler/icons-react";
 
 export interface UrlNode {
@@ -23,10 +23,10 @@ export interface WidgetLimits {
 
 export interface WidgetConfig {
     name: string;
-    image: string;
+    image?: string;
     icon: TablerIcon;
     content: WidgetContent;
-    propertiesContent: WidgetPropertiesContent; // TODO specify the props
+    propertiesContent?: WidgetPropertiesContent; // TODO specify the props
     limits: WidgetLimits;
     initialSettings: any;
     dataSource?: string;

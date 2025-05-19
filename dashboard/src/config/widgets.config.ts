@@ -1,14 +1,14 @@
 import { Box } from "@mantine/core";
 import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
-import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertCircle, IconAlertCircleFilled, IconAlertSquareRounded } from "@tabler/icons-react";
+import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertSquareRounded } from "@tabler/icons-react";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
 import FileSharesWidget from "../components/widgets/FileSharesWidget/FileSharesWidget";
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
 import { WidgetsConfig } from "../types/config.types";
 import StorageResourcesDrawer from "../components/drawers/StorageResourcesDrawer/StorageResourcesDrawer";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -111,7 +111,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         name: "network throughput",
         icon: IconNetwork,
         content: NetworkThroughputWidget,
-        propertiesContent: Box,
         limits: {
             minH: 2,
             maxH: 6,
@@ -120,6 +119,8 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         initialSettings: {},
         image: "/images/widgets/network_throughput.png",
+        dataSource: "network",
+        isReferingToSingularResource: false,
     },
 };
 

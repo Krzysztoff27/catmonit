@@ -10,7 +10,7 @@ interface WidgetContextType {
     widgets: WidgetData[];
     layout: LayoutItem[];
     selected: number | null;
-    setSelected: (selected: number | null) => void;
+    setSelected: (callback: (prev: number | null) => number | null) => void;
     getData: (source: string) => any;
     getWidget: (index: number | string) => WidgetData;
     createWidget: (type: string | null | undefined, layoutItem: LayoutItem) => void;
@@ -42,7 +42,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         },
     ]);
     const [data, setData] = useState(initialData);
-    const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState<null | number>(null);
 
     const saveStateToDatabase = () => {};
 
