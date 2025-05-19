@@ -1,6 +1,6 @@
 import { Paper } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { Corner, useCornerManager } from "../../../contexts/CornerManagerContext/CornerManagerContext";
 const SNAP_PADDING = 20;
 
