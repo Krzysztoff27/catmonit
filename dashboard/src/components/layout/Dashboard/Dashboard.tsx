@@ -1,5 +1,5 @@
 import { Flex } from "@mantine/core";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import WIDGETS_CONFIG from "../../../config/widgets.config";
 import { Layout, LayoutItem } from "../../../types/reactGridLayout.types";
 import WidgetBoard from "../WidgetBoard/WidgetBoard";

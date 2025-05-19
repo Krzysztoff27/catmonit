@@ -1,9 +1,8 @@
 import { Button, Combobox, Group, TextInput, useCombobox } from "@mantine/core";
 import { IconChevronDown, IconTrash } from "@tabler/icons-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import classes from "./LayoutControls.module.css";
-import { useElementSize } from "@mantine/hooks";
 
 const LayoutControls = ({}): React.JSX.Element => {
     const [layouts, setLayouts] = useState(["New layout 1", "New layout 2", "New layout 3", "New layout 4", "New layout 5", "New layout 6", "New layout 7"]);

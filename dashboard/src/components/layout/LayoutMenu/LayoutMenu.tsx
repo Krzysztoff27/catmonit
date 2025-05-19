@@ -1,4 +1,3 @@
-import React from "react";
 import CornerFloater from "../../wrappers/CornerFloater/CornerFloater";
 import { Stack, UnstyledButton } from "@mantine/core";
 import LayoutControls from "../../interactive/input/LayoutControls/LayoutControls";

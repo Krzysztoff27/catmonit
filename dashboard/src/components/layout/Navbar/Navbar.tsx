@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Flex, Group, ScrollArea, Stack } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight, IconPlus } from "@tabler/icons-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import ColorSchemeToggle from "../../interactive/button/ColorSchemeToggle/ColorSchemeToggle";
 import { LayoutLinkActionIcon } from "../../interactive/button/LayoutLinkActionIcon/LayoutLinkActionIcon";
 import { LayoutLinkButton } from "../../interactive/button/LayoutLinkButton/LayoutLinkButton";

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import CornerFloater from "../../wrappers/CornerFloater/CornerFloater";
 import { ActionIcon, ScrollArea, Stack, Title } from "@mantine/core";
 import classes from "./WidgetProperties.module.css";

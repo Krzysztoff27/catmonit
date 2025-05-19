@@ -1,5 +1,5 @@
 import { Grid, NumberInput, Title } from "@mantine/core";
-import React from "react";
+
 import classes from "./WidgetPropertiesControls.module.css";
 import { useForm } from "@mantine/form";
 import WIDGETS_CONFIG from "../../../../config/widgets.config";

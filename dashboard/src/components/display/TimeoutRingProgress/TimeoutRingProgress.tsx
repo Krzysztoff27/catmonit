@@ -1,5 +1,5 @@
 import { Group, GroupProps, RingProgress, Text } from "@mantine/core";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API_CONFIG from "../../../config/api.config";
 
 interface TimeoutRingProgressProps extends GroupProps {

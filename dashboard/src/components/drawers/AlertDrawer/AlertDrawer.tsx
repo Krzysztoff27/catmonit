@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import React from "react";
+
 import classes from "./AlertDrawer.module.css";
 import DataSourceMultiselect from "../../interactive/input/DataSourceMultiselect/DataSourceMultiselect";
 import { WidgetPropertiesContentProps } from "../../../types/components.types";

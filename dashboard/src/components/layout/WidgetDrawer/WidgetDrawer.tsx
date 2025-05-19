@@ -1,5 +1,5 @@
 import { Drawer, DrawerProps, Space } from "@mantine/core";
-import React from "react";
+
 import { WidgetPropertiesContent, WidgetPropertiesContentProps } from "../../../types/components.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import classes from "./WidgetDrawer.module.css";
