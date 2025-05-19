@@ -1,28 +1,25 @@
 ﻿using gRPC.telemetry.Server.webapi;
 using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using gRPC.telemetry.Server.webapi.Monitoring;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using webapi.Helpers;
-using webapi.Helpers.DBconnection;
 using webapi.webapi;
 
 namespace webapi.Controllers.http.layout
 {
-    /*
+    
     [ApiController]
     [Route("[controller]")]
     public class DeviceController : Controller
     {
         [HttpGet]
-        [Route("getAllDevicesUserHasAccessTo")]
-        public IActionResult GetDevicesUserHasAccessTo()
+        [Route("getAllDevices")]
+        public IActionResult GetDevices()
         {
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
             try
             {
-                List<Guid> devices = DeviceHelper.GetDevicesUserHasAccessTo(authRes.payload.id);
+                List<DeviceInfo> devices = DeviceHelper.GetDeviceInfos();
                 return Json(devices);
             }catch (InternalServerError)
             {
@@ -30,5 +27,4 @@ namespace webapi.Controllers.http.layout
             }
         }
     }
-    */
 }

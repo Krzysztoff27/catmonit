@@ -9,6 +9,8 @@ using gRPC.telemetry.Server.Models;
 using Microsoft.Extensions.Logging;
 using gRPC.telemetry.Server.webapi.Websocket;
 using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using webapi.webapi;
+using System.Security.Cryptography.Xml;
 
 public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryServiceBase
 {
@@ -26,6 +28,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         var responses = new List<ResponseModel>();
 
         Guid guid = Guid.Empty;
+        bool first = false;
         try
         {
             await foreach (var request in requestStream.ReadAllAsync())
@@ -41,17 +44,12 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Os = request.OperatingSystem
                     };
 
-                    if (guid == Guid.Empty)
-                    {
-                        guid = Guid.Parse(response.Uuid);
-                        DeviceHelper.OnDeviceConnected(guid);
-                    }
+                    
                     switch (request.PayloadCase)
                     {
                         case TelemetryRequest.PayloadOneofCase.Network:
                             response.PayloadType = PayloadType.Network;
                             response.Payload = ProcessNetworkPayload(request.Network);
-                            RequestParser.onResponseReceived(guid, response);
                             break;
 
                         case TelemetryRequest.PayloadOneofCase.Disks:
@@ -84,7 +82,36 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                             _logger.LogWarning("Received message with no valid payload");
                             break;
                     }
-                    RequestParser.onResponseReceived(guid, response);
+                    if (guid == Guid.Empty)
+                    {
+                        guid = Guid.Parse(response.Uuid);
+                        first = true;
+
+                    }
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            if (first)
+                            {
+                                DeviceHelper.OnDeviceConnected(new gRPC.telemetry.Server.webapi.Monitoring.DeviceInfo
+                                {
+                                    LastUpdated = response.Timestamp,
+                                    Hostname = response.Hostname,
+                                    IpAddress = response.IpAddress,
+                                    Uuid = guid,
+                                    Os = response.Os
+                                });
+                                first = false;
+                            }
+                            RequestParser.onResponseReceived(guid, response);
+                        }
+                        catch (Exception ex)
+                        {
+                            Utils.assert(false);
+                            Console.WriteLine(ex.Message);
+                        }
+                    });
 
                     responses.Add(response);
                     _logger.LogInformation("Processed message from {Hostname}", request.Hostname);

@@ -1,6 +1,7 @@
 ﻿using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using gRPC.telemetry.Server.webapi.Monitoring.Network;
 using webapi.Monitoring;
+using webapi.webapi;
 
 namespace gRPC.telemetry.Server.webapi.Services
 {
@@ -8,6 +9,7 @@ namespace gRPC.telemetry.Server.webapi.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<CleanupService> _logger;
+        private DateTime _lastCleanupDate = DateTime.MinValue;
 
         public CleanupService(IServiceScopeFactory scopeFactory, ILogger<CleanupService> logger)
         {
@@ -19,32 +21,37 @@ namespace gRPC.telemetry.Server.webapi.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(TimeUntilNextRun(), stoppingToken);
-
-                // update those devices which are active at the moment
-                foreach ((Guid deviceID, DateTime lastSeen) in NetworkMonit.networkDeviceInfos.GetAllDevicesUUIDsAndLastSeen())
+                try
                 {
                     try
                     {
-                        DeviceHelper.updateLastSeen(deviceID, lastSeen);
-                    }
-                    catch (InternalServerError)
+                        DeviceHelper.UpsertDevicesDB();
+                    } catch (InternalServerError)
                     {
-                        // ignore
+                        Utils.assert(false);
+                    }
+
+                    var now = DateTime.UtcNow;
+
+                    if (now.Hour == 1 && now.Date > _lastCleanupDate)
+                    {
+                        try
+                        {
+                            DeviceHelper.RemoveUnusedDevices();
+                        }catch (InternalServerError)
+                        {
+                            Utils.assert(false);
+                        }
+                        _lastCleanupDate = now.Date;
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in CleanupService execution");
+                }
 
-                // actually remove those which are unused
-                DeviceHelper.RemoveUnusedDevicesAndPermissions();
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
-        }
-
-        private TimeSpan TimeUntilNextRun()
-        {
-            return TimeSpan.FromSeconds(10);
-            var now = DateTime.UtcNow;
-            var nextRun = now.Date.AddDays(1);
-            return nextRun - now;
         }
     }
 }

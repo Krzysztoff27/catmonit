@@ -2,46 +2,41 @@
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
-    public class NetworkDeviceInfo
+    public class SharesDeviceInfo
     {
         public DeviceInfo DeviceInfo { get; set; }
-        public NetworkPayload MainPayload { get; set; }
-        public List<NetworkPayload> Networks { get; set; }
+        public List<SharePayload> SharesInfo { get; set; }
     }
-    public class NetworkInfoSnapshotHolder : ServiceContentSnapshotHolder<NetworkDeviceInfo>
+    public class SharesInfoSnapshotHolder : ServiceContentSnapshotHolder<SharesDeviceInfo>
     {
 
         public void CalculateBestAutoCandidates(int n)
         {
             AutoCandidates = MonitoredDevices
                 .Values
-                .OrderBy(device => device.MainPayload.RxMbps + device.MainPayload.TxMbps)
+                .OrderBy(device => device.SharesInfo.Count)
                 .Take(n)
                 .Select(device => device.DeviceInfo.Uuid)
                 .ToList();
         }
         public void CalculateWarnings()
         {
-
         }
-        public List<(Guid deviceID, DateTime lastSeen)> GetAllDevicesUUIDsAndLastSeen()
+        public void GetErrors()
         {
-            return MonitoredDevices
-                .Select(kvp => (kvp.Key, kvp.Value.DeviceInfo.LastUpdated))
-                .ToList();
         }
     }
-    public class NetworkInfo : ServiceContentInfo<NetworkDeviceInfo>
+    public class SharesInfo : ServiceContentInfo<SharesDeviceInfo>
     {
-        public static NetworkInfo Instance { get; set; } = new NetworkInfo();
+        public static SharesInfo Instance { get; set; } = new SharesInfo();
 
         public void RemoveStaleDevices(TimeSpan staleThreshold)
         {
             base.RemoveStaleDevices(dev => dev.DeviceInfo.LastUpdated, staleThreshold);
         }
-        public NetworkInfoSnapshotHolder snapShot()
+        public SharesInfoSnapshotHolder snapShot()
         {
-            NetworkInfoSnapshotHolder snapshotHolder = new();
+            SharesInfoSnapshotHolder snapshotHolder = new();
             snapshotHolder.SnapshotTime = DateTime.UtcNow;
             snapshotHolder.MonitoredDevices = base.GetDeviceSnapshot();
             return snapshotHolder;

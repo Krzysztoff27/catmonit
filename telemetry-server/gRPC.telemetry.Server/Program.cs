@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using webapi.Monitoring;
 using gRPC.telemetry.Server.webapi.Services;
 using gRPC.telemetry.Server.webapi.Websocket.Network;
+using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+
 
 
 #if CM_GENERATE_SWAGGER
@@ -72,11 +74,17 @@ app.Use(async (context, next) =>
         return;
     }
 
-    if (context.WebSockets.IsWebSocketRequest &&
-        (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase) ||
-         path.StartsWith("/storage", StringComparison.OrdinalIgnoreCase)))
+    if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/network", StringComparison.OrdinalIgnoreCase))
     {
         await NetworkMonitHandler.instance.HandleRequestAsync(context);
+    }
+    else if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/disks", StringComparison.OrdinalIgnoreCase))
+    {
+        await DisksMonitHandler.instance.HandleRequestAsync(context);
+    }
+    else if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/shares", StringComparison.OrdinalIgnoreCase))
+    {
+        await SharesMonitHandler.instance.HandleRequestAsync(context);
     }
     else
     {
@@ -135,5 +143,5 @@ if (app.Environment.IsDevelopment())
 }
 #endif
 
-
+DeviceHelper.SynchronizeDataWithDB();
 app.Run();

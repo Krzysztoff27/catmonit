@@ -61,7 +61,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         switch (messageType)
                         {
                             case "start":
-                                MonitRef.Unsubscribe(potentialSubscriber);
+                                MonitRef.Unsubscribe(potentialSubscriber); 
                                 List<Guid>? devices = new List<Guid>();
 
                                 int auto = 0;
