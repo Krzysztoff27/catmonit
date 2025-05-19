@@ -22,7 +22,7 @@ interface WidgetContextType {
     getWidgetLimits: (widget: WidgetData) => WidgetLimits;
     getWidgetContent: (widget: WidgetData) => WidgetContent;
     getWidgetConfig: (widget: WidgetData) => WidgetConfig;
-    getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent;
+    getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent | undefined;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
