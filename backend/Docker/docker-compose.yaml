@@ -51,11 +51,13 @@ services:
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
     - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines.tls=true"
+    - "traefik.http.routers.api-machines.service=api-machines"
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
     - "traefik.http.routers.api-mobile.rule=Host(`api-mobile.local`)"
     - "traefik.http.routers.api-mobile.entrypoints=websecure"
     - "traefik.http.routers.api-mobile.tls.certresolver=le"
+    - "traefik.http.routers.api-mobile.service=api-mobile"
     - "traefik.http.services.api-mobile.loadbalancer.server.port=5172"
     networks:
       - catmonit-network
@@ -64,7 +66,6 @@ services:
       container_name: catmonit-dashboard
       restart: always
       image: "ghcr.io/krzysztoff27/catmonit-dashboard:latest"
-      profiles: ["dashboard"]
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
