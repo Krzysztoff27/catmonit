@@ -3,17 +3,22 @@ services:
     container_name: catmonit-proxy
     restart: always
     image: traefik:v3.0
+    labels:
+      com.docker.compose.project.hook.before_up: /bin/sh -c "[ -f traefik/certs/catmonit-CA.pem ] || \
+        (mkdir -p traefik/certs && chmod +x ./certs/generate-certs.sh && ./certs/generate-certs.sh)"
     command:
     - "--providers.docker=true"
     - "--providers.file.directory=/etc/traefik/dynamic"
     - "--entrypoints.websecure.address=:443"
+    - "--entrypoints.grpcsecure.address=:444"
     - "--entrypoints.web.address=:80"
     - "--certificatesresolvers.le.acme.tlschallenge=true"
     - "--certificatesresolvers.le.acme.email=root@example.com"
     - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
     - "--api.dashboard=true" # Optional - comment to turn the dashboard off
     ports:
-      - "443:443"
+      - "443:443" # telemetry-server websockets/requests entrypoint + dashboard entrypoint
+      - "444:444" # telemetry-server machines entrypoint
       - "80:80"
       - "8080:8080"  # Optional: Traefik dashboard
     volumes:
@@ -47,8 +52,9 @@ services:
     - "traefik.enable=true"
 
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
-    - "traefik.http.routers.api-machines.entrypoints=websecure"
+    - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines.tls=true"
+    - "traefik.http.routers.grpc-secure.service=grpc-svc"
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
     - "traefik.http.routers.api-mobile.rule=Host(`api-mobile.local`)"
@@ -57,8 +63,6 @@ services:
     - "traefik.http.services.api-mobile.loadbalancer.server.port=5172"
     networks:
       - catmonit-network
-    #volumes:
-      #- "/opt/catmonit/backend/backend/Docker/telemetry-server/certs/server.pfx:/app/SSL/server.pfx:ro"
 
   website:
       container_name: catmonit-dashboard

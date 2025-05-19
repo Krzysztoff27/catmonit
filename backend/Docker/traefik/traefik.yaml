@@ -5,6 +5,9 @@ entryPoints:
   websecure:
     address: ":443"
 
+  grpsecure:
+    address: ":444"
+
 providers:
   docker:
     exposedByDefault: false
