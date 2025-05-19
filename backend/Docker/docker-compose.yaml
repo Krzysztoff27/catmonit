@@ -18,8 +18,8 @@ services:
       - "8080:8080"  # Optional: Traefik dashboard
     volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
-    - "./traefik/dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro"
+    - "./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro"
+    - "./traefik/dynamic.yaml:/etc/traefik/dynamic/dynamic.yaml:ro"
     - "./traefik/certs:/etc/traefik/certs:ro"
     - "./traefik/letsencrypt:/letsencrypt"
     networks:
