@@ -8,7 +8,7 @@ import FileSharesWidget from "../components/widgets/FileSharesWidget/FileSharesW
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
 import { WidgetsConfig } from "../types/config.types";
 import StorageResourcesDrawer from "../components/drawers/StorageResourcesDrawer/StorageResourcesDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallTemp/OverallDeviceStorageWidget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
