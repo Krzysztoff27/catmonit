@@ -27,7 +27,7 @@ if [ ! -f ./traefik/certs/catmonit-CA.pem ]; then
     fi
 
      if ! openssl req -x509 -new -nodes -key catmonit-CA.key -sha256 -days 1825 -out catmonit-CA.pem \
-        -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA" >/dev/null 2>&1;
+        -subj "/C=US/ST=California/L=San Francisco/O=Catmonit/OU=IT/CN=Catmonit Root CA" >/dev/null 2>&1
         printf "Failed to create CA certificate."
         exit 1
     fi
