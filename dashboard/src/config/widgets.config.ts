@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core";
-import { IconAlertSquareRounded, IconChartDonut, IconDatabase, IconFiles, IconNetwork } from "@tabler/icons-react";
 import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
+import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertCircle, IconAlertCircleFilled, IconAlertSquareRounded } from "@tabler/icons-react";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
 import FileSharesWidget from "../components/widgets/FileSharesWidget/FileSharesWidget";

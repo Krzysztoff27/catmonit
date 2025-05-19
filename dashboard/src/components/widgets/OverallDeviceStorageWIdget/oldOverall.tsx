@@ -101,6 +101,7 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
                 >
                     {formattedData.map((item, index) => (
                         <Text
+                            bg="blue"
                             key={index}
                             ta="center"
                             // style={{ whiteSpace: "pre-line" }}
