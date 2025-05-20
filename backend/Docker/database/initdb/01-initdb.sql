@@ -21,28 +21,24 @@ BEGIN
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         username character varying(32) NOT NULL,
         password_hash bytea NOT NULL,
-        salt bytea NOT NULL,
-        permissions integer
+        salt bytea NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS dashboard_layouts (
         layout_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
         layout_name TEXT NOT NULL,
         layout_body JSON NOT NULL,
-        user_id UUID NOT NULL
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
     );
-
-    CREATE TABLE IF NOT EXISTS users_devices (
-        user_id UUID NOT NULL,
-        device_id UUID NOT NULL,
-        PRIMARY KEY (user_id, device_id)
-    );
-
+    
     CREATE TABLE IF NOT EXISTS devices (
         device_id UUID PRIMARY KEY,
-        last_seen TIMESTAMP WITHOUT TIME ZONE NOT NULL
+        last_seen TIMESTAMP NOT NULL,
+        hostname VARCHAR(255),
+        ip_adress VARCHAR(15),
+        network_mask VARCHAR(15),
+        os VARCHAR(100)
     );
-
     GRANT ALL PRIVILEGES ON DATABASE catmonit_base TO catmonit_worker;
     
     RAISE NOTICE 'catmonit_base initialization completed.';
