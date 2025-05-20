@@ -1,4 +1,11 @@
 tls:
   certificates:
+    #API endpoint for telemetry data
     - certFile: /etc/traefik/certs/api-machines.crt
       keyFile: /etc/traefik/certs/api-machines.key
+    #API endpoint for web traffic
+    - certFile: /etc/traefik/certs/api-web.crt
+      keyFile: /etc/traefik/certs/api-web.key
+    #Website
+    - certFile: /etc/traefik/certs/website.crt
+      keyFile: /etc/traefik/certs/website.key

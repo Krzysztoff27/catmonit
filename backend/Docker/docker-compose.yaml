@@ -17,9 +17,11 @@ services:
     - "--providers.file.watch=true"
 
      #Let's Encrypt certificate resolver
-    - "--certificatesresolvers.le.acme.tlschallenge=true"
-    - "--certificatesresolvers.le.acme.email=krzysztof.kolasinski27@outlook.com"
-    - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    #- "--certificatesresolvers.le.acme.tlschallenge=true"
+    #- "--certificatesresolvers.le.acme.email=krzysztof.kolasinski27@outlook.com"
+    #- "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    #- "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
+
 
     - "--api.dashboard=true" # Optional - comment to turn the dashboard off
     ports:
@@ -72,7 +74,8 @@ services:
     #HTTP router
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
     - "traefik.http.routers.api-web.entrypoints=websecure"
-    - "traefik.http.routers.api-web.tls.certresolver=le"
+    #- "traefik.http.routers.api-web.tls.certresolver=le"
+    - "traefik.http.routers.api-web.tls=true"
     - "traefik.http.routers.api-web.service=api-web"
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
     networks:
@@ -86,7 +89,8 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
         - "traefik.http.routers.website.entrypoints=websecure"
-        - "traefik.http.routers.website.tls.certresolver=le"
+        #- "traefik.http.routers.website.tls.certresolver=le"
+        - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
         - "traefik.http.services.website.loadbalancer.server.port=3000"
       networks:
