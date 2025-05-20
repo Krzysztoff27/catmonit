@@ -12,8 +12,8 @@ fi
 CERT_NAMES=('website' 'api-machines' 'api-web')
 
 CERT_DIR="./traefik/certs"
-CA_FILE="${CERT_DIR}/catmonit-CA.pem"
-CA_KEY_FILE="${CERT_DIR}/catmonit-CA.key"
+CA_PEM="${CERT_DIR}/catmonit-CA.pem"
+CA_KEY="${CERT_DIR}/catmonit-CA.key"
 
 gen_cert() {
     NAME=$1
@@ -25,7 +25,7 @@ gen_cert() {
 
 #Check if certs directory exists and is empty
 # Check if CA exists
-if [ ! -f "$CA_FILE" ]; then
+if [ ! -f "$CA_PEM" ]; then
     printf "No CA present in ${CERT_DIR}. Creating new CA and all certificates..."
 
     mkdir -p "$CERT_DIR"
@@ -61,6 +61,9 @@ if [ ! -f "$CA_FILE" ]; then
 else
     printf "CA already exists in ${CERT_DIR}. Checking individual certs..."
 
+    cp "$CA_PEM" .
+    cp "$CA_KEY" .
+
     missing_cert=0
 
     for NAME in "${CERT_NAMES[@]}"; do
@@ -76,6 +79,8 @@ else
             missing_cert=1
         fi
     done
+
+     rm -f catmonit-CA.pem catmonit-CA.key catmonit-CA.srl
 
     if [ "$missing_cert" -eq 0 ]; then
         printf "All certificates present. Skipping generation."
