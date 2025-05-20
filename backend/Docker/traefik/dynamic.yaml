@@ -7,5 +7,5 @@ tls:
     - certFile: /etc/traefik/certs/api-web.crt
       keyFile: /etc/traefik/certs/api-web.key
     #Website
-    - certFile: /etc/traefik/certs/website.crt
-      keyFile: /etc/traefik/certs/website.key
+    - certFile: /etc/traefik/certs/dashboard.crt
+      keyFile: /etc/traefik/certs/dashboard.key

@@ -49,7 +49,6 @@ if [ ! -f "$CA_PEM" ]; then
         fi
         mv "${NAME}.crt" "$CERT_DIR/"
         mv "${NAME}.key" "$CERT_DIR/"
-        cp "$CERT_DIR/api-machines.crt" .
         rm -f "${NAME}.csr"
     done
 
@@ -76,13 +75,12 @@ else
             fi
             mv "${NAME}.crt" "$CERT_DIR/"
             mv "${NAME}.key" "$CERT_DIR/"
-            cp "$CERT_DIR/api-machines.crt" .
             rm -f "${NAME}.csr"
             missing_cert=1
         fi
     done
 
-     rm -f catmonit-CA.pem catmonit-CA.key catmonit-CA.srl
+     rm -f catmonit-CA.key catmonit-CA.srl
 
     if [ "$missing_cert" -eq 0 ]; then
         printf "All certificates present. Skipping generation."
