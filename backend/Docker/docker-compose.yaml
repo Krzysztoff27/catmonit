@@ -63,12 +63,12 @@ services:
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
     - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines.tls=true"
-    - "traefik.http.routers.api-machines.service=grpc.telemetry.server"
+    - "traefik.http.routers.api-machines.service=api-machines"
 
      # gRPC IP fallback
     - "traefik.http.routers.api-machines-ip.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines-ip.tls=true"
-    - "traefik.http.routers.api-machines-ip.service=grpc.telemetry.server"
+    - "traefik.http.routers.api-machines-ip.service=api-machines"
 
     # gRPC service definition
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
@@ -77,12 +77,12 @@ services:
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
     - "traefik.http.routers.api-web.entrypoints=apisecure"
     - "traefik.http.routers.api-web.tls=true"
-    - "traefik.http.routers.api-web.service=grpc.telemetry.server"
+    - "traefik.http.routers.api-web.service=api-web"
 
     # HTTP API IP fallback
     - "traefik.http.routers.api-web-ip.entrypoints=apisecure"
     - "traefik.http.routers.api-web-ip.tls=true"
-    - "traefik.http.routers.api-web-ip.service=grpc.telemetry.server"
+    - "traefik.http.routers.api-web-ip.service=api-web"
 
     # HTTP API service definition
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
