@@ -112,7 +112,7 @@ services:
         - "traefik.http.routers.website-ip.rule=Host(`10.10.51.3`)"
         - "traefik.http.routers.website-ip.entrypoints=websecure"
         - "traefik.http.routers.website-ip.tls=true"
-        - "traefik.http.routers.website-ip.service=api-web"
+        - "traefik.http.routers.website-ip.service=website"
       networks:
         - catmonit-network
 
