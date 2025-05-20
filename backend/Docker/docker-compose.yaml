@@ -1,10 +1,12 @@
 services:
   traefik:
+
     container_name: catmonit-proxy
     restart: always
     image: traefik:v3.0
     command:
     - "--log.level=DEBUG"
+    - "--accesslog=true"
 
     # Static configuration
     - "--entrypoints.web.address=:80" #Disable http access
@@ -52,7 +54,6 @@ services:
       - ./.env
     labels:
     - "traefik.enable=true"
-    - "--accesslog=true"
 
     # gRPC domain
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
