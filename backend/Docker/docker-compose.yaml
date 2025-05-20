@@ -11,6 +11,7 @@ services:
     - "--entrypoints.websecure.address=:443"
     - "--entrypoints.grpcsecure.address=:444"
     - "--entrypoints.apisecure.address=:445"
+    - "--entrypoints.websecure.http.tls=true"
 
     - "--providers.docker=true"
     - "--providers.docker.exposedByDefault=false"
