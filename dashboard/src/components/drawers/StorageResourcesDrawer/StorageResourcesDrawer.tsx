@@ -25,18 +25,17 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
         if (!target) return;
         const newData = getData(dataSource)[target];
         const newResourceData = safeObjectValues(newData[resourceKey]);
-        const newResourceSettings = newResourceData.map(({ path }) => ({ path, hidden: false, yellowStage: 75, redStage: 90 }));
+        const newResourceSettings = newResourceData.reduce((prev, { path }) => ({...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 }}}), {});
         setWidgetSettings(index, { ...widget.settings, target, [resourceKey]: newResourceSettings });
     };
 
     const isResourceHidden = (path: string) => {
-        return widget?.settings?.[resourceKey]?.find((resource) => resource.path === path).hidden;
+        return widget?.settings?.[resourceKey]?.[path].hidden;
     };
 
     const toggleResourceHidden = (path: string) => {
         const newSettings = widget.settings;
-        const diskIndex = newSettings[resourceKey].findIndex((resource) => resource.path === path);
-        newSettings[resourceKey][diskIndex].hidden = !newSettings[resourceKey][diskIndex].hidden;
+        newSettings[resourceKey][path].hidden = !newSettings[resourceKey][path].hidden;
         setWidgetSettings(index, newSettings);
     };
 
@@ -46,9 +45,10 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
         setWidgetSettings(index, newSettings);
     };
 
-    const modifyHighlightStage = (stage: "yellow" | "red", value: number | string) => {
+    const modifyHighlightStage = (path: string, stage: "yellow" | "red", value: number | string) => {
         const newSettings = widget.settings;
-        newSettings.highlightStages[stage] = value;
+        if(!newSettings?.[resourceKey]?.[path]?.highlightStages?.[stage]) return;
+        newSettings[resourceKey][path].highlightStages[stage] = value;
         setWidgetSettings(index, newSettings);
     };
 
@@ -56,6 +56,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
         () =>
             safeObjectValues(data[resourceKey]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
+                console.log(widget.settings[resourceKey][resource.path])
                 return (
                     <Flex
                         key={i}
@@ -68,8 +69,8 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                             readOnly
                         />
                         <NumberInput
-                            defaultValue={widget.settings.highlightStages.yellow}
-                            onChange={(val: number | string) => modifyHighlightStage("yellow", val)}
+                            defaultValue={widget?.settings?.[resourceKey]?.[resource.path]?.highlightStages?.yellow}
+                            onChange={(val: number | string) => modifyHighlightStage(resource.path, "yellow", val)}
                             min={0}
                             max={100}
                             step={1}
@@ -77,8 +78,8 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                             className={classes.percentInput}
                         />
                         <NumberInput
-                            defaultValue={widget.settings.highlightStages.red}
-                            onChange={(val: number | string) => modifyHighlightStage("red", val)}
+                            defaultValue={widget?.settings?.[resourceKey]?.[resource.path]?.highlightStages?.red}
+                            onChange={(val: number | string) => modifyHighlightStage(resource.path, "red", val)}
                             min={0}
                             max={100}
                             step={1}
@@ -97,7 +98,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                     </Flex>
                 );
             }),
-        [widget?.settings?.target]
+        [widget?.settings.target, widget?.settings?.[resourceKey]]
     );
 
     return (

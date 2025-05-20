@@ -15,7 +15,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
         if (!height || !data?.disks) return safeObjectValues(data?.disks) ?? [];
 
         const numberOfSlots = Math.floor((height + 12) / 44);
-        const visibleDisks = settings?.disks?.filter(({ hidden }) => !hidden).map(({ path }) => path);
+        const visibleDisks = safeObjectValues(settings?.disks)?.filter(({ hidden }) => !hidden).map(({ path }) => path);
         const disksData = visibleDisks?.map((path: string) => data.disks[path]) ?? safeObjectValues(data.disks);
 
         if (settings.automatic) {
@@ -52,7 +52,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     {disksData.map((disk: Disk, i) => (
                         <DiskProgress
                             key={i}
-                            highlightStages={settings.highlightStages}
+                            highlightStages={settings?.disks?.[disk.path]?.highlightStages ?? {red: 100, yellow: 100}}
                             {...disk}
                         />
                     ))}

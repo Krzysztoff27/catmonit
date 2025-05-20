@@ -13,7 +13,7 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
     const prepareData = () => {
         if (!height || !data?.fileShares) return safeObjectValues(data?.fileShares) ?? [];
         const numberOfSlots = Math.floor((height + 12) / 44);
-        const visiblefileShares = settings?.fileShares?.filter(({ hidden }) => !hidden).map(({ path }) => path);
+        const visiblefileShares = safeObjectValues(settings?.fileShares)?.filter(({ hidden }) => !hidden).map(({ path }) => path);
         const fileSharesData = visiblefileShares?.map((path: string) => data.fileShares[path]) ?? safeObjectValues(data.fileShares);
 
         if (settings.automatic) {
@@ -49,7 +49,7 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
                     {fileSharesData.map((fileShare: FileShare, i) => (
                         <DiskProgress
                             key={i}
-                            highlightStages={settings.highlightStages}
+                            highlightStages={settings?.fileShares?.[fileShare.path]?.highlightStages ?? {red: 100, yellow: 100}}
                             {...fileShare}
                         />
                     ))}
