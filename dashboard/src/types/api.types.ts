@@ -4,10 +4,21 @@ export interface TokenRequestForm {
 }
 
 export interface Device {
-    uuid: string;
-    hostname: string;
-    ip: string;
-    mask: string;
+  uuid: string;
+  hostname: string;
+  ip: string;
+  mask: string;
+}
+
+export interface DeviceCpuData extends Device {
+    bootTimestamp: number;
+    cpu: number; //percentage, so <0;100>
+    cpuCoreNumber: number;
+    cpuLoadAverage: number[];
+    ramUsed: number;
+    ramMax: number;
+    swapUsed: number;
+    swapMax: number;
 }
 
 export interface Disk {

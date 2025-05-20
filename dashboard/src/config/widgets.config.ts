@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertCircle, IconAlertCircleFilled } from "@tabler/icons-react";
+import { IconDatabase, IconNetwork, IconChartDonut, IconFiles, IconAlertCircleFilled, IconInfoCircleFilled } from "@tabler/icons-react";
 import DetailedDeviceStorageDrawer from "../components/drawers/DetailedDeviceStorageDrawer/DetailedDeviceStorageDrawer";
 import AlertWidget from "../components/widgets/AlertWidget/AlertWidget";
 import DetailedDeviceStorageWidget from "../components/widgets/DetailedDeviceStorageWidget/DetailedDeviceStorageWidget";
@@ -9,7 +9,9 @@ import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStora
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
 import FileshareWidget from "../components/widgets/FileshareWidget/FileshareWidget";
 import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
-import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWIdget";
+import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
+import DeviceStatusWidget from "../components/widgets/DeviceStatusWidget/DeviceStatusWidget";
+import DeviceStatusDrawer from "../components/drawers/DeviceStatusDrawer/DeviceStatusDrawer";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -52,6 +54,24 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         dataSource: "storage",
         isReferingToSingularResource: true,
     },
+    DEVICE_STATUS: {
+        name: "device status info",
+        icon: IconInfoCircleFilled,
+        content: DeviceStatusWidget,
+        drawer: DeviceStatusDrawer,
+        limits: {
+            minH: 2,
+            maxH: 3,
+            minW: 2,
+            maxW: 10,
+        },
+        initialSettings: {  
+            target: undefined,
+            automatic: true,
+        },
+        dataSource: "storage",
+        isReferingToSingularResource: true,
+    },
     STORAGE_ALERTS: {
         name: "storage alerts widget",
         icon: IconAlertCircleFilled,
@@ -64,6 +84,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 10,
         },
         initialSettings: {},
+        isReferingToSingularResource: false,
     },
     FILESHARE: {
         name: "fileshare widget",
