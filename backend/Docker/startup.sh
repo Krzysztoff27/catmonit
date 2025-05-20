@@ -9,7 +9,7 @@ if ((EUID != 0)); then
     exit
 fi
 
-CERT_NAMES=('website' 'api-machines' 'api-web')
+CERT_NAMES=('dashboard' 'api-machines' 'api-web')
 
 CERT_DIR="./traefik/certs"
 CA_PEM="${CERT_DIR}/catmonit-CA.pem"
@@ -47,8 +47,9 @@ if [ ! -f "$CA_PEM" ]; then
             printf "Failed to generate certificate for ${NAME}."
             exit 1
         fi
-        cp "${NAME}.crt" "$CERT_DIR/"
+        mv "${NAME}.crt" "$CERT_DIR/"
         mv "${NAME}.key" "$CERT_DIR/"
+        cp "$CERT_DIR/api-machines.crt" .
         rm -f "${NAME}.csr"
     done
 
@@ -73,8 +74,9 @@ else
                 printf "Failed to generate certificate for ${NAME}."
                 exit 1
             fi
-            cp "${NAME}.crt" "$CERT_DIR/"
+            mv "${NAME}.crt" "$CERT_DIR/"
             mv "${NAME}.key" "$CERT_DIR/"
+            cp "$CERT_DIR/api-machines.crt" .
             rm -f "${NAME}.csr"
             missing_cert=1
         fi
