@@ -7,27 +7,22 @@ services:
     - "--log.level=DEBUG"
 
     # Static configuration
-    - "--entrypoints.web.address=:80"
+    #- "--entrypoints.web.address=:80" Disable http access
     - "--entrypoints.websecure.address=:443"
     - "--entrypoints.grpcsecure.address=:444"
+    - "--entrypoints.apisecure.address=:445"
 
     - "--providers.docker=true"
     - "--providers.docker.exposedByDefault=false"
-    - "--providers.file.directory=/etc/traefik/dynamic"  # Optional — remove if unused
+    - "--providers.file.directory=/etc/traefik/dynamic"
     - "--providers.file.watch=true"
-
-     #Let's Encrypt certificate resolver
-    #- "--certificatesresolvers.le.acme.tlschallenge=true"
-    #- "--certificatesresolvers.le.acme.email=krzysztof.kolasinski27@outlook.com"
-    #- "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-    #- "--certificatesresolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
-
 
     - "--api.dashboard=true" # Optional - comment to turn the dashboard off
     ports:
-      - "443:443" # telemetry-server websockets/requests entrypoint + dashboard entrypoint
+      - "443:443" #dashboard entrypoint
       - "444:444" # telemetry-server machines entrypoint
-      - "80:80"
+      - "445:445" # api-web entrypoint (websockets/requests)
+      #- "80:80"
       - "8080:8080"  # Optional: Traefik dashboard
     volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -37,6 +32,7 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+    - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
     - "traefik.http.routers.traefik.entrypoints=websecure"
     - "traefik.http.routers.traefik.service=api@internal"
     - "traefik.http.routers.traefik.tls.certresolver=le"
@@ -64,6 +60,8 @@ services:
     labels:
     - "traefik.enable=true"
 
+    - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
+
     #gRPC router
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
     - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
@@ -73,8 +71,7 @@ services:
 
     #HTTP router
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
-    - "traefik.http.routers.api-web.entrypoints=websecure"
-    #- "traefik.http.routers.api-web.tls.certresolver=le"
+    - "traefik.http.routers.api-web.entrypoints=apisecure"
     - "traefik.http.routers.api-web.tls=true"
     - "traefik.http.routers.api-web.service=api-web"
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
@@ -88,8 +85,8 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
+        - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
         - "traefik.http.routers.website.entrypoints=websecure"
-        #- "traefik.http.routers.website.tls.certresolver=le"
         - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
         - "traefik.http.services.website.loadbalancer.server.port=3000"

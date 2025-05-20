@@ -11,16 +11,43 @@ fi
 
 CERT_NAMES=('dashboard' 'api-machines' 'api-web')
 
+declare -A CERT_MAP=(
+  [dashboard]="10.10.51.3"
+  [api-machines]="10.10.51.3"
+  [api-web]="10.10.51.3"
+)
+
 CERT_DIR="./traefik/certs"
 CA_PEM="${CERT_DIR}/catmonit-CA.pem"
 CA_KEY="${CERT_DIR}/catmonit-CA.key"
 
 gen_cert() {
     NAME=$1
-    openssl genrsa -out ${NAME}.key 2048
-    openssl req -new -key ${NAME}.key -out ${NAME}.csr -subj "/CN=${NAME}.local"
-    openssl x509 -req -in ${NAME}.csr -CA catmonit-CA.pem -CAkey catmonit-CA.key -CAcreateserial \
-    -out ${NAME}.crt -days 825 -sha256
+    IP=$2
+
+    cat > "${NAME}.cnf" <<EOF
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+CN = ${NAME}.local
+
+[v3_req]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = ${NAME}.local
+IP.1 = ${IP}
+EOF    
+
+    openssl genrsa -out "${NAME}.key" 2048
+    openssl req -new -key "${NAME}.key" -out "${NAME}.csr" -config "${NAME}.cnf"
+    openssl x509 -req -in "${NAME}.csr" -CA catmonit-CA.pem -CAkey catmonit-CA.key -CAcreateserial \
+        -out "${NAME}.crt" -days 825 -sha256 -extensions v3_req -extfile "${NAME}.cnf"
+    
+    rm -f "${NAME}.cnf" "${NAME}.csr"
 }
 
 #Check if certs directory exists and is empty
@@ -41,10 +68,24 @@ if [ ! -f "$CA_PEM" ]; then
         exit 1
     fi
 
+    '''
     for NAME in "${CERT_NAMES[@]}"; do
         printf "Generating certificate for ${NAME}..."
         if ! gen_cert "$NAME"; then
             printf "Failed to generate certificate for ${NAME}."
+            exit 1
+        fi
+        mv "${NAME}.crt" "$CERT_DIR/"
+        mv "${NAME}.key" "$CERT_DIR/"
+        rm -f "${NAME}.csr"
+    done
+    '''
+
+    for NAME in "${!CERT_MAP[@]}"; do
+        IP="${CERT_MAP[$NAME]}"
+        echo "Generating cert for $NAME ($IP)..."
+        if ! gen_cert "$NAME" "$IP"; then
+            echo "Failed to generate cert for $NAME"
             exit 1
         fi
         mv "${NAME}.crt" "$CERT_DIR/"
@@ -66,6 +107,7 @@ else
 
     missing_cert=0
 
+    '''
     for NAME in "${CERT_NAMES[@]}"; do
         if [ ! -f "${CERT_DIR}/${NAME}.crt" ] || [ ! -f "${CERT_DIR}/${NAME}.key" ]; then
             printf "Missing certificate for ${NAME}. Regenerating..."
@@ -78,6 +120,20 @@ else
             rm -f "${NAME}.csr"
             missing_cert=1
         fi
+    done
+    '''
+    
+    for NAME in "${!CERT_MAP[@]}"; do
+        IP="${CERT_MAP[$NAME]}"
+        echo "Generating cert for $NAME ($IP)..."
+        if ! gen_cert "$NAME" "$IP"; then
+            echo "Failed to generate cert for $NAME"
+            exit 1
+        fi
+         mv "${NAME}.crt" "$CERT_DIR/"
+        mv "${NAME}.key" "$CERT_DIR/"
+        rm -f "${NAME}.csr"
+        missing_cert=1
     done
 
      rm -f catmonit-CA.key catmonit-CA.srl
