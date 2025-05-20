@@ -108,6 +108,11 @@ services:
         - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
         - "traefik.http.services.website.loadbalancer.server.port=3000"
+
+        - "traefik.http.routers.website-ip.rule=Host(`10.10.51.3`)"
+        - "traefik.http.routers.website-ip.entrypoints=websecure"
+        - "traefik.http.routers.website-ip.tls=true"
+        - "traefik.http.routers.website-ip.service=api-web"
       networks:
         - catmonit-network
 
