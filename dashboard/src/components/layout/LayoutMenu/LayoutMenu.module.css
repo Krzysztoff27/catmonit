@@ -1,0 +1,21 @@
+.navbar {
+    overflow: hidden;
+    gap: 4px !important;
+    height: 100%;
+    padding: 8px;
+}
+
+.expandButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    margin: auto;
+    margin-bottom: 0;
+    gap: 4px !important;
+    font-size: var(--mantine-font-size-xs) !important;
+    color: var(--background-color-2);
+    margin-top: auto !important;
+    padding: var(--mantine-spacing-xs) 0 !important;
+    z-index: 200;
+}

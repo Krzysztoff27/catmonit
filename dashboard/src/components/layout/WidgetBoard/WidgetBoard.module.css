@@ -1,6 +1,7 @@
 .layout {
     min-height: 100vh;
     flex: 1;
+    z-index: 20;
 }
 
 .widget {

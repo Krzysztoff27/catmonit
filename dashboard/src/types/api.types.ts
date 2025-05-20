@@ -31,15 +31,11 @@ export interface DeviceDiskData extends Device {
     disks: { [key: string]: Disk };
 }
 
-// export interface OverallDeviceStorageData { //extends Device
-//   hostname: string;
-//   ip: string;
-//   storage: {
-//     name: string;
-//     value: number;
-//   }[];
-// }
-
+export interface FileShare {
+    path: string;
+    storageLimit: number;
+    storageCurrent: number;
+}
 
 export interface WidgetData {
     type: string;
@@ -52,4 +48,3 @@ export interface WidgetData {
     settings: any;
     version: number;
 }
-

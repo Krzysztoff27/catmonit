@@ -10,12 +10,12 @@ export interface WidgetContentProps {
 
 export type WidgetContent = ComponentType<WidgetContentProps>;
 
-export interface DrawerContentProps {
+export interface WidgetPropertiesContentProps {
     index: number;
     [key: string]: any;
 }
 
-export type DrawerContent = ComponentType<DrawerContentProps>;
+export type WidgetPropertiesContent = ComponentType<WidgetPropertiesContentProps>;
 
 export interface WidgetLayoutProps {
     selected?: number | null;

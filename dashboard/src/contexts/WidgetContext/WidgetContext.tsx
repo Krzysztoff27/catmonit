@@ -3,12 +3,14 @@ import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
 import { isEmpty } from "lodash";
-import { WidgetContent } from "../../types/components.types";
+import { WidgetPropertiesContent, WidgetContent } from "../../types/components.types";
 import { WidgetConfig, WidgetLimits } from "../../types/config.types";
 
 interface WidgetContextType {
     widgets: WidgetData[];
     layout: LayoutItem[];
+    selected: number | null;
+    setSelected: (a: ((prev: number | null) => number | null) | number | null) => void;
     getData: (source: string) => any;
     getWidget: (index: number | string) => WidgetData;
     createWidget: (type: string | null | undefined, layoutItem: LayoutItem) => void;
@@ -20,6 +22,7 @@ interface WidgetContextType {
     getWidgetLimits: (widget: WidgetData) => WidgetLimits;
     getWidgetContent: (widget: WidgetData) => WidgetContent;
     getWidgetConfig: (widget: WidgetData) => WidgetConfig;
+    getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent | undefined;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
@@ -39,6 +42,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         },
     ]);
     const [data, setData] = useState(initialData);
+    const [selected, setSelected] = useState<null | number>(null);
 
     const saveStateToDatabase = () => {};
 
@@ -46,7 +50,21 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const getWidgetLimits = (widget: WidgetData) => getWidgetConfig(widget).limits;
 
-    const getWidgetContent = (widget: WidgetData) => getWidgetConfig(widget).content;
+    const getWidgetContent = (widget: WidgetData) => {
+        const content = getWidgetConfig(widget).content;
+        if (!content) {
+            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+        }
+        return content;
+    };
+
+    const getWidgetPropertiesContent = (widget: WidgetData) => {
+        const propertiesContent = getWidgetConfig(widget).propertiesContent;
+        if (!propertiesContent) {
+            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+        }
+        return propertiesContent;
+    };
 
     const getItemRect = (item: LayoutItem) => ({
         x: item.x,
@@ -124,7 +142,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         const source = config.dataSource;
 
         if (!source) {
-            console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
+            //console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
             return;
         }
 
@@ -158,6 +176,8 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     const value = {
         widgets,
         layout,
+        selected,
+        setSelected,
         getData,
         getWidget,
         createWidget,
@@ -169,6 +189,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         getWidgetContent,
         getWidgetLimits,
         getWidgetConfig,
+        getWidgetPropertiesContent,
     };
 
     return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;

@@ -1,9 +1,16 @@
 import { Group, Progress, Stack, Text } from "@mantine/core";
 import { Disk } from "../../../types/api.types";
 
-function DiskProgress({ path, storageCurrent, storageLimit }: Disk) {
+interface DiskProgressProps extends Disk {
+    highlightStages: {
+        yellow: number;
+        red: number;
+    };
+}
+
+function DiskProgress({ path, storageCurrent, storageLimit, highlightStages }: DiskProgressProps) {
     const value = (storageCurrent / storageLimit) * 100;
-    const color = value > 90 ? "red" : value > 75 ? "yellow" : "var(--mantine-color-text)";
+    const color = value >= highlightStages.red ? "red" : value >= highlightStages.yellow ? "yellow" : "var(--mantine-color-text)";
 
     return (
         <Stack gap={0}>

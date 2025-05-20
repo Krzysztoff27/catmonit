@@ -1,21 +1,21 @@
-import { Box, Center, Group, Paper, PaperProps, Tooltip } from "@mantine/core";
+import { Box, Center, Group, Paper, PaperProps, Portal, ScrollArea, Stack, Tooltip } from "@mantine/core";
 import { useRef, useState } from "react";
 import classes from "./WidgetMenu.module.css";
 import { capitalize } from "lodash";
 import WIDGETS_CONFIG, { GRID_MARGIN_PX, GRID_SIZE_PX } from "../../../config/widgets.config";
 import { safeObjectEntries } from "../../../utils/object";
 import Widget from "../Widget/Widget";
-import { WidgetData } from "../../../types/api.types";
 
 interface WidgetMenuProps extends PaperProps {
+    isDragging: boolean;
+    setIsDragging: (prev: boolean) => void;
     currentDropType: string | null;
     setCurrentDropType: (type: string) => void;
 }
 
 const DRAG_OFFSET = 12;
 
-const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }: WidgetMenuProps): React.JSX.Element => {
-    const [isDragging, setIsDragging] = useState(false);
+const WidgetMenu = ({ isDragging, setIsDragging, currentDropType, setCurrentDropType, className, ...props }: WidgetMenuProps): React.JSX.Element => {
     const ref = useRef<HTMLDivElement>(null);
     const currentConfiguration = currentDropType ? WIDGETS_CONFIG[currentDropType] : undefined;
     const { minW, minH } = currentConfiguration?.limits || { minW: 0, minH: 0 };
@@ -37,55 +37,50 @@ const WidgetMenu = ({ currentDropType, setCurrentDropType, className, ...props }
         setIsDragging(true);
     };
 
-    const onDrag = (e) => updateGhostPosition(e.clientX, e.clientY);
+    const onDrag = (e) => {
+        updateGhostPosition(e.clientX, e.clientY);
+    };
 
-    const onDragEnd = (e) => setIsDragging(false);
+    const onDragEnd = (e) => {
+        setIsDragging(false);
+    };
 
     return (
         <>
             {currentConfiguration && (
-                <Widget
-                    index={-1}
-                    // @ts-ignore
-                    widget={{ type: currentDropType!, settings: currentConfiguration.initialSettings }}
-                    className={classes.ghost}
-                    style={{
-                        width: minW * GRID_SIZE_PX + (minW - 1) * GRID_MARGIN_PX,
-                        height: minH * GRID_SIZE_PX + (minH - 1) * GRID_MARGIN_PX,
-                        visibility: isDragging ? "visible" : "hidden",
-                    }}
-                    ref={ref}
-                />
+                <Portal>
+                    <Widget
+                        index={-1}
+                        // @ts-ignore
+                        widget={{ type: currentDropType!, settings: currentConfiguration.initialSettings }}
+                        className={classes.ghost}
+                        style={{
+                            width: minW * GRID_SIZE_PX + (minW - 1) * GRID_MARGIN_PX,
+                            height: minH * GRID_SIZE_PX + (minH - 1) * GRID_MARGIN_PX,
+                            visibility: isDragging ? "visible" : "hidden",
+                        }}
+                        ref={ref}
+                    />
+                </Portal>
             )}
-            <Box className={classes.positioner}>
-                <Paper
-                    {...props}
-                    className={`${className} ${classes.container}`}
-                    withBorder
-                    shadow="md"
-                >
-                    <Group gap="0">
-                        {safeObjectEntries(WIDGETS_CONFIG).map(([type, config], i) => (
-                            <Tooltip
-                                key={i}
-                                label={capitalize(config.name)}
-                            >
-                                <Center
-                                    id={type}
-                                    draggable={true}
-                                    unselectable="on"
-                                    onDragStart={onDragStart}
-                                    onDrag={onDrag}
-                                    onDragEnd={onDragEnd}
-                                    className={`droppable-element ${classes.droppable}`}
-                                >
-                                    <config.icon />
-                                </Center>
-                            </Tooltip>
-                        ))}
-                    </Group>
-                </Paper>
-            </Box>
+
+            <ScrollArea scrollbarSize="0.625rem">
+                <Stack className={classes.container}>
+                    {safeObjectEntries(WIDGETS_CONFIG).map(([type, config], i) => (
+                        <img
+                            key={i}
+                            id={type}
+                            draggable={true}
+                            unselectable="on"
+                            onDragStart={onDragStart}
+                            onDrag={onDrag}
+                            onDragEnd={onDragEnd}
+                            className={`droppable-element ${classes.droppable}`}
+                            src={config.image}
+                        />
+                    ))}
+                </Stack>
+            </ScrollArea>
         </>
     );
 };

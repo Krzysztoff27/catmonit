@@ -1,5 +1,4 @@
 import { Switch } from "@mantine/core";
-import React from "react";
 
 const AutoOrderToggle = ({ resourceName = "resources", checked, toggle }): React.JSX.Element => {
     return (

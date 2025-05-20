@@ -6,15 +6,45 @@ import { WidgetLayoutProps } from "../../../types/components.types";
 import classes from "./WidgetBoard.module.css";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import Widget from "../Widget/Widget";
+import { Layout, LayoutItem } from "../../../types/reactGridLayout.types";
+import { useEffect } from "react";
 
-function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart, onResize, onResizeStop, onDrop, droppingItem }: WidgetLayoutProps) {
-    const { widgets, layout, deleteWidget, setWidgetRects } = useWidgets();
+function WidgetBoard({ onResizeStart, onResize, onResizeStop, onDrop, droppingItem }: WidgetLayoutProps) {
+    const { widgets, layout, deleteWidget, setWidgetRects, setSelected, selected } = useWidgets();
 
     const { width, ref } = useElementSize();
     const cols = Math.floor(width / GRID_SIZE_PX);
     const layoutWidth = GRID_SIZE_PX * cols + GRID_MARGIN_PX * (cols + 1);
 
     if (!layout) return;
+
+    let clicked = false;
+    const onDragStart = () => {
+        clicked = true;
+        setTimeout(() => (clicked = false), 500); // verify its an a singular, short click
+    };
+
+    const onDragStop = (_: Layout, before: LayoutItem, after: LayoutItem) => {
+        if (!clicked || JSON.stringify(before) !== JSON.stringify(after)) return;
+        setSelected(parseInt(after.i));
+    };
+
+    const onMouseDown = (e) => {
+        if ((e.target as HTMLElement).closest(".layout")) setSelected(null);
+    };
+
+    useEffect(() => {
+        const element = ref.current;
+        if (element) {
+            element.addEventListener("mousedown", onMouseDown);
+        }
+
+        return () => {
+            if (element) {
+                element.removeEventListener("mousedown", onMouseDown);
+            }
+        };
+    }, []);
 
     const elements =
         width && layout ? (
@@ -42,7 +72,6 @@ function WidgetBoard({ selected, onDragStart, onDrag, onDragStop, onResizeStart,
             measureBeforeMount
             draggableHandle=".drag-handle"
             onDragStart={onDragStart}
-            onDrag={onDrag}
             onDragStop={onDragStop}
             onResizeStart={onResizeStart}
             onResize={onResize}

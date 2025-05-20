@@ -1,5 +1,5 @@
 import { Grid, NumberInput, Title } from "@mantine/core";
-import React from "react";
+
 import classes from "./WidgetPropertiesControls.module.css";
 import { useForm } from "@mantine/form";
 import WIDGETS_CONFIG from "../../../../config/widgets.config";
@@ -13,7 +13,6 @@ const WidgetPropertiesControls = ({ widget, setWidgetRect }): React.JSX.Element 
             h: widget?.rect?.h ?? 0,
         },
         onValuesChange: (values) => {
-            console.log(values);
             setWidgetRect(values);
         },
     });

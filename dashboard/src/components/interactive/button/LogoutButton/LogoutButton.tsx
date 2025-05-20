@@ -1,6 +1,6 @@
 import { ActionIcon, ActionIconProps } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
-import React from "react";
+
 import useAuth from "../../../../hooks/useAuth";
 
 const LogoutButton = (props: ActionIconProps): React.JSX.Element => {

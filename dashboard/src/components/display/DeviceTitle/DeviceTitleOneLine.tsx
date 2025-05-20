@@ -21,13 +21,13 @@ function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
                 lh="xs"
                 fw="600"
             >
-                {data.hostname ?? "Not set"}
+                {data?.hostname ?? "Not set"}
             </Text>
             <Text
                 fz="sm"
                 ml="auto"
             >
-                {data.ip && data.mask ? `${data.ip}/${data.mask}` : ""}
+                {data?.ip && data?.mask ? `${data.ip}/${data.mask}` : ""}
             </Text>
         </Group>
     );
