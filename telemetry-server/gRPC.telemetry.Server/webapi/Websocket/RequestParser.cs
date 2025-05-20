@@ -75,7 +75,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         SystemUsagePayload pl = (SystemUsagePayload)response.Payload;
 
-                        di.SystemInfo = new systemPayload { cpuUsagePercent = pl.CpuUsagePercent, ramTotalBytes = pl.RamTotalBytes, ramUsedBytes = pl.RamUsedBytes, pagefileTotalBytes = pl.PagefileTotalBytes, pagefileUsedBytes = pl.PagefileUsedBytes, lastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
+                        di.systemInfo = new systemPayload { cpuUsagePercent = pl.CpuUsagePercent, ramTotalBytes = pl.RamTotalBytes, ramUsedBytes = pl.RamUsedBytes, pagefileTotalBytes = pl.PagefileTotalBytes, pagefileUsedBytes = pl.PagefileUsedBytes, lastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
 
                         SystemInfo.Instance.AddOrUpdateDevice(di.deviceInfo.uuid, di);
 

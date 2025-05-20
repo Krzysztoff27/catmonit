@@ -18,7 +18,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     public class SystemDeviceInfo
     {
         public deviceInfo deviceInfo { get; set; }
-        public systemPayload SystemInfo { get; set; }
+        public systemPayload systemInfo { get; set; }
     }
 
     public class SystemErrorInfo
@@ -42,7 +42,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         {
             AutoCandidates = MonitoredDevices
                 .Values
-                .OrderByDescending(device => device.SystemInfo.ramTotalBytes)
+                .OrderByDescending(device => device.systemInfo.ramTotalBytes)
                 .Take(n)
                 .Select(device => device.deviceInfo.uuid)
                 .ToList();
@@ -57,11 +57,11 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
-                        warning.Warnings.Add($"CPU usage is high ({MonitoredDevices[id].SystemInfo.cpuUsagePercent}%).");
+                        warning.Warnings.Add($"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%).");
                     }
                     else
                     {
-                        SystemWarnings[id] = new OneDeviceWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, Warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].SystemInfo.cpuUsagePercent}%)." } };
+                        SystemWarnings[id] = new OneDeviceWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, Warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
                     }
                     totalWarningsCount++;
                 }
@@ -70,11 +70,11 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
-                        warning.Warnings.Add($"RAM usage is high ({(float)MonitoredDevices[id].SystemInfo.ramUsedBytes / (float)MonitoredDevices[id].SystemInfo.ramTotalBytes * 100}%).");
+                        warning.Warnings.Add($"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%).");
                     }
                     else
                     {
-                        SystemWarnings.TryAdd(id, new OneDeviceWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, Warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].SystemInfo.ramUsedBytes / (float)MonitoredDevices[id].SystemInfo.ramTotalBytes * 100}%)." } });
+                        SystemWarnings.TryAdd(id, new OneDeviceWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, Warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
                     }
                     totalWarningsCount++;
                 }
@@ -149,7 +149,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         }
         public override void onDeviceUpsert(SystemDeviceInfo device)
         {
-            if (device.SystemInfo.cpuUsagePercent > Tresholds.CPUwarningTresholdValue)
+            if (device.systemInfo.cpuUsagePercent > Tresholds.CPUwarningTresholdValue)
             {
                 if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out HistoricalSingleWarningInfo val))
                 {
@@ -172,7 +172,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 }
             }
 
-            float RAMusage = ((float)device.SystemInfo.ramUsedBytes / (float)device.SystemInfo.ramTotalBytes)*100;
+            float RAMusage = ((float)device.systemInfo.ramUsedBytes / (float)device.systemInfo.ramTotalBytes)*100;
             if (RAMusage > Tresholds.RAMwarningTresholdValue)
             { 
                 historicalWarningInfo[device.deviceInfo.uuid].timesRamUsageover85percent++;
