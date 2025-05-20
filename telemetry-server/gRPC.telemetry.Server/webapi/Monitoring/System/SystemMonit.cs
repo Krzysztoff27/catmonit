@@ -43,6 +43,9 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             {
                 nr.autoDevices[storageDeviceInfos.AutoCandidates[i]] = storageDeviceInfos.MonitoredDevices[storageDeviceInfos.AutoCandidates[i]];
             }
+
+            // TODO: better error selection
+            nr.errors = storageDeviceInfos.SystemErrorsDictionary;
             
             return JsonSerializer.Serialize(nr);
         }

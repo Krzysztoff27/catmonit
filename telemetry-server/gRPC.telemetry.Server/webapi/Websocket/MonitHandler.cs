@@ -61,41 +61,55 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         switch (messageType)
                         {
                             case "start":
-                                MonitRef.Unsubscribe(potentialSubscriber); 
-                                List<Guid>? devices = new List<Guid>();
-
-                                int auto = 0;
-                                int warn = 0;
-                                int err = 0;
-
-                                if (root.TryGetProperty("devices", out var devicesProp) && devicesProp.ValueKind == JsonValueKind.Array)
                                 {
-                                    devices = devicesProp.EnumerateArray()
-                                        .Where(d => d.ValueKind == JsonValueKind.String && Guid.TryParse(d.GetString(), out _))
-                                        .Select(d => Guid.Parse(d.GetString()!))
-                                        .ToList();
-                                    potentialSubscriber.monitoredDevicesIndexes = devices;
-                                }
+                                    MonitRef.Unsubscribe(potentialSubscriber);
+                                    List<Guid>? devices = new List<Guid>();
 
-                                if (root.TryGetProperty("warningsCount", out var warnProp) && warnProp.ValueKind == JsonValueKind.Number)
-                                {
-                                    warn = warnProp.GetInt32();
-                                    if (warn > 0)
+                                    int auto = 0;
+                                    int warn = 0;
+                                    int err = 0;
+
+                                    if (root.TryGetProperty("devices", out var devicesProp) && devicesProp.ValueKind == JsonValueKind.Array)
                                     {
-                                        potentialSubscriber.warningCount = warn;
+                                        devices = devicesProp.EnumerateArray()
+                                            .Where(d => d.ValueKind == JsonValueKind.String && Guid.TryParse(d.GetString(), out _))
+                                            .Select(d => Guid.Parse(d.GetString()!))
+                                            .ToList();
+                                        potentialSubscriber.monitoredDevicesIndexes = devices;
                                     }
-                                }
-                                if (root.TryGetProperty("errorsCount", out var errProp) && errProp.ValueKind == JsonValueKind.Number)
-                                {
-                                    err = errProp.GetInt32();
-                                    if (err > 0)
-                                    {
-                                        potentialSubscriber.errorCount = err;
-                                    }
-                                }
-                                MonitRef.Subscribe(potentialSubscriber);
-                                break;
 
+                                    if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
+                                    {
+                                        auto = autoProp.GetInt32();
+                                        if (auto > 0)
+                                        {
+                                            potentialSubscriber.autoDevicesCount = auto;
+                                        }
+                                    }
+                                    if (root.TryGetProperty("warningsCount", out var warnProp) && warnProp.ValueKind == JsonValueKind.Number)
+                                    {
+                                        warn = warnProp.GetInt32();
+                                        if (warn > 0)
+                                        {
+                                            potentialSubscriber.warningCount = warn;
+                                        }
+                                    }
+                                    if (root.TryGetProperty("errorsCount", out var errProp) && errProp.ValueKind == JsonValueKind.Number)
+                                    {
+                                        err = errProp.GetInt32();
+                                        if (err > 0)
+                                        {
+                                            potentialSubscriber.errorCount = err;
+                                        }
+                                    }
+                                    MonitRef.Subscribe(potentialSubscriber);
+                                    break;
+                                }
+                            case "stop":
+                                {
+                                    MonitRef.Unsubscribe(potentialSubscriber);
+                                    break;
+                                }
 
                             default:
                                 break;

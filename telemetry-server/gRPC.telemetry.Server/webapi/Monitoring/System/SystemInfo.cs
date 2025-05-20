@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
+
     public class SystemDeviceInfo
     {
         public DeviceInfo DeviceInfo { get; set; }
@@ -18,6 +19,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
     public class SystemInfoSnapshotHolder : ServiceContentSnapshotHolder<SystemDeviceInfo>
     {
+        public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
         public void CalculateBestAutoCandidates(int n)
         {
             AutoCandidates = MonitoredDevices
@@ -38,7 +40,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     }
     public class SystemInfo : ServiceContentInfo<SystemDeviceInfo>
     {
-        public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; }
+        public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
         public static SystemInfo Instance { get; set; } = new SystemInfo();
 
         public void RemoveStaleDevices(TimeSpan staleThreshold)
@@ -66,6 +68,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             SystemInfoSnapshotHolder snapshotHolder = new();
             snapshotHolder.SnapshotTime = DateTime.UtcNow;
             snapshotHolder.MonitoredDevices = base.GetDeviceSnapshot();
+            snapshotHolder.SystemErrorsDictionary = SystemErrorsDictionary;
             return snapshotHolder;
         }
         public void AddOrUpdateErrors(SystemErrorInfo error)

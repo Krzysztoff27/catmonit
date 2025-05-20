@@ -53,14 +53,18 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5172, listenOptions =>
     {   
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+#if DEBUG
         listenOptions.UseHttps("./SSL/server.pfx", "");
+#endif
     });
 
     // gRPC on 5001 (HTTPS)
     options.ListenAnyIP(5001, listenOptions =>
     {
         listenOptions.Protocols = HttpProtocols.Http2;
+#if DEBUG
         listenOptions.UseHttps("./SSL/server.pfx", "");
+#endif
     });
 });
 
