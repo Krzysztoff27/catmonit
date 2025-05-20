@@ -35,7 +35,6 @@ services:
     - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
     - "traefik.http.routers.traefik.entrypoints=websecure"
     - "traefik.http.routers.traefik.service=api@internal"
-    - "traefik.http.routers.traefik.tls.certresolver=le"
     networks:
       - catmonit-network
 
