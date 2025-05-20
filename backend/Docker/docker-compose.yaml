@@ -7,7 +7,7 @@ services:
     - "--log.level=DEBUG"
 
     # Static configuration
-    #- "--entrypoints.web.address=:80" Disable http access
+    - "--entrypoints.web.address=:80" #Disable http access
     - "--entrypoints.websecure.address=:443"
     - "--entrypoints.grpcsecure.address=:444"
     - "--entrypoints.apisecure.address=:445"
@@ -22,18 +22,12 @@ services:
       - "443:443" #dashboard entrypoint
       - "444:444" # telemetry-server machines entrypoint
       - "445:445" # api-web entrypoint (websockets/requests)
-      #- "80:80"
+      - "80:80"
       - "8080:8080"  # Optional: Traefik dashboard
     volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
     - "./traefik/dynamic.yaml:/etc/traefik/dynamic/dynamic.yaml:ro"
     - "./traefik/certs:/etc/traefik/certs:ro"
-    - "./traefik/letsencrypt:/letsencrypt"
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
-    - "traefik.http.routers.traefik.entrypoints=websecure"
-    - "traefik.http.routers.traefik.service=api@internal"
     networks:
       - catmonit-network
 
@@ -65,11 +59,6 @@ services:
     - "traefik.http.routers.api-machines.tls=true"
     - "traefik.http.routers.api-machines.service=api-machines"
 
-     # gRPC IP fallback
-    - "traefik.http.routers.api-machines-ip.entrypoints=grpcsecure"
-    - "traefik.http.routers.api-machines-ip.tls=true"
-    - "traefik.http.routers.api-machines-ip.service=api-machines"
-
     # gRPC service definition
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
@@ -78,11 +67,6 @@ services:
     - "traefik.http.routers.api-web.entrypoints=apisecure"
     - "traefik.http.routers.api-web.tls=true"
     - "traefik.http.routers.api-web.service=api-web"
-
-    # HTTP API IP fallback
-    - "traefik.http.routers.api-web-ip.entrypoints=apisecure"
-    - "traefik.http.routers.api-web-ip.tls=true"
-    - "traefik.http.routers.api-web-ip.service=api-web"
 
     # HTTP API service definition
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
@@ -101,11 +85,6 @@ services:
         - "traefik.http.routers.website.entrypoints=websecure"
         - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
-
-          # IP-based access
-        - "traefik.http.routers.website-ip.entrypoints=websecure"
-        - "traefik.http.routers.website-ip.tls=true"
-        - "traefik.http.routers.website-ip.service=website"
         
         # Service definition
         - "traefik.http.services.website.loadbalancer.server.port=3000"
