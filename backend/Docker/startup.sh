@@ -40,7 +40,7 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = ${NAME}.local
 IP.1 = ${IP}
-EOF    
+EOF
 
     openssl genrsa -out "${NAME}.key" 2048
     openssl req -new -key "${NAME}.key" -out "${NAME}.csr" -config "${NAME}.cnf"
@@ -122,7 +122,7 @@ else
         fi
     done
     '''
-    
+
     for NAME in "${!CERT_MAP[@]}"; do
         IP="${CERT_MAP[$NAME]}"
         echo "Generating cert for $NAME ($IP)..."
