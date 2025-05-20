@@ -1,36 +1,49 @@
 services:
   traefik:
-
     container_name: catmonit-proxy
     restart: always
     image: traefik:v3.0
     command:
-    - "--log.level=DEBUG"
-    - "--accesslog=true"
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
 
-    # Static configuration
-    - "--entrypoints.web.address=:80" #Disable http access
-    - "--entrypoints.websecure.address=:443"
-    - "--entrypoints.grpcsecure.address=:444"
-    - "--entrypoints.apisecure.address=:445"
-    - "--entrypoints.websecure.http.tls=true"
+      # Entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.grpcsecure.address=:444"
+      - "--entrypoints.apisecure.address=:445"
 
-    - "--providers.docker=true"
-    - "--providers.docker.exposedByDefault=false"
-    - "--providers.file.directory=/etc/traefik/dynamic"
-    - "--providers.file.watch=true"
+      # TLS termination at Traefik
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.grpcsecure.http.tls=true"
+      - "--entrypoints.apisecure.http.tls=true"
 
-    - "--api.dashboard=true" # Optional - comment to turn the dashboard off
+      # gRPC protocol enforcement
+      #- "--entrypoints.grpcsecure.transport.protocol=h2c"
+
+      # Providers
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+
+      # Dashboard (exposed via separate router)
+      - "--api.dashboard=true"
     ports:
-      - "443:443" #dashboard entrypoint
-      - "444:444" # telemetry-server machines entrypoint
-      - "445:445" # api-web entrypoint (websockets/requests)
-      - "80:80"
-      - "8080:8080"  # Optional: Traefik dashboard
+      - "443:443"     # HTTPS for all domain-based routes
+      - "444:444"     # gRPC API for api-web
+      - "445:445"     # gRPC API for api-machines
+      - "80:80"       # For dashboard or fallback redirects
+      - "8080:8080"   # Internal dashboard API (not public facing)
     volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    - "./traefik/dynamic.yaml:/etc/traefik/dynamic/dynamic.yaml:ro"
-    - "./traefik/certs:/etc/traefik/certs:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/dynamic.yaml:/etc/traefik/dynamic/dynamic.yaml:ro"
+      - "./traefik/certs:/etc/traefik/certs:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
     networks:
       - catmonit-network
 
@@ -55,23 +68,31 @@ services:
     labels:
     - "traefik.enable=true"
 
-    # gRPC domain
+    # ROUTER 1: API-MACHINES domain access on port 443
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
-    - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
+    - "traefik.http.routers.api-machines.entrypoints=websecure"
     - "traefik.http.routers.api-machines.tls=true"
     - "traefik.http.routers.api-machines.service=api-machines"
-
-    # gRPC service definition
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
-    # HTTP API domain
+    # ROUTER 2: API-MACHINES IP access on port 445
+    - "traefik.http.routers.api-machines-ip.rule=Host(`10.10.51.3`)"
+    - "traefik.http.routers.api-machines-ip.entrypoints=apisecure"
+    - "traefik.http.routers.api-machines-ip.tls=true"
+    - "traefik.http.routers.api-machines-ip.service=api-machines"
+
+    # ROUTER 3: API-WEB domain access on port 443
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
-    - "traefik.http.routers.api-web.entrypoints=apisecure"
+    - "traefik.http.routers.api-web.entrypoints=websecure"
     - "traefik.http.routers.api-web.tls=true"
     - "traefik.http.routers.api-web.service=api-web"
-
-    # HTTP API service definition
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
+
+    # ROUTER 4: API-WEB IP access on port 444
+    - "traefik.http.routers.api-web-ip.rule=Host(`10.10.51.3`)"
+    - "traefik.http.routers.api-web-ip.entrypoints=grpcsecure"
+    - "traefik.http.routers.api-web-ip.tls=true"
+    - "traefik.http.routers.api-web-ip.service=api-web"
     networks:
       - catmonit-network
 
@@ -82,15 +103,11 @@ services:
       labels:
         - "traefik.enable=true"
 
-        # Domain-based access
         - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
         - "traefik.http.routers.website.entrypoints=websecure"
         - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
-        
-        # Service definition
         - "traefik.http.services.website.loadbalancer.server.port=3000"
-
       networks:
         - catmonit-network
 
