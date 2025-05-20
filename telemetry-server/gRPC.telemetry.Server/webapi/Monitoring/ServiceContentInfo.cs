@@ -38,6 +38,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring
             _writeQueue.Add(() =>
             {
                 _monitoredDevices[id] = device;
+                onDeviceUpsert(device);
             });
         }
 
@@ -46,6 +47,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring
             _writeQueue.Add(() =>
             {
                 _monitoredDevices.TryRemove(id, out _);
+                onDeviceLeave(id);
             });
         }
 
@@ -122,6 +124,8 @@ namespace gRPC.telemetry.Server.webapi.Monitoring
                 _rwLock.ExitWriteLock();
             }
         }
+        public virtual void onDeviceUpsert(TDevice device) { }
+        public virtual void onDeviceLeave(Guid deviceID) { }
     }
 
     public abstract class ServiceContentSnapshotHolder<TDevice>

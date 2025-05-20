@@ -46,7 +46,37 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
             // TODO: better error selection
             nr.errors = storageDeviceInfos.SystemErrorsDictionary;
-            
+            int warningsToGet = (storageDeviceInfos.totalWarningsCount > subber.warningCount ? storageDeviceInfos.totalWarningsCount : subber.warningCount);
+
+
+            int count = 0;
+
+            foreach (var kvp in storageDeviceInfos.SystemWarnings)
+            {
+                var warningCount = kvp.Value.Warnings?.Count ?? 0;
+
+                if (warningCount == 0)
+                    continue;
+
+                if (count + warningCount <= warningsToGet)
+                {
+                    nr.warnings.TryAdd(kvp.Key, kvp.Value);
+                    count += warningCount;
+                }
+                else
+                {
+                    var partialWarnings = kvp.Value.Warnings.Take(warningsToGet - count).ToList();
+
+                    nr.warnings.TryAdd(kvp.Key, new OneDeviceWarningsHolder
+                    {
+                        deviceInfo = kvp.Value.deviceInfo,
+                        Warnings = partialWarnings
+                    });
+
+                    break;
+                }
+            }
+
             return JsonSerializer.Serialize(nr);
         }
         

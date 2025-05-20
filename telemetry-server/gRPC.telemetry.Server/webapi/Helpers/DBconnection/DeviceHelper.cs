@@ -10,21 +10,21 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 {
     public class DeviceHelper
     {
-        public static ConcurrentDictionary<Guid, DeviceInfo> allDeviceInfos = new();
-        public static List<DeviceInfo> GetDeviceInfos()
+        public static ConcurrentDictionary<Guid, deviceInfo> allDeviceInfos = new();
+        public static List<deviceInfo> GetDeviceInfos()
         {
             return allDeviceInfos.Values.ToList();
         }
         private static void updateLastSeen(Guid deviceID, DateTime lastSeen)
         {
             Utils.assert(allDeviceInfos.ContainsKey(deviceID));
-            allDeviceInfos[deviceID].LastUpdated = lastSeen;
+            allDeviceInfos[deviceID].lastUpdated = lastSeen;
         }
-        private static void UpsertDevice(DeviceInfo device)
+        private static void UpsertDevice(deviceInfo device)
         {
-            allDeviceInfos[device.Uuid] = device;
+            allDeviceInfos[device.uuid] = device;
         }
-        public static void UpsertDevicesDB(List<DeviceInfo>? devices = null)
+        public static void UpsertDevicesDB(List<deviceInfo>? devices = null)
         {
             if (devices == null)
             {
@@ -40,11 +40,11 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
             for (int i = 0; i < devices.Count; i++)
             {
                 sb.AppendLine($"(@deviceID{i}, @lastSeen{i}, @hostname{i}, @ipAddress{i}, @os{i}){(i < devices.Count - 1 ? "," : "")}");
-                parameters.Add($"@deviceID{i}", devices[i].Uuid);
-                parameters.Add($"@lastSeen{i}", devices[i].LastUpdated);
-                parameters.Add($"@hostname{i}", (object?)devices[i].Hostname ?? DBNull.Value);
-                parameters.Add($"@ipAddress{i}", (object?)devices[i].IpAddress ?? DBNull.Value);
-                parameters.Add($"@os{i}", (object?)devices[i].Os ?? DBNull.Value);
+                parameters.Add($"@deviceID{i}", devices[i].uuid);
+                parameters.Add($"@lastSeen{i}", devices[i].lastUpdated);
+                parameters.Add($"@hostname{i}", (object?)devices[i].hostname ?? DBNull.Value);
+                parameters.Add($"@ipAddress{i}", (object?)devices[i].ipAddress ?? DBNull.Value);
+                parameters.Add($"@os{i}", (object?)devices[i].os ?? DBNull.Value);
             }
 
             sb.AppendLine(@"
@@ -61,7 +61,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         {
             updateLastSeen(device, DateTime.UtcNow);
         }
-        public static void OnDeviceConnected(DeviceInfo device)
+        public static void OnDeviceConnected(deviceInfo device)
         {
             UpsertDevice(device);
         }
@@ -76,7 +76,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
 
             foreach (var kvp in allDeviceInfos.ToList())
             {
-                if (kvp.Value.LastUpdated < cutoff)
+                if (kvp.Value.lastUpdated < cutoff)
                 {
                     allDeviceInfos.TryRemove(kvp.Key, out _);
                 }
@@ -97,26 +97,33 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         }
         public static void SynchronizeDataWithDB()
         {
-            var tempDeviceInfos = new ConcurrentDictionary<Guid, DeviceInfo>();
-
-            using (var reader = ConHelper.ExecuteReader("SELECT device_id, last_seen, hostname, ip_adress, os FROM devices;", new Dictionary<string, object>()))
+            try
             {
-                while (reader.Read())
+                var tempDeviceInfos = new ConcurrentDictionary<Guid, deviceInfo>();
+
+                using (var reader = ConHelper.ExecuteReader("SELECT device_id, last_seen, hostname, ip_adress, os FROM devices;", new Dictionary<string, object>()))
                 {
-                    var deviceInfo = new DeviceInfo
+                    while (reader.Read())
                     {
-                        Uuid = reader.GetGuid(0),
-                        LastUpdated = reader.GetDateTime(1),
-                        Hostname = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                        IpAddress = reader.IsDBNull(3) ? "": reader.GetString(3),
-                        Os = reader.IsDBNull(4) ? "": reader.GetString(4),
-                    };
+                        var deviceInfo = new deviceInfo
+                        {
+                            uuid = reader.GetGuid(0),
+                            lastUpdated = reader.GetDateTime(1),
+                            hostname = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                            ipAddress = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                            os = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                        };
 
-                    tempDeviceInfos[deviceInfo.Uuid] = deviceInfo;
+                        tempDeviceInfos[deviceInfo.uuid] = deviceInfo;
+                    }
                 }
-            }
 
-            Interlocked.Exchange(ref allDeviceInfos, tempDeviceInfos);
+                Interlocked.Exchange(ref allDeviceInfos, tempDeviceInfos);
+            }
+            catch (InternalServerError) 
+            { 
+                // ignore
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ namespace webapi.Controllers.http.layout
             if (authRes.res != null) return authRes.res;
             try
             {
-                List<DeviceInfo> devices = DeviceHelper.GetDeviceInfos();
+                List<deviceInfo> devices = DeviceHelper.GetDeviceInfos();
                 return Json(devices);
             }catch (InternalServerError)
             {

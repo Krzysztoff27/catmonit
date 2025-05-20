@@ -9,14 +9,14 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 {
     public class RequestParser
     {
-        private static DeviceInfo getDeviceInfoFromResponse(ResponseModel response)
+        private static deviceInfo getDeviceInfoFromResponse(ResponseModel response)
         {
-            var deviceInfo = new DeviceInfo();
-            deviceInfo.LastUpdated = response.Timestamp;
-            deviceInfo.Hostname = response.Hostname;
-            deviceInfo.IpAddress = response.IpAddress;
-            deviceInfo.Uuid = Guid.Parse(response.Uuid);
-            deviceInfo.Os = response.Os;
+            var deviceInfo = new deviceInfo();
+            deviceInfo.lastUpdated = response.Timestamp;
+            deviceInfo.hostname = response.Hostname;
+            deviceInfo.ipAddress = response.IpAddress;
+            deviceInfo.uuid = Guid.Parse(response.Uuid);
+            deviceInfo.os = response.Os;
             return deviceInfo;
         }
         public static void onResponseReceived(Guid deviceGUID, ResponseModel response)
@@ -39,7 +39,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         }
                         di.Networks = ((List<NetworkPayload>)response.Payload).Except(new List<NetworkPayload>{di.MainPayload}).ToList();
 
-                        NetworkInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
+                        NetworkInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.uuid, di);
 
                         break;
                     }
@@ -51,7 +51,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         di.DisksInfo = (List<DiskPayload>)response.Payload;
 
-                        DisksInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
+                        DisksInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.uuid, di);
 
                         break;
                     }
@@ -63,7 +63,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         di.SharesInfo = (List<SharePayload>)response.Payload;
 
-                        SharesInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
+                        SharesInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.uuid, di);
 
                         break;
                     }
@@ -71,13 +71,13 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                     {
                         SystemDeviceInfo di = new SystemDeviceInfo();
 
-                        di.DeviceInfo = getDeviceInfoFromResponse(response);
+                        di.deviceInfo = getDeviceInfoFromResponse(response);
 
                         SystemUsagePayload pl = (SystemUsagePayload)response.Payload;
 
-                        di.SystemInfo = new SystemPayload { CpuUsagePercent = pl.CpuUsagePercent, RamTotalBytes = pl.RamTotalBytes, RamUsedBytes = pl.RamUsedBytes, PagefileTotalBytes = pl.PagefileTotalBytes, PagefileUsedBytes = pl.PagefileUsedBytes, LastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
+                        di.SystemInfo = new systemPayload { cpuUsagePercent = pl.CpuUsagePercent, ramTotalBytes = pl.RamTotalBytes, ramUsedBytes = pl.RamUsedBytes, pagefileTotalBytes = pl.PagefileTotalBytes, pagefileUsedBytes = pl.PagefileUsedBytes, lastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
 
-                        SystemInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
+                        SystemInfo.Instance.AddOrUpdateDevice(di.deviceInfo.uuid, di);
 
                         break;
                     }
@@ -85,7 +85,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                     {
                         SystemErrorInfo di = new SystemErrorInfo();
 
-                        di.DeviceInfo = getDeviceInfoFromResponse(response);
+                        di.deviceInfo = getDeviceInfoFromResponse(response);
 
                         di.SystemErrorsPayloads = (List<SystemErrorsPayload>)response.Payload;
 

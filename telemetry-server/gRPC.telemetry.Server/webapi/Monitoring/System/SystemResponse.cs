@@ -8,14 +8,14 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         RAMusage,
         PagefileUsage
     }
-    public class SystemPayload
+    public class systemPayload
     {
-        public double CpuUsagePercent { get; set; }
-        public double RamTotalBytes { get; set; }
-        public double RamUsedBytes { get; set; }
-        public double PagefileTotalBytes { get; set; }
-        public double PagefileUsedBytes { get; set; }
-        public DateTime LastBootTimestamp { get; set; }
+        public double cpuUsagePercent { get; set; }
+        public double ramTotalBytes { get; set; }
+        public double ramUsedBytes { get; set; }
+        public double pagefileTotalBytes { get; set; }
+        public double pagefileUsedBytes { get; set; }
+        public DateTime lastBootTimestamp { get; set; }
     }
     public class SystemResponse
     {
@@ -26,7 +26,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public DateTime responseTime { get; set; }
         public ConcurrentDictionary<Guid, SystemDeviceInfo?> monitoredDevices { get; set; } = new();
         public ConcurrentDictionary<Guid, SystemDeviceInfo> autoDevices { get; set; } = new();
-        public ConcurrentDictionary<Guid, SystemErrorInfo> warnings { get; set; } = new();
+        public ConcurrentDictionary<Guid, OneDeviceWarningsHolder> warnings { get; set; } = new();
         public ConcurrentDictionary<Guid, SystemErrorInfo> errors { get; set; } = new();
     }
 }

@@ -4,7 +4,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
     public class DisksDeviceInfo
     {
-        public DeviceInfo DeviceInfo { get; set; }
+        public deviceInfo DeviceInfo { get; set; }
         public List<DiskPayload> DisksInfo { get; set; }
     }
     public class DisksInfoSnapshotHolder : ServiceContentSnapshotHolder<DisksDeviceInfo>
@@ -16,7 +16,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 .Values
                 .OrderBy(device => device.DisksInfo.Count)
                 .Take(n)
-                .Select(device => device.DeviceInfo.Uuid)
+                .Select(device => device.DeviceInfo.uuid)
                 .ToList();
         }
         public void CalculateWarnings()
@@ -42,7 +42,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
         public void RemoveStaleDevices(TimeSpan staleThreshold)
         {
-            base.RemoveStaleDevices(dev => dev.DeviceInfo.LastUpdated, staleThreshold);
+            base.RemoveStaleDevices(dev => dev.DeviceInfo.lastUpdated, staleThreshold);
         }
         public DisksInfoSnapshotHolder snapShot()
         {

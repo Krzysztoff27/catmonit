@@ -4,7 +4,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
     public class NetworkDeviceInfo
     {
-        public DeviceInfo DeviceInfo { get; set; }
+        public deviceInfo DeviceInfo { get; set; }
         public NetworkPayload MainPayload { get; set; }
         public List<NetworkPayload> Networks { get; set; }
     }
@@ -17,7 +17,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 .Values
                 .OrderBy(device => device.MainPayload.RxMbps + device.MainPayload.TxMbps)
                 .Take(n)
-                .Select(device => device.DeviceInfo.Uuid)
+                .Select(device => device.DeviceInfo.uuid)
                 .ToList();
         }
         public void CalculateWarnings()
@@ -27,7 +27,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public List<(Guid deviceID, DateTime lastSeen)> GetAllDevicesUUIDsAndLastSeen()
         {
             return MonitoredDevices
-                .Select(kvp => (kvp.Key, kvp.Value.DeviceInfo.LastUpdated))
+                .Select(kvp => (kvp.Key, kvp.Value.DeviceInfo.lastUpdated))
                 .ToList();
         }
     }
@@ -37,7 +37,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
         public void RemoveStaleDevices(TimeSpan staleThreshold)
         {
-            base.RemoveStaleDevices(dev => dev.DeviceInfo.LastUpdated, staleThreshold);
+            base.RemoveStaleDevices(dev => dev.DeviceInfo.lastUpdated, staleThreshold);
         }
         public NetworkInfoSnapshotHolder snapShot()
         {

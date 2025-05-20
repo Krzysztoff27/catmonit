@@ -94,13 +94,13 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         {
                             if (first)
                             {
-                                DeviceHelper.OnDeviceConnected(new gRPC.telemetry.Server.webapi.Monitoring.DeviceInfo
+                                DeviceHelper.OnDeviceConnected(new gRPC.telemetry.Server.webapi.Monitoring.deviceInfo
                                 {
-                                    LastUpdated = response.Timestamp,
-                                    Hostname = response.Hostname,
-                                    IpAddress = response.IpAddress,
-                                    Uuid = guid,
-                                    Os = response.Os
+                                    lastUpdated = response.Timestamp,
+                                    hostname = response.Hostname,
+                                    ipAddress = response.IpAddress,
+                                    uuid = guid,
+                                    os = response.Os
                                 });
                                 first = false;
                             }

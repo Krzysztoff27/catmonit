@@ -8,21 +8,17 @@
         public string Os { get; set; }
 
     }
-    public class WarningPayload
-    {
-        public string Message { get; set; }
-    }
     public class Warning
     {
-        public SmallDeviceInfo Device { get; set; }
-        public List<WarningPayload> Messages { get; set; }
+        public deviceInfo Device { get; set; }
+        public string Message { get; set; }
     }
-    public class DeviceInfo
+    public class deviceInfo
     {
-        public DateTime LastUpdated { get; set; }
-        public string Hostname { get; set; }
-        public string IpAddress { get; set; }
-        public Guid Uuid { get; set; }
-        public string Os { get; set; }
+        public DateTime lastUpdated { get; set; }
+        public string hostname { get; set; }
+        public string ipAddress { get; set; }
+        public Guid uuid { get; set; }
+        public string os { get; set; }
     }
 }
