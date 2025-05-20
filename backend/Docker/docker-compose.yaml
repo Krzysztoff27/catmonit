@@ -59,20 +59,32 @@ services:
     labels:
     - "traefik.enable=true"
 
-    - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
-
-    #gRPC router
+    # gRPC domain
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
     - "traefik.http.routers.api-machines.entrypoints=grpcsecure"
     - "traefik.http.routers.api-machines.tls=true"
     - "traefik.http.routers.api-machines.service=api-machines"
+
+     # gRPC IP fallback
+    - "traefik.http.routers.api-machines-ip.entrypoints=grpcsecure"
+    - "traefik.http.routers.api-machines-ip.tls=true"
+    - "traefik.http.routers.api-machines-ip.service=api-machines"
+
+    # gRPC service definition
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
 
-    #HTTP router
+    # HTTP API domain
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
     - "traefik.http.routers.api-web.entrypoints=apisecure"
     - "traefik.http.routers.api-web.tls=true"
     - "traefik.http.routers.api-web.service=api-web"
+
+    # HTTP API IP fallback
+    - "traefik.http.routers.api-web-ip.entrypoints=apisecure"
+    - "traefik.http.routers.api-web-ip.tls=true"
+    - "traefik.http.routers.api-web-ip.service=api-web"
+
+    # HTTP API service definition
     - "traefik.http.services.api-web.loadbalancer.server.port=5172"
     networks:
       - catmonit-network
@@ -83,12 +95,21 @@ services:
       image: "ghcr.io/krzysztoff27/catmonit-dashboard:latest"
       labels:
         - "traefik.enable=true"
+
+        # Domain-based access
         - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
-        - "traefik.http.routers.website-ip.rule=HostRegexp(`{any:.+}`)"
         - "traefik.http.routers.website.entrypoints=websecure"
         - "traefik.http.routers.website.tls=true"
         - "traefik.http.routers.website.service=website"
+
+          # IP-based access
+        - "traefik.http.routers.website-ip.entrypoints=websecure"
+        - "traefik.http.routers.website-ip.tls=true"
+        - "traefik.http.routers.website-ip.service=website"
+        
+        # Service definition
         - "traefik.http.services.website.loadbalancer.server.port=3000"
+
       networks:
         - catmonit-network
 
