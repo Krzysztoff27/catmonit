@@ -57,6 +57,7 @@ services:
       - ./.env
     labels:
     - "traefik.enable=true"
+    - "--accesslog=true"
 
     # gRPC domain
     - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
