@@ -10,6 +10,8 @@ namespace webapi.Monitoring
         public WebSocket WebSocket { get; set; }
         public List<Guid> monitoredDevicesIndexes;
         public int autoDevicesCount { get; set; }
+        public int warningCount { get; set; }
+        public int errorCount { get; set; }
         public Subscriber(Guid userID, WebSocket webSocket)
         {
             this.userID = userID;

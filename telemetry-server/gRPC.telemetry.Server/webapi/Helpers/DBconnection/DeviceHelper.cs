@@ -19,37 +19,10 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         {
             Utils.assert(allDeviceInfos.ContainsKey(deviceID));
             allDeviceInfos[deviceID].LastUpdated = lastSeen;
-            /*
-            bool res = ConHelper.execNonQuery("UPDATE devices SET last_seen = @now where device_id = @deviceID;", new Dictionary<string, object> { { "@now", lastSeen }, { "@deviceID", deviceID } });
-            if (!res)
-                ConHelper.execNonQuery("INSERT INTO devices (last_seen, device_id) VALUES (@now, @deviceID);", new Dictionary<string, object> { { "@now", lastSeen }, { "@deviceID", deviceID } });
-            */
         }
         private static void UpsertDevice(DeviceInfo device)
         {
             allDeviceInfos[device.Uuid] = device;
-            /*
-            string sql = @"
-                INSERT INTO devices (device_id, last_seen, hostname, ip_adress, os)
-                VALUES (@deviceID, @lastSeen, @hostname, @ipAddress, @os)
-                ON CONFLICT (device_id) DO UPDATE 
-                SET last_seen = EXCLUDED.last_seen,
-                    hostname = EXCLUDED.hostname,
-                    ip_adress = EXCLUDED.ip_adress,
-                    os = EXCLUDED.os;
-            ";
-
-                    var parameters = new Dictionary<string, object>
-            {
-                { "@deviceID", device.Uuid },
-                { "@lastSeen", device.LastUpdated },
-                { "@hostname", device.Hostname },
-                { "@ipAddress", device.IpAddress },
-                { "@os", device.Os }
-            };
-
-            ConHelper.execNonQuery(sql, parameters);
-            */
         }
         public static void UpsertDevicesDB(List<DeviceInfo>? devices = null)
         {
@@ -88,13 +61,13 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
         {
             updateLastSeen(device, DateTime.UtcNow);
         }
-        public static void OnResponseGet(Guid device)
-        {
-            updateLastSeen(device, DateTime.UtcNow);
-        }
         public static void OnDeviceConnected(DeviceInfo device)
         {
             UpsertDevice(device);
+        }
+        public static void OnResponseGet(Guid device)
+        {
+            updateLastSeen(device, DateTime.UtcNow);
         }
         public static bool RemoveUnusedDevices(int tresholdDays = 14)
         {
@@ -121,14 +94,6 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 // ignore 
                 return false;
             }
-        }
-        public static bool DeviceExistsInDB(Guid deviceID)
-        {
-            int res = ConHelper.execCountQuery("SELECT count(device_id) from devices where device_id = @devID", new Dictionary<string, object> { { "@devID", deviceID } });
-            if ( res == 0 ) return false;
-            else if ( res == 1 ) return true;
-            else Utils.assert( false );
-            return true;
         }
         public static void SynchronizeDataWithDB()
         {

@@ -6,7 +6,7 @@ using webapi.Monitoring;
 
 namespace gRPC.telemetry.Server.webapi.Websocket
 {
-    public abstract class MonitHandler // handler just for websockets. Delegates websockets to Monit
+    public abstract class MonitHandler 
     {
         public Monit MonitRef { get; set; }
         public async Task HandleRequestAsync(HttpContext context)
@@ -65,6 +65,8 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                                 List<Guid>? devices = new List<Guid>();
 
                                 int auto = 0;
+                                int warn = 0;
+                                int err = 0;
 
                                 if (root.TryGetProperty("devices", out var devicesProp) && devicesProp.ValueKind == JsonValueKind.Array)
                                 {
@@ -75,12 +77,20 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                                     potentialSubscriber.monitoredDevicesIndexes = devices;
                                 }
 
-                                if (root.TryGetProperty("auto", out var autoProp) && autoProp.ValueKind == JsonValueKind.Number)
+                                if (root.TryGetProperty("warningsCount", out var warnProp) && warnProp.ValueKind == JsonValueKind.Number)
                                 {
-                                    auto = autoProp.GetInt32();
-                                    if (auto > 0)
+                                    warn = warnProp.GetInt32();
+                                    if (warn > 0)
                                     {
-                                        potentialSubscriber.autoDevicesCount = auto;
+                                        potentialSubscriber.warningCount = warn;
+                                    }
+                                }
+                                if (root.TryGetProperty("errorsCount", out var errProp) && errProp.ValueKind == JsonValueKind.Number)
+                                {
+                                    err = errProp.GetInt32();
+                                    if (err > 0)
+                                    {
+                                        potentialSubscriber.errorCount = err;
                                     }
                                 }
                                 MonitRef.Subscribe(potentialSubscriber);

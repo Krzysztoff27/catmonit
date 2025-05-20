@@ -73,10 +73,33 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         di.DeviceInfo = getDeviceInfoFromResponse(response);
 
-                        di.SystemInfo = (SystemUsagePayload)response.Payload;
+                        SystemUsagePayload pl = (SystemUsagePayload)response.Payload;
+
+                        di.SystemInfo = new SystemPayload { CpuUsagePercent = pl.CpuUsagePercent, RamTotalBytes = pl.RamTotalBytes, RamUsedBytes = pl.RamUsedBytes, PagefileTotalBytes = pl.PagefileTotalBytes, PagefileUsedBytes = pl.PagefileUsedBytes, LastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
 
                         SystemInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.Uuid, di);
 
+                        break;
+                    }
+                case PayloadType.SystemErrors:
+                    {
+                        SystemErrorInfo di = new SystemErrorInfo();
+
+                        di.DeviceInfo = getDeviceInfoFromResponse(response);
+
+                        di.SystemErrorsPayloads = (List<SystemErrorsPayload>)response.Payload;
+
+                        SystemInfo.Instance.AddOrUpdateErrors(di);
+
+                        break;
+                    }
+                case PayloadType.DiskErrors:
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        Utils.assert(false);
                         break;
                     }
             }

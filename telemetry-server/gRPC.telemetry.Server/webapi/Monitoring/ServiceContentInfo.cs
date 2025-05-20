@@ -129,8 +129,6 @@ namespace gRPC.telemetry.Server.webapi.Monitoring
     {
         public DateTime SnapshotTime { get; set; }
         public Dictionary<Guid, TDevice> MonitoredDevices { get; set; } = new();
-        public List<Warning> Warnings { get; set; } = new();
-        public List<Error> Errors { get; set; } = new();
         public List<Guid> AutoCandidates { get; set; } = new();
     }
 }

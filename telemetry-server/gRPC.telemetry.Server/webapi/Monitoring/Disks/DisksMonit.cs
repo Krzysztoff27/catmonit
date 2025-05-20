@@ -37,8 +37,6 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     nr.monitoredDevices[device] = null;
                 }
             }
-            nr.warnings = storageDeviceInfos.Warnings;
-            nr.errors = storageDeviceInfos.Errors;
 
             for (int i = 0; i < (subber.autoDevicesCount < storageDeviceInfos.MonitoredDevices.Count ? subber.autoDevicesCount: storageDeviceInfos.MonitoredDevices.Count); i++)
             {

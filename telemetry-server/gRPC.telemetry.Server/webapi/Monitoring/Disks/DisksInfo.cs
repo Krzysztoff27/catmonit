@@ -27,10 +27,10 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     if ((float)disk.Usage / (float)disk.Capacity >= deviceMemoryTreshold)
                     {
                         // warning
-                        Warnings.Add(new Warning { 
+                        /*Warnings.Add(new Warning { 
                             Device = new SmallDeviceInfo {Hostname = deviceInfo.DeviceInfo.Hostname, IpAddress= deviceInfo.DeviceInfo.IpAddress, Os=deviceInfo.DeviceInfo.Os, Uuid=deviceId }, 
                             Message = $"{disk.MountPoint} free space is {((1f - ((float)disk.Usage / (float)disk.Capacity)) * 100)}%. Please free up storage." 
-                        });
+                        });*/
                     }
                 }
             }

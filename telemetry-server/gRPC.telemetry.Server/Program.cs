@@ -18,6 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Register services
 
 #if CM_RUN_ALL
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("base_policy", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddHostedService<CleanupService>();
@@ -57,34 +67,30 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 #if CM_RUN_ALL
-
+app.UseCors("base_policy");
 // Enable WebSockets
 app.UseWebSockets();
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.ToString();
 
-    // Skip WebSocket middleware for Swagger and other non-WebSocket routes
-    if (path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("/favicon.ico", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("/css", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("/js", StringComparison.OrdinalIgnoreCase))
-    {
-        await next();
-        return;
-    }
-
-    if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/network", StringComparison.OrdinalIgnoreCase))
-    {
-        await NetworkMonitHandler.instance.HandleRequestAsync(context);
-    }
-    else if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/disks", StringComparison.OrdinalIgnoreCase))
-    {
-        await DisksMonitHandler.instance.HandleRequestAsync(context);
-    }
-    else if (context.WebSockets.IsWebSocketRequest && path.StartsWith("/shares", StringComparison.OrdinalIgnoreCase))
-    {
-        await SharesMonitHandler.instance.HandleRequestAsync(context);
+    if (context.WebSockets.IsWebSocketRequest) {
+        if (path.StartsWith("/network", StringComparison.OrdinalIgnoreCase))
+        {
+            await NetworkMonitHandler.instance.HandleRequestAsync(context);
+        }
+        else if (path.StartsWith("/disks", StringComparison.OrdinalIgnoreCase))
+        {
+            await DisksMonitHandler.instance.HandleRequestAsync(context);
+        }
+        else if (path.StartsWith("/shares", StringComparison.OrdinalIgnoreCase))
+        {
+            await SharesMonitHandler.instance.HandleRequestAsync(context);
+        }
+        else if (path.StartsWith("/system", StringComparison.OrdinalIgnoreCase))
+        {
+            await SystemMonitHandler.instance.HandleRequestAsync(context);
+        }
     }
     else
     {

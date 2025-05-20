@@ -2,13 +2,13 @@
 
 namespace gRPC.telemetry.Server.webapi.Websocket.Network
 {
-    public class SharesMonitHandler : MonitHandler // handler just for websockets. Delegates websockets to StorageMonit
+    public class DisksMonitHandler : MonitHandler // handler just for websockets. Delegates websockets to StorageMonit
     {
-        public static SharesMonitHandler instance { get; } = new SharesMonitHandler();
+        public static DisksMonitHandler instance { get; } = new DisksMonitHandler();
 
-        SharesMonitHandler()
+        DisksMonitHandler()
         {
-            MonitRef = SharesMonit.Instance;
+            MonitRef = DisksMonit.Instance;
         }
     }
 }
