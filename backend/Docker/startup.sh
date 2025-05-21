@@ -68,19 +68,6 @@ if [ ! -f "$CA_PEM" ]; then
         exit 1
     fi
 
-    '''
-    for NAME in "${CERT_NAMES[@]}"; do
-        printf "Generating certificate for ${NAME}..."
-        if ! gen_cert "$NAME"; then
-            printf "Failed to generate certificate for ${NAME}."
-            exit 1
-        fi
-        mv "${NAME}.crt" "$CERT_DIR/"
-        mv "${NAME}.key" "$CERT_DIR/"
-        rm -f "${NAME}.csr"
-    done
-    '''
-
     for NAME in "${!CERT_MAP[@]}"; do
         IP="${CERT_MAP[$NAME]}"
         echo "Generating cert for $NAME ($IP)..."
@@ -106,22 +93,6 @@ else
     cp "$CA_KEY" .
 
     missing_cert=0
-
-    '''
-    for NAME in "${CERT_NAMES[@]}"; do
-        if [ ! -f "${CERT_DIR}/${NAME}.crt" ] || [ ! -f "${CERT_DIR}/${NAME}.key" ]; then
-            printf "Missing certificate for ${NAME}. Regenerating..."
-            if ! gen_cert "$NAME"; then
-                printf "Failed to generate certificate for ${NAME}."
-                exit 1
-            fi
-            mv "${NAME}.crt" "$CERT_DIR/"
-            mv "${NAME}.key" "$CERT_DIR/"
-            rm -f "${NAME}.csr"
-            missing_cert=1
-        fi
-    done
-    '''
 
     for NAME in "${!CERT_MAP[@]}"; do
         IP="${CERT_MAP[$NAME]}"
