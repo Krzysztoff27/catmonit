@@ -62,7 +62,6 @@ const LayoutControls = ({}): React.JSX.Element => {
     const onSubmit = async (val) => {
         if (val === "+") val = await createNewLayout();
         combobox.closeDropdown();
-        console.log(val);
         setCurrent(val);
     };
 

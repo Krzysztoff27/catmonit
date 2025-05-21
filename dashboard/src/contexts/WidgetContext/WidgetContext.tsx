@@ -31,17 +31,15 @@ interface WidgetContextType {
 
 interface WidgetProviderProps {
     children: React.ReactNode;
-    initialData: any;
     currentLayout?: string;
 }
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
-export function WidgetProvider({ children, initialData }: WidgetProviderProps) {
+export function WidgetProvider({ children }: WidgetProviderProps) {
     const { currentLayout } = useLayouts();
-    const { websockets } = useData();
+    const { websockets, data } = useData();
     const [widgets, setWidgets] = useState<WidgetData[]>(currentLayout?.data || []);
-    const [data, setData] = useState(initialData);
     const [selected, setSelected] = useState<null | number>(null);
 
     const saveStateToDatabase = useDebouncedCallback(() => {
