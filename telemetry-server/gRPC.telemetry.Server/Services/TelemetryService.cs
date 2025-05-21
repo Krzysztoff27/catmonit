@@ -21,6 +21,11 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         _logger = logger;
     }
 
+    public void onDisconnect(Guid id)
+    {
+
+        RequestParser.onDisconnected(id);
+    }
     public override async Task<TelemetryResponse> StreamTelemetry(
         IAsyncStreamReader<TelemetryRequest> requestStream,
         ServerCallContext context)
@@ -125,7 +130,8 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     _logger.LogError(ex, "Error processing individual message");
                 }
             }
-            
+
+            onDisconnect(guid);
             return new TelemetryResponse 
             { 
                 Status = JsonSerializer.Serialize(new
@@ -139,6 +145,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         catch (IOException ex)
         {
             _logger.LogInformation("Client disconnected from stream: {Message}", ex.Message);
+            onDisconnect(guid);
             return new TelemetryResponse
             {
                 Status = JsonSerializer.Serialize(new
@@ -152,6 +159,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         catch (OperationCanceledException)
         {
             _logger.LogInformation("Stream cancelled by client.");
+            onDisconnect(guid);
             return new TelemetryResponse
             {
                 Status = JsonSerializer.Serialize(new
@@ -165,6 +173,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
         {
             _logger.LogInformation("gRPC stream cancelled: {Message}", ex.Message);
+            onDisconnect(guid);
             return new TelemetryResponse
             {
                 Status = JsonSerializer.Serialize(new
@@ -178,9 +187,9 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
         catch (Exception ex)
         {
             // disconnect
-            RequestParser.onDisconnected(guid);
 
             _logger.LogError(ex, "Error in StreamTelemetry");
+            onDisconnect(guid);
             return new TelemetryResponse 
             { 
                 Status = JsonSerializer.Serialize(new

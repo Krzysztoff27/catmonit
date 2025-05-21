@@ -53,7 +53,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
             foreach (var kvp in storageDeviceInfos.SystemWarnings)
             {
-                var warningCount = kvp.Value.Warnings?.Count ?? 0;
+                var warningCount = kvp.Value.warnings?.Count ?? 0;
 
                 if (warningCount == 0)
                     continue;
@@ -65,12 +65,12 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 }
                 else
                 {
-                    var partialWarnings = kvp.Value.Warnings.Take(warningsToGet - count).ToList();
+                    var partialWarnings = kvp.Value.warnings.Take(warningsToGet - count).ToList();
 
                     nr.warnings.TryAdd(kvp.Key, new OneDeviceWarningsHolder
                     {
                         deviceInfo = kvp.Value.deviceInfo,
-                        Warnings = partialWarnings
+                        warnings = partialWarnings
                     });
 
                     break;

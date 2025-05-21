@@ -3,6 +3,7 @@ using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using gRPC.telemetry.Server.webapi.Monitoring;
 using gRPC.telemetry.Server.webapi.Monitoring.Network;
 using System;
+using System.Runtime.Intrinsics.X86;
 using webapi.webapi;
 
 namespace gRPC.telemetry.Server.webapi.Websocket
@@ -108,6 +109,10 @@ namespace gRPC.telemetry.Server.webapi.Websocket
         public static void onDisconnected(Guid UUID)
         {
             DeviceHelper.OnDeviceDisconnected(UUID);
+            NetworkInfo.Instance.onDeviceLeave(UUID);
+            SystemInfo.Instance.onDeviceLeave(UUID);
+            DisksInfo.Instance.onDeviceLeave(UUID);
+            SharesInfo.Instance.onDeviceLeave(UUID);
         }
     }
 }

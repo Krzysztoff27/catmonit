@@ -29,7 +29,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     public class OneDeviceWarningsHolder
     {
         public deviceInfo deviceInfo { get; set; }
-        public List<string> Warnings { get; set; }
+        public List<string> warnings { get; set; }
     }
 
     public class SystemInfoSnapshotHolder : ServiceContentSnapshotHolder<SystemDeviceInfo>
@@ -57,11 +57,11 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
-                        warning.Warnings.Add($"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%).");
+                        warning.warnings.Add($"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%).");
                     }
                     else
                     {
-                        SystemWarnings[id] = new OneDeviceWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, Warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
+                        SystemWarnings[id] = new OneDeviceWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
                     }
                     totalWarningsCount++;
                 }
@@ -70,11 +70,11 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
-                        warning.Warnings.Add($"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%).");
+                        warning.warnings.Add($"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%).");
                     }
                     else
                     {
-                        SystemWarnings.TryAdd(id, new OneDeviceWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, Warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
+                        SystemWarnings.TryAdd(id, new OneDeviceWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
                     }
                     totalWarningsCount++;
                 }

@@ -11,6 +11,5 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public DateTime responseTime { get; set; }
         public ConcurrentDictionary<Guid, DisksDeviceInfo?> monitoredDevices { get; set; } = new();
         public ConcurrentDictionary<Guid, DisksDeviceInfo> autoDevices { get; set; } = new();
-        public List<Warning> warnings { get; set; } = new();
     }
 }
