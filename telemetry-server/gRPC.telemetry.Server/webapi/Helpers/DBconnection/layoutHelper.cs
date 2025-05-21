@@ -18,9 +18,10 @@ namespace webapi.Helpers.DBconnection
         public string name { get; set; }
         public Guid id { get; set; }
     }
+
     public class LayoutHelper
     {
-        public static LayoutIDandName addOrUpdateLayout(Guid userID, string layoutName, string layoutData)
+        public static LayoutIDandName addLayout(Guid userID, string layoutName, string layoutData)
         {
             int count = ConHelper.execCountQuery(
                     $"SELECT count(layout_id) FROM dashboard_layouts WHERE user_id = @userID AND layout_name = @layoutName;",
@@ -43,13 +44,27 @@ namespace webapi.Helpers.DBconnection
             }
             else
             {
+                return new LayoutIDandName { name = "", id = Guid.Empty };
+            }
+        }
+        public static LayoutIDandName UpdateLayout(Guid layoutID, string layoutData)
+        {
+            int count = ConHelper.execCountQuery(
+                    $"SELECT count(layout_id) FROM dashboard_layouts WHERE layout_id = @layoutID;",
+                    new Dictionary<string, object> { { "@layoutID", layoutID } });
+            if (count == 0)
+            {
+                return new LayoutIDandName { name = "", id = Guid.Empty };
+            }
+            else
+            {
                 using (var reader = ConHelper.ExecuteReader(
-                    $"UPDATE dashboard_layouts SET layout_body = @newLayout::json WHERE user_id = @userID AND layout_name = @layoutName RETURNING layout_id;",
-                    new Dictionary<string, object> { { "@userID", userID }, { "@layoutName", layoutName }, { "@newLayout", layoutData } }))
+                    $"UPDATE dashboard_layouts SET layout_body = @newLayout::json WHERE layout_id = @layoutID RETURNING layout_name;",
+                    new Dictionary<string, object> { { "@layoutID", layoutID }, { "@newLayout", layoutData } }))
                 {
                     if (reader.Read())
                     {
-                        return new LayoutIDandName { name = layoutName, id = (Guid)reader["layout_id"] };
+                        return new LayoutIDandName { name = reader.GetString("layout_name"), id = layoutID };
                     }
                     else
                     {

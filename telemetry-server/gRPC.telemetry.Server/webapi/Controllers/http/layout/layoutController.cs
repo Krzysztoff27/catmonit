@@ -55,15 +55,15 @@ namespace webapi.Controllers.http.layout
             }
         }
         [HttpPut]
-        [Route("update/{layoutName}")]
-        public async Task<IActionResult> UpdateOrCreate(string layoutName)
+        [Route("create/{layoutName}")]
+        public async Task<IActionResult> Create(string layoutName)
         {
             if (!isCorrect(layoutName)) return Utils.returnVal(400, "incorrect layout name");
 
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
-            
+
             using (var reader = new StreamReader(Request.Body))
             {
                 try
@@ -73,11 +73,40 @@ namespace webapi.Controllers.http.layout
                     {
                         return Utils.returnVal(400, "layout name or data is empty");
                     }
-                    LayoutIDandName res = LayoutHelper.addOrUpdateLayout(authRes.payload.id, layoutName, layoutJson);
+                    LayoutIDandName res = LayoutHelper.addLayout(authRes.payload.id, layoutName, layoutJson);
+                    if (string.IsNullOrEmpty(res.name)) return Utils.returnVal(400, "layout already exists");
                     return Json(res);
-                }catch (InternalServerError) 
-                {  
-                    return Utils.returnVal(500); 
+                }
+                catch (InternalServerError)
+                {
+                    return Utils.returnVal(500);
+                }
+            }
+        }
+        [HttpPut]
+        [Route("update/{layoutID}")]
+        public async Task<IActionResult> Update(Guid layoutID)
+        {
+            authResult authRes = Utils.Authenticate(Request);
+            if (authRes.res != null) return authRes.res;
+
+
+            using (var reader = new StreamReader(Request.Body))
+            {
+                try
+                {
+                    var layoutJson = await reader.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(layoutJson))
+                    {
+                        return Utils.returnVal(400, "layout data is empty");
+                    }
+                    LayoutIDandName res = LayoutHelper.UpdateLayout(layoutID, layoutJson);
+                    if (string.IsNullOrEmpty(res.name)) return Utils.returnVal(400, "layout doesn't exists");
+                    return Json(res);
+                }
+                catch (InternalServerError)
+                {
+                    return Utils.returnVal(500);
                 }
             }
         }
