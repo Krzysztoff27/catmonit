@@ -27,7 +27,7 @@ export interface ShareInfo {
     capacity: number;
 }
 //@TODO should we leave it as optional?
-export interface AutoDevice {
+export interface Device {
     deviceInfo: DeviceInfo;
     systemInfo?: SystemInfo;
     sharesInfo?: ShareInfo[];
@@ -40,8 +40,8 @@ export interface WarningInfo {
 
 export interface APIResponse {
     responseTime: string;
-    monitoredDevices: Record<string, null>;
-    autoDevices: Record<string, AutoDevice>;
+    monitoredDevices: Record<string, Device | null>;
+    autoDevices: Record<string, Device | null>;
     warnings?: Record<string, WarningInfo>;
     errors?: Record<string, string>;
 }
