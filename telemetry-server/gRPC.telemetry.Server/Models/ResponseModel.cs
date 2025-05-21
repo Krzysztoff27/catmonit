@@ -5,6 +5,8 @@ public class ResponseModel
     public DateTime Timestamp { get; set; }
     public string Hostname { get; set; }
     public string IpAddress { get; set; }
+
+    public string IpMask { get; set; }
     public string Uuid { get; set; }
     public string Os { get; set; }
     public PayloadType PayloadType { get; set; }
@@ -16,6 +18,10 @@ public class NetworkPayload
     public string InterfaceName { get; set; }
     public double RxMbps { get; set; }
     public double TxMbps { get; set; }
+    
+    public string IpAddress { get; set; }
+    
+    public string IpMask { get; set; }
     public bool? IsMain { get; set; }
 }
 

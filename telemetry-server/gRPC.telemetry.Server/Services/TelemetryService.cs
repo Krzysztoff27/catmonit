@@ -45,6 +45,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         Timestamp = DateTime.UtcNow,
                         Hostname = request.Hostname,
                         IpAddress = request.IpAddress,
+                        IpMask = request.IpMask,
                         Uuid = request.Uuid,
                         Os = request.OperatingSystem
                     };
@@ -212,6 +213,8 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                 InterfaceName = entry.InterfaceName,
                 RxMbps = entry.RxMbps,
                 TxMbps = entry.TxMbps,
+                IpAddress = entry.IpAddress,
+                IpMask = entry.IpMask,
                 IsMain = entry.InterfaceRoleCase == NetworkStats.InterfaceRoleOneofCase.IsMain ? 
                          entry.IsMain : (bool?)null
             });

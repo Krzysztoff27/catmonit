@@ -11,8 +11,9 @@ service TelemetryService {
 message TelemetryRequest {
   string hostname = 1;
   string ip_address = 2;
-  string uuid = 3;
-  string operating_system = 4;
+  string ip_mask = 3;
+  string uuid = 4;
+  string operating_system = 5;
 
   oneof payload {
     NetworkStatsList network = 6;
@@ -35,8 +36,11 @@ message NetworkStats {
   double rx_mbps = 2;
   double tx_mbps = 3;
 
+  string ip_address = 4;
+  string ip_mask = 5;
+
   oneof interface_role {
-    bool is_main = 4;
+    bool is_main = 6;
   }
 }
 
