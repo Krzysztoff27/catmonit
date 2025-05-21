@@ -5,25 +5,25 @@ import logging
 #Local imports
 import data_retrieval
 import telemetry_pb2_grpc
+import telemetry_pb2
 import utils
 
 logger = logging.getLogger(__name__)
 
 class TelemetryStream:
+    #Intervals are specified in seconds
     push_interval = 5.0
     network_push_interval = 30.0
-    disk_push_interval = 1200.0
+    disk_push_interval = 120.0
     fileshares_push_interval = 120.0
     usage_push_interval = 15.0
     error_push_interval = 120.0
 
-
-
     def __init__(self):
-        cert = utils.load_certificate()
-        if not cert:
+        trusted_certs = utils.load_certificate()
+        if not trusted_certs:
             raise RuntimeError("Certificate file is empty or missing!")
-        self.credentials = grpc.ssl_channel_credentials(root_certificates=cert)
+        self.credentials = grpc.ssl_channel_credentials(root_certificates=trusted_certs)
 
     async def open_stream(self, server_address, server_port):
         while True:
@@ -31,7 +31,6 @@ class TelemetryStream:
                 async with grpc.aio.secure_channel(f"{server_address}:{server_port}", self.credentials) as channel:
                     stub = telemetry_pb2_grpc.TelemetryServiceStub(channel)
                     stream = stub.StreamTelemetry()
-
 
                     last_network_sent = 0
                     last_disk_sent = 0
@@ -79,22 +78,18 @@ class TelemetryStream:
                                         logger.exception(f"Unexpected stream error: {e}")
                                 last_usage_sent = now
 
-                            #Disk/System Errors
+                            #Disk Errors
                             if now - last_error_sent >= self.error_push_interval:
-                                for err_type in ["disk_errors", "system_errors"]:
-                                    try:
-                                        msg_list = data_retrieval.get_message(err_type)
-                                        if not isinstance(msg_list, list):
-                                            print(
-                                                f"[{err_type}] Warning: Expected list but got {type(msg_list).__name__}")
-                                            continue
+                                msg = data_retrieval.get_message("disk_errors")
+                                if msg:
+                                    await stream.write(msg)
+                                last_error_sent = now
 
-                                        for msg in msg_list:
-                                            await stream.write(msg)
-
-                                    except Exception as e:
-                                        print(f"[{err_type}] Streaming failed: {str(e)}")
-
+                            #System Errors
+                            if now - last_error_sent >= self.error_push_interval:
+                                msg = data_retrieval.get_message("system_errors")
+                                if msg:
+                                    await stream.write(msg)
                                 last_error_sent = now
 
                             await asyncio.sleep(self.push_interval)

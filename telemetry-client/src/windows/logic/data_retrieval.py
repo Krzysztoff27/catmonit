@@ -3,9 +3,12 @@ import subprocess
 import platform
 import psutil
 import json
+
 from typing import List
 from pydantic import BaseModel
 from functools import lru_cache
+from typing import Literal
+
 #Local imports
 import scripts
 import telemetry_pb2
@@ -26,12 +29,12 @@ class SystemUsageCached(BaseModel):
 #JSON output parser for unified error messages handling
 def _parse_json_output(output: str, context: str):
     if not output.strip():
-        raise ValueError(f"{context}: PowerShell returned empty output.")
+        raise ValueError(f"[{context}] PowerShell returned empty output.")
 
     try:
         events = json.loads(output.strip())
     except json.JSONDecodeError as e:
-        raise ValueError(f"{context}: Failed to parse JSON output. Error: {str(e)}\nRaw output: {output.strip()[:300]}")
+        raise ValueError(f"[{context}] Failed to parse JSON output. Error: {str(e)}\nRaw output: {output.strip()[:300]}")
 
     if isinstance(events, dict):
         events = [events]
@@ -41,11 +44,11 @@ def _parse_json_output(output: str, context: str):
     return events
 
 #Message model with changing payload
-def get_message(payload_type: str) -> [telemetry_pb2.TelemetryRequest]:
+def get_message(payload_type: Literal["network", "disks", "fileshares", "disk_errors", "system_errors", "usage"]) -> telemetry_pb2.TelemetryRequest | None:
     try:
         message = telemetry_pb2.TelemetryRequest()
-        base = base_data
 
+        base = base_data
         message.hostname = base.hostname
         message.ip_address = base.ip_address
         message.uuid = base.uuid
@@ -81,8 +84,14 @@ def get_message(payload_type: str) -> [telemetry_pb2.TelemetryRequest]:
         elif payload_type == "disk_errors":
             try:
                 errors = telemetry_pb2.DiskErrorsList()
-                errors.entries.extend(get_disk_errors_payload())
-                message.disk_errors.CopyFrom(errors)
+                disk_errors_payload = get_disk_errors_payload()
+
+                if disk_errors_payload:
+                    errors.entries.extend(disk_errors_payload)
+                    message.disk_errors.CopyFrom(errors)
+                else:
+                    return None
+
             except Exception as e:
                 print(f"[get_message/disk_errors] Failed to retrieve disk errors: {e}")
                 return None
@@ -90,8 +99,14 @@ def get_message(payload_type: str) -> [telemetry_pb2.TelemetryRequest]:
         elif payload_type == "system_errors":
             try:
                 errors = telemetry_pb2.SystemErrorsList()
-                errors.entries.extend(get_system_errors_payload())
-                message.system_errors.CopyFrom(errors)
+                system_errors_payload = get_system_errors_payload()
+
+                if system_errors_payload:
+                    errors.entries.extend(system_errors_payload)
+                    message.system_errors.CopyFrom(errors)
+                else:
+                    return None
+
             except Exception as e:
                 print(f"[get_message/system_errors] Failed to retrieve system errors: {e}")
                 return None
@@ -215,7 +230,7 @@ def get_fileshares_payload() -> List[telemetry_pb2.FileShares]:
         print(f"Error getting fileshares: {e}")
     return []
 
-def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
+def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors] | None:
     try:
         result = subprocess.run(
             ["powershell", "-Command", scripts.disk_errors_script],
@@ -238,8 +253,7 @@ def get_disk_errors_payload() -> List[telemetry_pb2.DiskErrors]:
         print(f"[DiskErrors] Retrieval failed: {str(e)}")
         return []
 
-
-def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
+def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors] | None:
     try:
         result = subprocess.run(
             ["powershell", "-Command", scripts.system_errors_script],
@@ -257,6 +271,7 @@ def get_system_errors_payload() -> List[telemetry_pb2.SystemErrors]:
             )
             for event in events
         ]
+
     except Exception as e:
         print(f"[SystemErrors] Retrieval failed: {str(e)}")
         return []

@@ -1,5 +1,4 @@
 ﻿import threading
-
 import win32serviceutil
 import win32service
 import win32event
@@ -28,7 +27,6 @@ class CatMonitService(win32serviceutil.ServiceFramework):
         self.stop_event = win32event.CreateEvent(None, 0, 0, None)
         self.running = True
         self.loop = asyncio.new_event_loop()
-
 
     def SvcStop(self):
         logging.info("Service stop requested")

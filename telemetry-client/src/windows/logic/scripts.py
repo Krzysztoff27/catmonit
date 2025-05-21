@@ -26,12 +26,19 @@ fileshares_extract_script = """
 
 disk_errors_script = """
 $vols = Get-Volume | Where-Object DriveLetter | Select-Object DriveLetter, ObjectId
-$events = Get-WinEvent -FilterHashtable @{
-    LogName = 'System'
-    ProviderName = 'disk'
-    Level = 2,3
-    StartTime = (Get-Date).AddDays(-1)
-} -MaxEvents 30
+
+try {
+    $events = Get-WinEvent -FilterHashtable @{
+        #LogName = 'System'
+        #ProviderName = 'disk'
+        LogName = 'Application'
+        ProviderName = 'TelemetryTestSource'
+        Level = 2,3
+        StartTime = (Get-Date).AddDays(-1)
+    } -MaxEvents 30
+} catch {
+    $events = @()  # If no events match, use empty array instead of failing
+}
 
 $result = @()
 
@@ -47,21 +54,27 @@ foreach ($e in $events) {
     }
 
     $result += [PSCustomObject]@{
-        message = $msg
-        source = $e.ProviderName
-        timestamp = [int64]([DateTimeOffset]$e.TimeCreated).ToUnixTimeSeconds()
+        message     = $msg
+        source      = $e.ProviderName
+        timestamp   = [int64]([DateTimeOffset]$e.TimeCreated).ToUnixTimeSeconds()
         mount_point = $mount
     }
 }
+
+# Always return valid JSON — even if empty
 $result | ConvertTo-Json -Depth 3
 """
 
 system_errors_script = """
-$events = Get-WinEvent -FilterHashtable @{
-    LogName = 'System'
-    Level = 1,2
-    StartTime = (Get-Date).AddDays(-1)
-} -MaxEvents 30
+try {
+    $events = Get-WinEvent -FilterHashtable @{
+        LogName = 'System'
+        Level = 1,2
+        StartTime = (Get-Date).AddDays(-1)
+    } -MaxEvents 30
+} catch {
+    $events = @()
+}
 
 $result = @()
 
