@@ -4,7 +4,7 @@ import platform
 import psutil
 import json
 
-from typing import List
+from typing import List, Dict
 from pydantic import BaseModel
 from functools import lru_cache
 from typing import Literal
@@ -17,6 +17,7 @@ import telemetry_pb2
 class Base(BaseModel):
     hostname: str
     ip_address: str
+    ip_mask: str
     uuid: str
     operating_system: str
     last_boot_timestamp: int
@@ -25,6 +26,12 @@ class SystemUsageCached(BaseModel):
     ram_total_bytes: int
     pagefile_total_bytes: int
     last_boot_timestamp: int
+
+class NetworkCached(BaseModel):
+    interface: str
+    ip_address: str
+    ip_mask: str
+    is_main: bool
 
 #JSON output parser for unified error messages handling
 def _parse_json_output(output: str, context: str):
@@ -51,6 +58,7 @@ def get_message(payload_type: Literal["network", "disks", "fileshares", "disk_er
         base = base_data
         message.hostname = base.hostname
         message.ip_address = base.ip_address
+        message.ip_mask = base.ip_mask
         message.uuid = base.uuid
         message.operating_system = base.operating_system
 
@@ -129,10 +137,19 @@ def get_message(payload_type: Literal["network", "disks", "fileshares", "disk_er
         print(f"[get_message] Unexpected error: {e}")
         return None
 
+def get_netmask_by_ip(ip: str) -> str | None:
+    for iface_addrs in psutil.net_if_addrs().values():
+        for addr in iface_addrs:
+            if addr.family == socket.AF_INET and addr.address == ip:
+                return addr.netmask
+    return None
+
 @lru_cache(maxsize=1)
 def get_base() -> Base:
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
+    ip_mask = get_netmask_by_ip(ip_address)
+
 
     uuid_raw = subprocess.run(
         ["powershell", "-Command", "(Get-WmiObject Win32_ComputerSystemProduct).UUID"],
@@ -146,6 +163,7 @@ def get_base() -> Base:
     return Base(
         hostname=hostname,
         ip_address=ip_address,
+        ip_mask=ip_mask,
         uuid=uuid,
         operating_system=operating_system,
         last_boot_timestamp=last_boot_timestamp
@@ -153,10 +171,28 @@ def get_base() -> Base:
 
 base_data = get_base()
 
+@lru_cache(maxsize=1)
+def get_network_cached() -> Dict[str, NetworkCached]:
+    main_ip = socket.gethostbyname(socket.gethostname())
+    interfaces = {}
+
+    for interface, addrs in psutil.net_if_addrs().items():
+        for addr in addrs:
+            if addr.family == socket.AF_INET:
+                NetworkCached.ip_address = addr.address
+                NetworkCached.ip_mask = addr.netmask
+                if addr.address == main_ip:
+                    NetworkCached.is_main = True
+                break
+        interfaces[interface] = NetworkCached
+
+    return interfaces
+
+all_interfaces = get_network_cached()
+
 def get_network_payload() -> List[telemetry_pb2.NetworkStats]:
     network_stats = psutil.net_io_counters(pernic=True)
     interfaces = []
-    main_ip = socket.gethostbyname(socket.gethostname())
 
     for interface, addrs in psutil.net_if_addrs().items():
         stats = network_stats.get(interface)
@@ -166,8 +202,10 @@ def get_network_payload() -> List[telemetry_pb2.NetworkStats]:
             interface_msg.rx_mbps = round(stats.bytes_recv * 8 / (1024 ** 2), 2)
             interface_msg.tx_mbps = round(stats.bytes_sent * 8 / (1024 ** 2), 2)
 
-            if any(addr.address == main_ip for addr in addrs):
-                interface_msg.is_main = True
+            network_interface = all_interfaces.get(interface)
+            interface_msg.ip_address = network_interface.ip_address
+            interface_msg.ip_mask = network_interface.ip_mask
+            interface_msg.is_main = network_interface.is_main
 
             interfaces.append(interface_msg)
 
