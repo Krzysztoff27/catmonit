@@ -48,3 +48,22 @@ export interface WidgetData {
     settings: any;
     version: number;
 }
+
+export type AlertType = "storage" | "fileShares" | "system";
+
+export interface Alert {
+  id: number;
+  uuid: string;
+  hostname: string;
+  ip: string;
+  mask: string;
+  path: string;
+  message: string;
+  isWarning: boolean;
+  type: AlertType;
+}
+
+export interface AlertListElementProps {
+  alert: Alert;
+  onRemove: () => void;
+}

@@ -1,34 +1,58 @@
-import { Box, Group, Paper, ScrollArea, Stack } from "@mantine/core";
+import { Group, ScrollArea, Stack } from "@mantine/core";
 import { useState } from "react";
 import AlertCount from "../../display/AlertCount/AlertCount";
-import classes from "./AlertWidget.module.css";
 import AlertListElement from "../../display/AlertListElement/AlertListElement";
 import { WidgetContentProps } from "../../../types/components.types";
-
-type Alert = {
-    id: number;
-    isWarning: boolean;
-};
-
-const initialAlerts: Alert[] = [
-    { id: 1, isWarning: true },
-    { id: 2, isWarning: false },
-    { id: 3, isWarning: false },
-    { id: 4, isWarning: false },
-    { id: 5, isWarning: false },
-    { id: 6, isWarning: false },
-    { id: 7, isWarning: false },
-    { id: 8, isWarning: false },
-    { id: 9, isWarning: false },
-    { id: 10, isWarning: false },
-];
-
+import { Alert } from "../../../types/api.types";
+import { dummies } from "../../../pages/Editor/dummies";
 function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
-    const [alerts, setAlerts] = useState(initialAlerts);
+    //source: trust me bro
+    const [alerts, setAlerts] = useState<Record<string, Alert>>(dummies.alerts as Record<string, Alert>);
+    const [hiddenAlerts, setHiddenAlerts] = useState<Record<string, Alert>>({});
 
     const handleRemove = (idToRemove: number) => {
-        setAlerts((prev) => prev.filter((alert) => alert.id !== idToRemove));
+        setAlerts((prev) => {
+            const updated = { ...prev };
+            let removedAlert: Alert | undefined;
+
+            for (const key in updated) {
+                if (updated[key].id === idToRemove) {
+                    removedAlert = updated[key];
+                    delete updated[key];
+                    break;
+                }
+            }
+
+            if (removedAlert) {
+                setHiddenAlerts((prevHidden) => ({
+                    ...prevHidden,
+                    [removedAlert.id]: removedAlert,
+                }));
+            }
+
+            return updated;
+        });
     };
+    // Add restore function
+    const restoreAlert = (idToRestore: number) => {
+        setHiddenAlerts((prevHidden) => {
+            const updatedHidden = { ...prevHidden };
+            const alertToRestore = updatedHidden[idToRestore];
+            if (!alertToRestore) return prevHidden;
+
+            setAlerts((prev) => ({
+                ...prev,
+                [alertToRestore.id]: alertToRestore,
+            }));
+
+            delete updatedHidden[idToRestore];
+            return updatedHidden;
+        });
+    };
+
+    const allAlerts = Object.values(alerts);
+    const criticalCount = allAlerts.filter((a) => !a.isWarning).length;
+    const mediumCount = allAlerts.filter((a) => a.isWarning).length;
 
     return (
         <Group
@@ -38,8 +62,8 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
             align="start"
         >
             <AlertCount
-                criticalCount={3}
-                mediumCount={10}
+                criticalCount={criticalCount}
+                mediumCount={mediumCount}
                 isWarning={false}
             />
             <ScrollArea
@@ -53,10 +77,10 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
                     gap="xs"
                     pr="lg"
                 >
-                    {alerts.map((alert) => (
+                    {allAlerts.map((alert) => (
                         <AlertListElement
                             key={alert.id}
-                            isWarning={alert.isWarning}
+                            alert={alert}
                             onRemove={() => handleRemove(alert.id)}
                         />
                     ))}

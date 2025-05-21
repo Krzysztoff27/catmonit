@@ -11,8 +11,9 @@ interface DataSourceMultiselectProps {
 
 const SELECT_DATA = [
     { value: "storage", label: "Storage" },
-    { value: "network", label: "Network" },
+    // { value: "network", label: "Network" },
     { value: "fileShares", label: "File Shares" },
+    { value: "system", label: "System" },
 ];
 
 function DataSourceMultiselect({ index, widget, onChange }: DataSourceMultiselectProps) {

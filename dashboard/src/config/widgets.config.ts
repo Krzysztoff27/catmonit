@@ -116,18 +116,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         isReferingToSingularResource: true,
         image: "/images/widgets/fileshares.png",
     },
-    // SERVICE_STATUS: {
-    //     name: "device's status ",
-    //     icon: IconProgressCheck,
-    //     content: Box,
-    //     1tiesContent: ServiceStatusDrawer, //@TODO change it
-    //     limits: {
-    //         minH: 2,
-    //         maxH: 5,
-    //         minW: 2,
-    //         maxW: 4,
-    //     },
-    // },
     NETWORK_THROUGHPUT: {
         name: "network throughput",
         icon: IconNetwork,
