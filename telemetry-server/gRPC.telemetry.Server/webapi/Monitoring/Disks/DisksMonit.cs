@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using webapi.Monitoring;
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
@@ -42,7 +43,14 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             {
                 nr.autoDevices[storageDeviceInfos.AutoCandidates[i]] = storageDeviceInfos.MonitoredDevices[storageDeviceInfos.AutoCandidates[i]];
             }
-            
+            if (storageDeviceInfos.DiskWarnings.Count != 0)
+            {
+                nr.warnings = new ConcurrentDictionary<Guid, OneDeviceDiskWarningsHolder>(
+                    storageDeviceInfos.DiskWarnings.Take(subber.warningCount)
+                );
+            }
+
+
             return JsonSerializer.Serialize(nr);
         }
         

@@ -67,7 +67,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 {
                     var partialWarnings = kvp.Value.warnings.Take(warningsToGet - count).ToList();
 
-                    nr.warnings.TryAdd(kvp.Key, new OneDeviceWarningsHolder
+                    nr.warnings.TryAdd(kvp.Key, new OneDeviceSystemWarningsHolder
                     {
                         deviceInfo = kvp.Value.deviceInfo,
                         warnings = partialWarnings

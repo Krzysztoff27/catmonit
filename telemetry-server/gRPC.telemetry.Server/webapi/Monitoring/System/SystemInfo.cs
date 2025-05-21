@@ -3,13 +3,13 @@ using System.Collections.Concurrent;
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
-    public class Tresholds
+    public class TresholdsSystem
     {
         public const int CPUwarningTresholdValue = 85; // precent
         public const int RAMwarningTresholdValue = 85; // percent
-        public const int warningTresholdTime = 5; // times 
+        public const int warningTresholdTimes = 5; // times 
     }
-    public class HistoricalSingleWarningInfo
+    public class SingleDeviceHistoricalSystemInfo
     {
         public int timesCPUover85 = 0;
         public int timesRamUsageover85percent = 0;
@@ -26,7 +26,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public deviceInfo deviceInfo { get; set; }
         public List<SystemErrorsPayload> SystemErrorsPayloads { get; set; }
     }
-    public class OneDeviceWarningsHolder
+    public class OneDeviceSystemWarningsHolder
     {
         public deviceInfo deviceInfo { get; set; }
         public List<string> warnings { get; set; }
@@ -36,8 +36,8 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     {
         public int totalWarningsCount = 0;
         public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
-        public ConcurrentDictionary<Guid, HistoricalSingleWarningInfo> SystemHistoricalData { get; set; }
-        public ConcurrentDictionary<Guid, OneDeviceWarningsHolder> SystemWarnings { get; set; } = new();
+        public ConcurrentDictionary<Guid, SingleDeviceHistoricalSystemInfo> AllDevicesHistoricalSystemInfo { get; set; }
+        public ConcurrentDictionary<Guid, OneDeviceSystemWarningsHolder> SystemWarnings { get; set; } = new();
         public void CalculateBestAutoCandidates(int n)
         {
             AutoCandidates = MonitoredDevices
@@ -51,9 +51,9 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         {
             totalWarningsCount = 0;
             SystemWarnings = new();
-            foreach((Guid id, HistoricalSingleWarningInfo historicalInfo) in SystemHistoricalData)
+            foreach((Guid id, SingleDeviceHistoricalSystemInfo historicalInfo) in AllDevicesHistoricalSystemInfo)
             {
-                if (historicalInfo.timesCPUover85 > Tresholds.warningTresholdTime)
+                if (historicalInfo.timesCPUover85 > TresholdsSystem.warningTresholdTimes)
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
@@ -61,12 +61,12 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     }
                     else
                     {
-                        SystemWarnings[id] = new OneDeviceWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
+                        SystemWarnings[id] = new OneDeviceSystemWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
                     }
                     totalWarningsCount++;
                 }
 
-                if (historicalInfo.timesRamUsageover85percent > Tresholds.warningTresholdTime)
+                if (historicalInfo.timesRamUsageover85percent > TresholdsSystem.warningTresholdTimes)
                 {
                     if (SystemWarnings.TryGetValue(id, out var warning))
                     {
@@ -74,7 +74,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     }
                     else
                     {
-                        SystemWarnings.TryAdd(id, new OneDeviceWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
+                        SystemWarnings.TryAdd(id, new OneDeviceSystemWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
                     }
                     totalWarningsCount++;
                 }
@@ -87,7 +87,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     }
     public class SystemInfo : ServiceContentInfo<SystemDeviceInfo>
     {
-        public ConcurrentDictionary<Guid, HistoricalSingleWarningInfo> historicalWarningInfo { get; set; } = new();
+        public ConcurrentDictionary<Guid, SingleDeviceHistoricalSystemInfo> historicalWarningInfo { get; set; } = new();
         public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
         public static SystemInfo Instance { get; set; } = new SystemInfo();
 
@@ -117,7 +117,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             snapshotHolder.SnapshotTime = DateTime.UtcNow;
             snapshotHolder.MonitoredDevices = base.GetDeviceSnapshot();
             snapshotHolder.SystemErrorsDictionary = SystemErrorsDictionary;
-            snapshotHolder.SystemHistoricalData = historicalWarningInfo;
+            snapshotHolder.AllDevicesHistoricalSystemInfo = historicalWarningInfo;
             return snapshotHolder;
         }
         public void AddOrUpdateErrors(SystemErrorInfo error)
@@ -149,52 +149,52 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         }
         public override void onDeviceUpsert(SystemDeviceInfo device)
         {
-            if (device.systemInfo.cpuUsagePercent > Tresholds.CPUwarningTresholdValue)
+            if (device.systemInfo.cpuUsagePercent > TresholdsSystem.CPUwarningTresholdValue)
             {
-                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out HistoricalSingleWarningInfo val))
+                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out SingleDeviceHistoricalSystemInfo val))
                 {
                     val.timesCPUover85++;
                 }
                 else
                 {
-                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new HistoricalSingleWarningInfo { timesCPUover85 = 1 });
+                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new SingleDeviceHistoricalSystemInfo { timesCPUover85 = 1 });
                 }
             }
             else
             {
-                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out HistoricalSingleWarningInfo val))
+                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out SingleDeviceHistoricalSystemInfo val))
                 {
                     val.timesCPUover85 = 0;
                 }
                 else
                 {
-                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new HistoricalSingleWarningInfo());
+                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new SingleDeviceHistoricalSystemInfo());
                 }
             }
 
             float RAMusage = ((float)device.systemInfo.ramUsedBytes / (float)device.systemInfo.ramTotalBytes)*100;
-            if (RAMusage > Tresholds.RAMwarningTresholdValue)
+            if (RAMusage > TresholdsSystem.RAMwarningTresholdValue)
             { 
                 historicalWarningInfo[device.deviceInfo.uuid].timesRamUsageover85percent++;
-                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out HistoricalSingleWarningInfo val))
+                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out SingleDeviceHistoricalSystemInfo val))
                 {
                     val.timesRamUsageover85percent++;
                 }
                 else
                 {
-                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new HistoricalSingleWarningInfo { timesRamUsageover85percent = 1 });
+                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new SingleDeviceHistoricalSystemInfo { timesRamUsageover85percent = 1 });
                 }
             }
             else
             {
 
-                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out HistoricalSingleWarningInfo val))
+                if (historicalWarningInfo.TryGetValue(device.deviceInfo.uuid, out SingleDeviceHistoricalSystemInfo val))
                 {
                     val.timesRamUsageover85percent = 0;
                 }
                 else
                 {
-                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new HistoricalSingleWarningInfo());
+                    historicalWarningInfo.TryAdd(device.deviceInfo.uuid, new SingleDeviceHistoricalSystemInfo());
                 }
             }
         }

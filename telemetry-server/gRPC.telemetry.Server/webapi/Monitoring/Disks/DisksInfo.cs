@@ -1,7 +1,19 @@
 ﻿using gRPC.telemetry.Server.Models;
+using System.Collections.Concurrent;
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
+    public class TresholdsDisk
+    {
+        public const int SpaceWarningTresholdValue = 10; // precent
+    }
+    
+    public class OneDeviceDiskWarningsHolder
+    {
+        public deviceInfo deviceInfo { get; set; }
+        public List<string> warnings { get; set; }
+    }
+
     public class DisksDeviceInfo
     {
         public deviceInfo DeviceInfo { get; set; }
@@ -9,7 +21,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     }
     public class DisksInfoSnapshotHolder : ServiceContentSnapshotHolder<DisksDeviceInfo>
     {
-        public static float deviceMemoryTreshold = 0.9f;
+        public ConcurrentDictionary<Guid, OneDeviceDiskWarningsHolder> DiskWarnings { get; set; } = new();
         public void CalculateBestAutoCandidates(int n)
         {
             AutoCandidates = MonitoredDevices
@@ -21,16 +33,29 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         }
         public void CalculateWarnings()
         {
+            DiskWarnings.Clear();
             foreach ((Guid deviceId, DisksDeviceInfo deviceInfo) in MonitoredDevices)
             {
                 foreach (DiskPayload disk in deviceInfo.DisksInfo) {
-                    if ((float)disk.Usage / (float)disk.Capacity >= deviceMemoryTreshold)
+                    if (((float)disk.Usage / (float)disk.Capacity *100)> TresholdsDisk.SpaceWarningTresholdValue)
                     {
-                        // warning
-                        /*Warnings.Add(new Warning { 
-                            Device = new SmallDeviceInfo {Hostname = deviceInfo.DeviceInfo.Hostname, IpAddress= deviceInfo.DeviceInfo.IpAddress, Os=deviceInfo.DeviceInfo.Os, Uuid=deviceId }, 
-                            Message = $"{disk.MountPoint} free space is {((1f - ((float)disk.Usage / (float)disk.Capacity)) * 100)}%. Please free up storage." 
-                        });*/
+                        DiskWarnings.AddOrUpdate(
+                            deviceId,
+                            id => new OneDeviceDiskWarningsHolder
+                            {
+                                deviceInfo = deviceInfo.DeviceInfo,
+                                warnings = new List<string> { $"Disk ({disk.MountPoint}) storage is low ({100-((float)disk.Usage / (float)disk.Capacity * 100)}%). Please free up storage." }
+                            },
+                            (id, existingHolder) =>
+                            {
+                                lock (existingHolder)
+                                {
+                                    existingHolder.warnings.Add($"Disk ({disk.MountPoint}) storage is low ({100 - ((float)disk.Usage / (float)disk.Capacity * 100)}%). Please free up storage.");
+                                }
+                                return existingHolder;
+                            }
+                        );
+
                     }
                 }
             }
