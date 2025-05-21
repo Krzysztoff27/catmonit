@@ -52,7 +52,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const resourceList = useMemo(
         () =>
-            safeObjectValues(data[dataSource]).map((resource, i: number) => {
+            safeObjectValues(data?.[dataSource]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
                 console.log(widget.settings[dataSource][resource.path]);
                 return (

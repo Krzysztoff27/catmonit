@@ -38,6 +38,7 @@ export interface FileShare {
 }
 
 export interface WidgetData {
+    index: number;
     type: string;
     rect: {
         x: number;

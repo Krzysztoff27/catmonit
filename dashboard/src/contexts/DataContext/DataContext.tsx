@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import useApiWebSocket, { useApiWebSocketReturn } from "../../hooks/useApiWebSocket";
 
 interface DataContextType {
@@ -20,8 +20,6 @@ export function DataProvider({ children }) {
     const data = {
         disks: websockets.disks.last,
     };
-
-    console.log(data);
 
     const value = {
         websockets,
