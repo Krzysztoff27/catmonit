@@ -61,7 +61,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const appendToAutoRetrievalOrders = (dataSource: string, index: number) => {
         setAutoRetrievalOrders((prev) => {
             const newAutoRetrievalOrders = prev;
-            newAutoRetrievalOrders[dataSource].append(index);
+            newAutoRetrievalOrders[dataSource].push(index);
             return newAutoRetrievalOrders;
         });
     };

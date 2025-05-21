@@ -23,6 +23,7 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
         const { getWidgetConfig, getWidgetData, getWidgetContent } = useWidgets();
         const WidgetContent = getWidgetContent(widget);
         const config = getWidgetConfig(widget);
+        const data = index !== -1 ? getWidgetData(widget) : safeObjectValues(dummies[config?.dataSource ?? ""])[0];
         const showTimestamp = config.isReferingToSingularResource && widget?.settings?.target;
 
         return (
@@ -55,13 +56,13 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                     {WidgetContent && (
                         <WidgetContent
                             index={index}
-                            data={index !== -1 ? getWidgetData(widget) : safeObjectValues(dummies[config?.dataSource ?? ""])[0]}
+                            data={data}
                             settings={widget?.settings}
                         />
                     )}
                     {showTimestamp && (
                         <TimeoutRingProgress
-                            timestamp={new Date().toISOString()}
+                            timestamp={data?.deviceInfo?.lastUpdated}
                             className={classes.timeout}
                         />
                     )}

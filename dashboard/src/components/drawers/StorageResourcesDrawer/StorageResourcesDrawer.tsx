@@ -19,7 +19,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
         const newData = getData(dataSource)[target];
-        const newResourceData = safeObjectValues(newData[dataSource]);
+        const newResourceData = safeObjectValues(newData?.[dataSource]);
         const newResourceSettings = newResourceData.reduce(
             (prev, { path }) => ({ ...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 } } }),
             {}
