@@ -9,7 +9,8 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { useLayouts } from "../LayoutContext/LayoutContext";
 import { useData } from "../DataContext/DataContext";
 import urlConfig from "../../config/url.config";
-import { safeObjectEntries } from "../../utils/object";
+import { safeObjectEntries, safeObjectValues } from "../../utils/object";
+import { preview } from "vite";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -17,9 +18,9 @@ interface WidgetContextType {
     selected: number | null;
     setSelected: (a: ((prev: number | null) => number | null) | number | null) => void;
     getData: (source: string) => any;
-    getWidget: (index: number | string) => WidgetData;
+    getWidget: (index: number) => WidgetData;
     createWidget: (type: string | null | undefined, layoutItem: LayoutItem) => void;
-    deleteWidget: (index: number | string) => void;
+    deleteWidget: (index: number) => void;
     setWidgetRects: (newLayout: Layout) => void;
     setWidgetRect: (index: number, rect: any) => void;
     setWidgetSettings: (index: number, newSettings: any) => void;
@@ -39,33 +40,59 @@ const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
 export function WidgetProvider({ children }: WidgetProviderProps) {
     const { currentLayout, updateCurrentLayout } = useLayouts();
+    const [autoRetrievalOrders, setAutoRetrievalOrders] = useState({
+        disks: [],
+        fileShares: [],
+        system: [],
+        network: [],
+    });
     const { websockets, data } = useData();
     const [widgets, setWidgets] = useState<WidgetData[]>([]);
     const [selected, setSelected] = useState<null | number>(null);
+
+    const removeFromAutoRetrievalOrders = (dataSource: string, index: number) => {
+        setAutoRetrievalOrders((prev) => {
+            const newAutoRetrievalOrders = prev;
+            newAutoRetrievalOrders[dataSource].filter((e) => e !== index);
+            return newAutoRetrievalOrders;
+        });
+    };
+
+    const appendToAutoRetrievalOrders = (dataSource: string, index: number) => {
+        setAutoRetrievalOrders((prev) => {
+            const newAutoRetrievalOrders = prev;
+            newAutoRetrievalOrders[dataSource].push(index);
+            return newAutoRetrievalOrders;
+        });
+    };
 
     useEffect(() => {
         setWidgets(currentLayout?.data || []);
         const subscriptions = {};
 
-        currentLayout?.data?.forEach((widget: WidgetData) => {
+        currentLayout?.data?.forEach((widget: WidgetData, index) => {
             const config = getWidgetConfig(widget);
 
             if (!config.isReferingToSingularResource) return;
 
             if (isUndefined(subscriptions[config.dataSource])) {
                 subscriptions[config.dataSource] = {
-                    resourceUuids: [],
-                    autoNumber: 0,
+                    resourceUuids: [], // save which resources set widgets need
+                    autoWidgetIndexes: [], // save which widgets are set to auto
                 };
             }
 
-            if (isNull(widget.settings.target)) subscriptions[config.dataSource].autoNumber++;
-            else subscriptions[config.dataSource].resourceUuids.push(widget.settings.target);
+            if (isNull(widget.settings.target)) {
+                subscriptions[config.dataSource].autoWidgetIndexes.push(index);
+            } else {
+                subscriptions[config.dataSource].resourceUuids.push(widget.settings.target);
+            }
         });
 
-        safeObjectEntries(subscriptions).map(([dataSource, { resourceUuids, autoNumber }]) => {
+        safeObjectEntries(subscriptions).map(([dataSource, { resourceUuids, autoWidgetIndexes }]) => {
             websockets[dataSource].updateSubscribedResources(resourceUuids);
-            websockets[dataSource].updateAutoResources(autoNumber);
+            websockets[dataSource].updateAutoResources(autoWidgetIndexes.length);
+            setAutoRetrievalOrders((prev) => ({ ...prev, [dataSource]: autoWidgetIndexes }));
         });
     }, [currentLayout?.data]);
 
@@ -142,6 +169,13 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
 
         if (config.isReferingToSingularResource && widget.settings?.target !== newSettings?.target) {
             websockets[config.dataSource]?.replaceSubscribedResource(widget.settings.target, newSettings.target);
+
+            if (isNull(widget.settings.target)) {
+                removeFromAutoRetrievalOrders(config.dataSource, index);
+            }
+            if (isNull(newSettings.target)) {
+                appendToAutoRetrievalOrders(config.dataSource, index);
+            }
         }
 
         setWidgets((prev) => {
@@ -163,12 +197,14 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
 
         if (config.isReferingToSingularResource) {
             websockets[config.dataSource].incrementAutoResources();
+            appendToAutoRetrievalOrders(config.dataSource, widgets.length);
         }
 
         setWidgets((prev) => [
             ...prev,
             {
                 type,
+                index: widgets.length,
                 settings: config.initialSettings,
                 rect: getItemRect(layoutItem),
                 version: 0,
@@ -176,13 +212,15 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         ]);
     };
 
-    const deleteWidget = (index: number | string) => {
+    const deleteWidget = (index: number) => {
         const widget = widgets[index];
         const config = getWidgetConfig(widget);
 
         if (config.isReferingToSingularResource) {
-            if (isNull(widget.settings.target)) websockets[config.dataSource].decrementAutoResources();
-            else websockets[config.dataSource].removeSubscribedResource(widget.settings.target);
+            if (isNull(widget.settings.target)) {
+                websockets[config.dataSource].decrementAutoResources();
+                removeFromAutoRetrievalOrders(config.dataSource, index);
+            } else websockets[config.dataSource].removeSubscribedResource(widget.settings.target);
         }
 
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== index));
@@ -196,7 +234,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         const isSingular = config.isReferingToSingularResource;
         const source = config.dataSource;
 
-        if (!source) {
+        if (isSingular && !source) {
             console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
             return;
         }
@@ -204,14 +242,17 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         if (!isSingular) return data[source] ?? {};
 
         const target = widget?.settings?.target;
-        return target ? data[source]?.[target] ?? {} : {};
+        if (target) return data[source].monitoredDevices[target];
+
+        const index = autoRetrievalOrders[source].findIndex((idx: number) => idx === widget.index);
+        return safeObjectValues(data[source]?.autoDevices)[index];
     };
 
     const getData = (source: string) => {
         return data?.[source] ?? {};
     };
 
-    const getWidget = (index: number | string) => {
+    const getWidget = (index: number) => {
         return widgets[index];
     };
 

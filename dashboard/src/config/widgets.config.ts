@@ -28,6 +28,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         initialSettings: {},
         isReferingToSingularResource: false,
+        dataSource: "",
         image: "/images/widgets/alerts.png",
     },
     DETAILED_DEVICE_STORAGE: {
@@ -84,11 +85,11 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 2,
             maxW: 10,
         },
-        initialSettings: {  
+        initialSettings: {
             target: undefined,
             automatic: true,
         },
-        dataSource: "storage",
+        dataSource: "system",
         isReferingToSingularResource: true,
         image: "/images/widgets/device_status.png",
     },

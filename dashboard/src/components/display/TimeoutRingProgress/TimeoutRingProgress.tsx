@@ -26,7 +26,7 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
         return () => cancelAnimationFrame(animationRef.current!);
     }, [timestamp]);
 
-    const [date, time, _] = timestamp.split(/[TZ\.]+/);
+    const [date, time, _] = timestamp?.split?.(/[TZ\.]+/) || ["01.01.1970", "00:00"];
 
     return (
         <Group

@@ -19,7 +19,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
         const newData = getData(dataSource)[target];
-        const newResourceData = safeObjectValues(newData[dataSource]);
+        const newResourceData = safeObjectValues(newData?.[dataSource]);
         const newResourceSettings = newResourceData.reduce(
             (prev, { path }) => ({ ...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 } } }),
             {}
@@ -52,7 +52,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const resourceList = useMemo(
         () =>
-            safeObjectValues(data[dataSource]).map((resource, i: number) => {
+            safeObjectValues(data?.[dataSource]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
                 console.log(widget.settings[dataSource][resource.path]);
                 return (

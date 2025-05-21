@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import useApiWebSocket, { useApiWebSocketReturn } from "../../hooks/useApiWebSocket";
 
 interface DataContextType {
@@ -15,13 +15,20 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }) {
     const websockets = {
         disks: useApiWebSocket("disks"),
+        fileShares: useApiWebSocket("shares"),
+        system: useApiWebSocket("system"),
+        network: useApiWebSocket("network"),
     };
 
-    const data = {
-        disks: websockets.disks.last,
-    };
-
-    console.log(data);
+    const data = useMemo(
+        () => ({
+            disks: websockets.disks.last,
+            fileShares: websockets.fileShares.last,
+            system: websockets.system.last,
+            network: websockets.network.last,
+        }),
+        [websockets.disks.last, websockets.fileShares.last, websockets.system.last, websockets.network.last]
+    );
 
     const value = {
         websockets,

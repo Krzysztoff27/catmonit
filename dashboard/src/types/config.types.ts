@@ -29,7 +29,7 @@ export interface WidgetConfig {
     propertiesContent?: WidgetPropertiesContent; // TODO specify the props
     limits: WidgetLimits;
     initialSettings: any;
-    dataSource?: string;
+    dataSource: "disks" | "fileShares" | "network" | "system" | "";
     isReferingToSingularResource: boolean;
 }
 

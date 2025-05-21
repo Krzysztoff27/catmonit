@@ -14,7 +14,7 @@ interface DeviceSelectProps {
 }
 
 function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: DeviceSelectProps) {
-    const {data, loading} = useFetch('/device/getAllDevices');
+    const { data, loading } = useFetch("/device/getAllDevices");
     const { setWidgetSettings, getWidgetConfig } = useWidgets();
     const source = overridenDataSource || getWidgetConfig(widget).dataSource;
 
@@ -24,6 +24,7 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
         // Widgets of type ${widget.type} have no default "dataSource" defined and "overridenDataSource" was not provided.`);
     }
 
+    if (loading) return;
 
     const selectData = [
         {
