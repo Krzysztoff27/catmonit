@@ -1,11 +1,11 @@
 import { Stack, Button, Group, Text } from "@mantine/core";
-import { Alert } from "../../../types/api.types";
+// import { Alert } from "../../../types/api.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import { WidgetPropertiesContentProps } from "../../../types/components.types";
 import DataSourceMultiselect from "../../interactive/input/DataSourceMultiselect/DataSourceMultiselect";
 
 interface AlertDrawerProps {
-    hiddenAlerts: Record<string, Alert>;
+    // hiddenAlerts: Record<string, Alert>;
     onRestore: (id: number) => void;
 }
 //@TODO store in cookies - useAuth

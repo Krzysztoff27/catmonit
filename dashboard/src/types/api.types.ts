@@ -3,43 +3,51 @@ export interface TokenRequestForm {
     password: string;
 }
 
-export interface Device {
-    uuid: string;
+export interface DeviceInfo {
+    lastUpdated: string;
     hostname: string;
     ipAddress: string;
     mask: string;
+    uuid: string;
     os: string;
-    lastUpdated: string;
 }
 
-export interface DeviceCpuData extends Device {
-    bootTimestamp: number;
-    cpu: number; //percentage, so <0;100>
-    cpuCoreNumber: number;
-    cpuLoadAverage: number[];
-    ramUsed: number;
-    ramMax: number;
-    swapUsed: number;
-    swapMax: number;
+export interface SystemInfo {
+    cpuUsagePercent: number;
+    ramTotalBytes: number;
+    ramUsedBytes: number;
+    pagefileTotalBytes: number; //SWAP
+    pagefileUsedBytes: number;
+    lastBootTimestamp: string;
 }
 
-export interface Disk {
-    path: string;
-    storageLimit: number;
-    storageCurrent: number;
+export interface ShareInfo {
+    sharePath: string;
+    usage: number;
+    capacity: number;
+}
+//@TODO should we leave it as optional?
+export interface AutoDevice {
+    deviceInfo: DeviceInfo;
+    systemInfo?: SystemInfo;
+    sharesInfo?: ShareInfo[];
 }
 
-export interface DeviceDiskData extends Device {
-    disks: { [key: string]: Disk };
+export interface WarningInfo {
+    deviceInfo: DeviceInfo;
+    warnings: string[];
 }
 
-export interface FileShare {
-    path: string;
-    storageLimit: number;
-    storageCurrent: number;
+export interface APIResponse {
+    responseTime: string;
+    monitoredDevices: Record<string, null>;
+    autoDevices: Record<string, AutoDevice>;
+    warnings?: Record<string, WarningInfo>;
+    errors?: Record<string, string>;
 }
 
 export interface WidgetData {
+    index: number;
     type: string;
     rect: {
         x: number;
@@ -51,24 +59,24 @@ export interface WidgetData {
     version: number;
 }
 
-export type AlertType = "disks" | "fileShares" | "system";
+// export type AlertType = "disks" | "fileShares" | "system";
 
-export interface Alert {
-    id: number;
-    uuid: string;
-    hostname: string;
-    ip: string;
-    mask: string;
-    path: string;
-    message: string;
-    isWarning: boolean;
-    type: AlertType;
-}
+// export interface Alert {
+//     id: number;
+//     uuid: string;
+//     hostname: string;
+//     ip: string;
+//     mask: string;
+//     path: string;
+//     message: string;
+//     isWarning: boolean;
+//     type: AlertType;
+// }
 
-export interface AlertListElementProps {
-    alert: Alert;
-    onRemove: () => void;
-}
+// export interface AlertListElementProps {
+//     alert: Alert;
+//     onRemove: () => void;
+// }
 
 export interface LayoutInfoInDatabase {
     id: string;
