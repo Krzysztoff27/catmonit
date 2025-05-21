@@ -25,11 +25,14 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public void CalculateBestAutoCandidates(int n)
         {
             AutoCandidates = MonitoredDevices
-                .Values
-                .OrderBy(device => device.DisksInfo.Count)
-                .Take(n)
-                .Select(device => device.DeviceInfo.uuid)
-                .ToList();
+            .Values
+            .OrderBy(device => device.DisksInfo
+                .Where(disk => disk.Capacity > 0)
+                .DefaultIfEmpty()
+                .Average(disk => (double)((float)disk.Usage / (float)disk.Capacity)))
+            .Take(n)
+            .Select(device => device.DeviceInfo.uuid)
+            .ToList();
         }
         public void CalculateWarnings()
         {

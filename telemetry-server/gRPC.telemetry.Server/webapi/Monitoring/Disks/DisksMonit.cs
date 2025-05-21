@@ -12,24 +12,24 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         private DisksMonit() {
             StartMonitoring(15000);
         }
-        public static DisksInfoSnapshotHolder storageDeviceInfos { get; set; } = new();
+        public static DisksInfoSnapshotHolder diskDeviceInfos { get; set; } = new();
         public override void UpdateGeneralData()
         {
             // remove the unactive devices
             DisksInfo.Instance.RemoveStaleDevices(TimeSpan.FromMinutes(5));
             // create snapshot
-            storageDeviceInfos = DisksInfo.Instance.snapShot();
+            diskDeviceInfos = DisksInfo.Instance.snapShot();
             // caluculate the AUTO best candidates, as well as the overall warnings and errors.
-            storageDeviceInfos.CalculateBestAutoCandidates(NextAutoRequestedCount);
-            storageDeviceInfos.CalculateWarnings();
+            diskDeviceInfos.CalculateBestAutoCandidates(NextAutoRequestedCount);
+            diskDeviceInfos.CalculateWarnings();
 
         }
         public override string subscriberUpdateMessage(Subscriber subber)
         {
-            DisksResponse nr = new DisksResponse(storageDeviceInfos.SnapshotTime);
+            DisksResponse nr = new DisksResponse(diskDeviceInfos.SnapshotTime);
             foreach(var device in subber.monitoredDevicesIndexes)
             {
-                if (storageDeviceInfos.MonitoredDevices.TryGetValue(device, out DisksDeviceInfo deviceInfo))
+                if (diskDeviceInfos.MonitoredDevices.TryGetValue(device, out DisksDeviceInfo deviceInfo))
                 {
                     nr.monitoredDevices[device] = deviceInfo;
                 }
@@ -39,14 +39,14 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 }
             }
 
-            for (int i = 0; i < (subber.autoDevicesCount < storageDeviceInfos.MonitoredDevices.Count ? subber.autoDevicesCount: storageDeviceInfos.MonitoredDevices.Count); i++)
+            for (int i = 0; i < (subber.autoDevicesCount < diskDeviceInfos.MonitoredDevices.Count ? subber.autoDevicesCount: diskDeviceInfos.MonitoredDevices.Count); i++)
             {
-                nr.autoDevices[storageDeviceInfos.AutoCandidates[i]] = storageDeviceInfos.MonitoredDevices[storageDeviceInfos.AutoCandidates[i]];
+                nr.autoDevices[diskDeviceInfos.AutoCandidates[i]] = diskDeviceInfos.MonitoredDevices[diskDeviceInfos.AutoCandidates[i]];
             }
-            if (storageDeviceInfos.DiskWarnings.Count != 0)
+            if (diskDeviceInfos.DiskWarnings.Count != 0)
             {
                 nr.warnings = new ConcurrentDictionary<Guid, OneDeviceDiskWarningsHolder>(
-                    storageDeviceInfos.DiskWarnings.Take(subber.warningCount)
+                    diskDeviceInfos.DiskWarnings.Take(subber.warningCount)
                 );
             }
 

@@ -2,6 +2,7 @@
 using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using gRPC.telemetry.Server.webapi.Monitoring;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 using webapi.webapi;
 
 namespace webapi.Controllers.http.layout
@@ -19,7 +20,7 @@ namespace webapi.Controllers.http.layout
             if (authRes.res != null) return authRes.res;
             try
             {
-                List<deviceInfo> devices = DeviceHelper.GetDeviceInfos();
+                Dictionary<Guid, deviceInfo> devices = DeviceHelper.GetDeviceInfos();
                 return Json(devices);
             }catch (InternalServerError)
             {

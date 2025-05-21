@@ -11,9 +11,9 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
     public class DeviceHelper
     {
         public static ConcurrentDictionary<Guid, deviceInfo> allDeviceInfos = new();
-        public static List<deviceInfo> GetDeviceInfos()
+        public static Dictionary<Guid, deviceInfo> GetDeviceInfos()
         {
-            return allDeviceInfos.Values.ToList();
+            return allDeviceInfos.ToDictionary();
         }
         private static void updateLastSeen(Guid deviceID, DateTime lastSeen)
         {

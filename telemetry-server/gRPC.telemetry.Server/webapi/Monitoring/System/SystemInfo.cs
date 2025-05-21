@@ -46,6 +46,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 .Take(n)
                 .Select(device => device.deviceInfo.uuid)
                 .ToList();
+
         }
         public void CalculateWarnings()
         {

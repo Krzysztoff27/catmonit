@@ -1,24 +1,21 @@
 ﻿using gRPC.telemetry.Server.webapi.Monitoring.Network;
-using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using webapi.webapi;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace webapi.Monitoring
 {
-
     public class Monit
     {
-       
-        public int NextAutoRequestedCount { get; set; } = 0;
+        private readonly object _lock = new object();
+
+        public int NextAutoRequestedCount { get; private set; } = 0;
 
         public int requestTimeout;
-        public readonly List<Subscriber> subscribers = new List<Subscriber>();
+        private readonly List<Subscriber> subscribers = new List<Subscriber>();
 
         public readonly SemaphoreSlim monitorLock = new SemaphoreSlim(1, 1);
-        public CancellationTokenSource cancellationTokenSource;
+        public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         public Task monitorTask;
-
 
         public void sendSimpleMsg(WebSocket ws, string msg)
         {
@@ -29,62 +26,23 @@ namespace webapi.Monitoring
 
         public void Subscribe(Subscriber sub)
         {
-            if (subscribers.Count == 0)
+            lock (_lock)
             {
-                NetworkMonit.Instance.NextAutoRequestedCount = sub.autoDevicesCount;
-                NetworkMonit.Instance.UpdateGeneralData();
-            }
-            subscribers.Add(sub);
-
-            if (sub.autoDevicesCount > NextAutoRequestedCount)
-            {
-                NextAutoRequestedCount = sub.autoDevicesCount;
-                UpdateGeneralData();
-            }
-
-            /*
-            // check if user has permission to view all the requested devices
-            int permissions = (int)Permissions.defaultPermission;
-            try
-            {
-                int? perms;
-                perms = PermissionHelper.UserPermission(subber.userID);
-                if (perms == null)
+                if (subscribers.Count == 0)
                 {
-                    string message = JsonSerializer.Serialize(new { message= "user doesn't exist"});
-                    sendSimpleMsg(subber.WebSocket, message);
+                    NetworkMonit.Instance.NextAutoRequestedCount = sub.autoDevicesCount;
+                    NetworkMonit.Instance.UpdateGeneralData();
                 }
-                else
+
+                subscribers.Add(sub);
+
+                if (sub.autoDevicesCount > NextAutoRequestedCount)
                 {
-                    permissions = perms.Value;
+                    NextAutoRequestedCount = sub.autoDevicesCount;
+                    UpdateGeneralData();
                 }
             }
-            catch (InternalServerError)
-            {
-                // ignore
-            }
-            if ((permissions & (int)Permissions.seeAllPermission) != (int)Permissions.seeAllPermission)
-            {
 
-                try
-                {
-                    List<Guid> canBeAccessedDevices = DeviceHelper.GetDevicesUserHasAccessTo(subber.userID);
-                    var missing = subber.monitoredDevicesIndexes.Where(item => !canBeAccessedDevices.Contains(item)).ToList();
-                    subber.monitoredDevicesIndexes = subber.monitoredDevicesIndexes.Except(missing).ToList();
-
-                    string message = JsonSerializer.Serialize(new { message = "You don't have permissions to view all the requested devices", missing = missing });
-                    sendSimpleMsg(subber.WebSocket, message);
-                }
-                catch (InternalServerError)
-                {
-                    subber.monitoredDevicesIndexes.Clear();
-                    subber.autoDevicesCount = 0;
-                    string message = JsonSerializer.Serialize(new { message = "Internal server error. Cannot check permissions- assuming you have none >:3" });
-                    sendSimpleMsg(subber.WebSocket, message);
-                }
-            }*/
-
-            // send cached data on devices
             string customMessage = subscriberUpdateMessage(sub);
             sendSimpleMsg(sub.WebSocket, customMessage);
             onSubscribe(sub);
@@ -92,38 +50,43 @@ namespace webapi.Monitoring
 
         public void Unsubscribe(Subscriber sub)
         {
-            subscribers.Remove(sub);
-            if (subscribers.Count == 0)
+            lock (_lock)
             {
-                NextAutoRequestedCount = 0;
-            }
-            else if (sub.autoDevicesCount == NextAutoRequestedCount)
-            {
-                // recalculate auto count
-                int auto = 0;
-                foreach (var subscriber in subscribers)
+                subscribers.Remove(sub);
+
+                if (subscribers.Count == 0)
                 {
-                    if (subscriber.autoDevicesCount > auto)
-                        auto = subscriber.autoDevicesCount;
+                    NextAutoRequestedCount = 0;
                 }
-                NextAutoRequestedCount = auto;
+                else if (sub.autoDevicesCount == NextAutoRequestedCount)
+                {
+                    // recalculate auto count
+                    NextAutoRequestedCount = subscribers.Max(s => s.autoDevicesCount);
+                }
             }
+
             onUnsubscribe(sub);
         }
 
         public void StartMonitoring(int timeout = 5000)
         {
-            if (monitorTask != null && !monitorTask.IsCompleted)
-                return; // Already running
-            requestTimeout = timeout;
-            cancellationTokenSource = new CancellationTokenSource();
-            monitorTask = Task.Run(() => MonitorLoop(cancellationTokenSource.Token));
+            lock (_lock)
+            {
+                if (monitorTask != null && !monitorTask.IsCompleted)
+                    return;
+
+                requestTimeout = timeout;
+                monitorTask = Task.Run(() => MonitorLoop(cancellationTokenSource.Token));
+            }
         }
 
         public void StopMonitoring()
         {
-            cancellationTokenSource?.Cancel();
-            monitorTask?.Wait();
+            lock (_lock)
+            {
+                cancellationTokenSource?.Cancel();
+                monitorTask?.Wait();
+            }
         }
 
         private async Task MonitorLoop(CancellationToken token)
@@ -140,16 +103,23 @@ namespace webapi.Monitoring
                 {
                     monitorLock.Release();
                 }
-                await Task.Delay((int)requestTimeout, token);
-            }
 
+                await Task.Delay(requestTimeout, token);
+            }
         }
+
         public async void sendData()
         {
-            var tasks = subscribers.Select(async sub =>
+            List<Subscriber> currentSubs;
+
+            lock (_lock)
+            {
+                currentSubs = subscribers.ToList(); // snapshot
+            }
+
+            var tasks = currentSubs.Select(async sub =>
             {
                 string customMessage = subscriberUpdateMessage(sub);
-
                 byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(customMessage);
                 var buffer = new ArraySegment<byte>(messageBytes);
 
@@ -159,14 +129,14 @@ namespace webapi.Monitoring
                 }
                 catch (Exception)
                 {
-                    Utils.assert(false);
+                    // ignore, not a biggie
                 }
             });
 
             await Task.WhenAll(tasks);
         }
 
-        public virtual string subscriberUpdateMessage(Subscriber subber) { return ""; }
+        public virtual string subscriberUpdateMessage(Subscriber subber) => "";
         public virtual void UpdateGeneralData() { }
         public virtual void onSubscribe(Subscriber subber) { }
         public virtual void onUnsubscribe(Subscriber subber) { }
