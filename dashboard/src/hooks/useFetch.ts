@@ -8,7 +8,7 @@ const useFetch = (path: string, options: object | undefined = undefined, cleanBe
     const [refreshValue, setRefreshValue] = useState<boolean>(false);
 
     const refresh = () => {
-        setRefreshValue(prev => !prev);
+        setRefreshValue((prev) => !prev);
     };
 
     const { sendRequest } = useApiRequests();
@@ -27,7 +27,7 @@ const useFetch = (path: string, options: object | undefined = undefined, cleanBe
                 setLoading(false);
             };
 
-            const json = await sendRequest(path, "GET", options, undefined, onError);
+            const json = await sendRequest("GET", path, options, undefined, onError);
 
             if (!json) return;
             setData(json);

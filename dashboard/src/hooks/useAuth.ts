@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 
@@ -53,8 +53,9 @@ export default function useAuth(): useAuthReturn {
     const getTokenOptions = (token: string) => ({
         headers: {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
             Accept: "application/json",
-            Authorization: `Bearer ${token}`,
+            Authentication: `${token}`,
         },
     });
 

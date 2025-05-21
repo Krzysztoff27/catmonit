@@ -6,31 +6,21 @@
 
 .button {
     border: none !important;
-    background: var(--background-color-5) !important;
+    background: transparent !important;
     padding-left: var(--mantine-spacing-xs) !important;
     padding-right: var(--mantine-spacing-xs) !important;
-}
-
-.dropdownButton {
-    border-radius: 6px 0 0 6px !important;
 }
 
 .textInput {
     flex: 1;
     border-left-width: 0 !important;
     border-right-width: 0 !important;
-    border-radius: 0 !important;
     height: 36px;
 }
 
-.textInputInput {
-    &:focus-within {
-        border-color: transparent !important;
-    }
-}
-
-.deleteButton {
-    border-radius: 0 6px 6px 0 !important;
+.textInputInput:disabled {
+    background-color: var(--background-color-4) !important;
+    color: var(--mantine-color-dimmed) !important;
 }
 
 .dropdownMenu {

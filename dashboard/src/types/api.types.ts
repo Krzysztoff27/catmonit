@@ -4,10 +4,10 @@ export interface TokenRequestForm {
 }
 
 export interface Device {
-  uuid: string;
-  hostname: string;
-  ip: string;
-  mask: string;
+    uuid: string;
+    hostname: string;
+    ip: string;
+    mask: string;
 }
 
 export interface DeviceCpuData extends Device {
@@ -49,21 +49,38 @@ export interface WidgetData {
     version: number;
 }
 
-export type AlertType = "storage" | "fileShares" | "system";
+export type AlertType = "disks" | "fileShares" | "system";
 
 export interface Alert {
-  id: number;
-  uuid: string;
-  hostname: string;
-  ip: string;
-  mask: string;
-  path: string;
-  message: string;
-  isWarning: boolean;
-  type: AlertType;
+    id: number;
+    uuid: string;
+    hostname: string;
+    ip: string;
+    mask: string;
+    path: string;
+    message: string;
+    isWarning: boolean;
+    type: AlertType;
 }
 
 export interface AlertListElementProps {
-  alert: Alert;
-  onRemove: () => void;
+    alert: Alert;
+    onRemove: () => void;
+}
+
+export interface LayoutInfoInDatabase {
+    id: string;
+    name: string;
+}
+export interface LayoutInDatabase {
+    info: LayoutInfoInDatabase;
+    data: WidgetData[];
+}
+
+export interface WebSocketStart {
+    message: "start";
+    devices?: string[]; // uuids
+    auto?: number; // amount of automatically provided resources
+    warningsCount?: number;
+    errorsCount?: number;
 }

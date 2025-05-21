@@ -1,5 +1,5 @@
 import CornerFloater from "../../wrappers/CornerFloater/CornerFloater";
-import { Stack, UnstyledButton } from "@mantine/core";
+import { Space, Stack, UnstyledButton } from "@mantine/core";
 import LayoutControls from "../../interactive/input/LayoutControls/LayoutControls";
 import WidgetMenu from "../WidgetMenu/WidgetMenu";
 import { useDisclosure } from "@mantine/hooks";
@@ -12,12 +12,13 @@ const LayoutMenu = ({ isDraggingDroppable, setIsDraggingDroppable, currentDropTy
     return (
         <CornerFloater
             id="layoutMenu"
-            height={expanded ? window.innerHeight / 2 - 20 : 90}
+            height={expanded ? window.innerHeight / 2 - 20 : 100}
             width={300}
             hide={isDraggingDroppable}
         >
             <Stack className={classes.navbar}>
                 <LayoutControls />
+                <Space h="md" />
                 {expanded && (
                     <WidgetMenu
                         isDragging={isDraggingDroppable}

@@ -1,10 +1,15 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
-import { isEmpty } from "lodash";
+import { isEmpty, isNull, isUndefined } from "lodash";
 import { WidgetPropertiesContent, WidgetContent } from "../../types/components.types";
 import { WidgetConfig, WidgetLimits } from "../../types/config.types";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { useLayouts } from "../LayoutContext/LayoutContext";
+import { useData } from "../DataContext/DataContext";
+import urlConfig from "../../config/url.config";
+import { safeObjectEntries } from "../../utils/object";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -25,26 +30,54 @@ interface WidgetContextType {
     getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent | undefined;
 }
 
+interface WidgetProviderProps {
+    children: React.ReactNode;
+    currentLayout?: string;
+}
+
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
-export function WidgetProvider({ children, initialData }: { children: React.ReactNode; initialData: any }) {
-    const [widgets, setWidgets] = useState<WidgetData[]>([
-        {
-            type: "DETAILED_DEVICE_STORAGE",
-            rect: {
-                x: 0,
-                y: 0,
-                w: 2,
-                h: 2,
-            },
-            settings: WIDGETS_CONFIG.DETAILED_DEVICE_STORAGE.initialSettings,
-            version: 0,
-        },
-    ]);
-    const [data, setData] = useState(initialData);
+export function WidgetProvider({ children }: WidgetProviderProps) {
+    const { currentLayout, updateCurrentLayout } = useLayouts();
+    const { websockets, data } = useData();
+    const [widgets, setWidgets] = useState<WidgetData[]>([]);
     const [selected, setSelected] = useState<null | number>(null);
 
-    const saveStateToDatabase = () => {};
+    useEffect(() => {
+        setWidgets(currentLayout?.data || []);
+        const subscriptions = {};
+
+        currentLayout?.data?.forEach((widget: WidgetData) => {
+            const config = getWidgetConfig(widget);
+
+            if (!config.isReferingToSingularResource) return;
+
+            if (isUndefined(subscriptions[config.dataSource])) {
+                subscriptions[config.dataSource] = {
+                    resourceUuids: [],
+                    autoNumber: 0,
+                };
+            }
+
+            if (isNull(widget.settings.target)) subscriptions[config.dataSource].autoNumber++;
+            else subscriptions[config.dataSource].resourceUuids.push(widget.settings.target);
+        });
+
+        safeObjectEntries(subscriptions).map(([dataSource, { resourceUuids, autoNumber }]) => {
+            websockets[dataSource].updateSubscribedResources(resourceUuids);
+            websockets[dataSource].updateAutoResources(autoNumber);
+        });
+    }, [currentLayout?.data]);
+
+    const saveStateToDatabase = useDebouncedCallback(() => {
+        console.log("saved");
+        updateCurrentLayout(widgets);
+    }, 2000);
+
+    const saveState = () => {
+        console.log("saving");
+        saveStateToDatabase();
+    };
 
     const getWidgetConfig = (widget: WidgetData) => WIDGETS_CONFIG?.[widget?.type] ?? {};
 
@@ -53,7 +86,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     const getWidgetContent = (widget: WidgetData) => {
         const content = getWidgetConfig(widget).content;
         if (!content) {
-            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+            console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
         }
         return content;
     };
@@ -61,7 +94,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     const getWidgetPropertiesContent = (widget: WidgetData) => {
         const propertiesContent = getWidgetConfig(widget).propertiesContent;
         if (!propertiesContent) {
-            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+            console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
         }
         return propertiesContent;
     };
@@ -87,7 +120,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
                 return widget;
             })
         );
-        saveStateToDatabase();
+        saveState();
     };
 
     const setWidgetRect = (index: number, newRect: Rect) => {
@@ -100,10 +133,17 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
             };
             return newWidgets;
         });
-        saveStateToDatabase();
+        saveState();
     };
 
     const setWidgetSettings = (index: number, newSettings: any) => {
+        const widget = widgets[index];
+        const config = getWidgetConfig(widget);
+
+        if (config.isReferingToSingularResource && widget.settings?.target !== newSettings?.target) {
+            websockets[config.dataSource]?.replaceSubscribedResource(widget.settings.target, newSettings.target);
+        }
+
         setWidgets((prev) => {
             const newWidgets = [...prev];
             newWidgets[index] = {
@@ -113,16 +153,23 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
             };
             return newWidgets;
         });
-        saveStateToDatabase();
+        saveState();
     };
 
     const createWidget = (type: string | null | undefined, layoutItem: LayoutItem) => {
         if (!type) return;
+
+        const config = WIDGETS_CONFIG[type];
+
+        if (config.isReferingToSingularResource) {
+            websockets[config.dataSource].incrementAutoResources();
+        }
+
         setWidgets((prev) => [
             ...prev,
             {
                 type,
-                settings: WIDGETS_CONFIG[type].initialSettings,
+                settings: config.initialSettings,
                 rect: getItemRect(layoutItem),
                 version: 0,
             } as WidgetData,
@@ -130,8 +177,16 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     };
 
     const deleteWidget = (index: number | string) => {
+        const widget = widgets[index];
+        const config = getWidgetConfig(widget);
+
+        if (config.isReferingToSingularResource) {
+            if (isNull(widget.settings.target)) websockets[config.dataSource].decrementAutoResources();
+            else websockets[config.dataSource].removeSubscribedResource(widget.settings.target);
+        }
+
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== index));
-        saveStateToDatabase();
+        saveState();
     };
 
     const getWidgetData = (widget: WidgetData) => {
@@ -142,7 +197,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
         const source = config.dataSource;
 
         if (!source) {
-            //console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
+            console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
             return;
         }
 
@@ -162,14 +217,14 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const layout = useMemo(
         () =>
-            widgets.map((widget: WidgetData, i): LayoutItem => {
+            widgets?.map?.((widget: WidgetData, i): LayoutItem => {
                 return {
                     i: `${i}`,
                     ...widget.rect,
                     ...getWidgetConfig(widget).limits,
                     isResizable: true,
                 };
-            }),
+            }) || [],
         [widgets]
     );
 

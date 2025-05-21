@@ -42,7 +42,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
         initialSettings: {
-            target: undefined,
+            target: null,
             automatic: true,
             disks: undefined,
             highlightStages: {
@@ -50,12 +50,12 @@ const WIDGETS_CONFIG: WidgetsConfig = {
                 red: 90,
             },
         },
-        dataSource: "storage",
+        dataSource: "disks",
         isReferingToSingularResource: true,
         image: "/images/widgets/detailed_device_storage.png",
     },
     OVERALL_DEVICE_STORAGE: {
-        name: "overall device's storage",
+        name: "overall device's disks",
         icon: IconChartDonut,
         content: OverallDeviceStorageWidget,
         propertiesContent: OverallDeviceStorageDrawer,
@@ -66,10 +66,10 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
         initialSettings: {
-            target: undefined,
+            target: null,
             automatic: true,
         },
-        dataSource: "storage",
+        dataSource: "disks",
         isReferingToSingularResource: true,
         image: "/images/widgets/overall_device_storage.png",
     },
@@ -104,7 +104,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 4,
         },
         initialSettings: {
-            arget: undefined,
+            target: null,
             automatic: true,
             fileShares: undefined,
             highlightStages: {

@@ -14,28 +14,26 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const data = getWidgetData(widget);
     const config = getWidgetConfig(widget);
     const dataSource: string = config.dataSource ?? "";
-    const resourceKey =
-        {
-            storage: "disks",
-            fileShares: "fileShares",
-        }[dataSource] ?? "";
     const selectedDevice = widget?.settings?.target;
 
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
         const newData = getData(dataSource)[target];
-        const newResourceData = safeObjectValues(newData[resourceKey]);
-        const newResourceSettings = newResourceData.reduce((prev, { path }) => ({...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 }}}), {});
-        setWidgetSettings(index, { ...widget.settings, target, [resourceKey]: newResourceSettings });
+        const newResourceData = safeObjectValues(newData[dataSource]);
+        const newResourceSettings = newResourceData.reduce(
+            (prev, { path }) => ({ ...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 } } }),
+            {}
+        );
+        setWidgetSettings(index, { ...widget.settings, target, [dataSource]: newResourceSettings });
     };
 
     const isResourceHidden = (path: string) => {
-        return widget?.settings?.[resourceKey]?.[path].hidden;
+        return widget?.settings?.[dataSource]?.[path].hidden;
     };
 
     const toggleResourceHidden = (path: string) => {
         const newSettings = widget.settings;
-        newSettings[resourceKey][path].hidden = !newSettings[resourceKey][path].hidden;
+        newSettings[dataSource][path].hidden = !newSettings[dataSource][path].hidden;
         setWidgetSettings(index, newSettings);
     };
 
@@ -47,16 +45,16 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const modifyHighlightStage = (path: string, stage: "yellow" | "red", value: number | string) => {
         const newSettings = widget.settings;
-        if(!newSettings?.[resourceKey]?.[path]?.highlightStages?.[stage]) return;
-        newSettings[resourceKey][path].highlightStages[stage] = value;
+        if (!newSettings?.[dataSource]?.[path]?.highlightStages?.[stage]) return;
+        newSettings[dataSource][path].highlightStages[stage] = value;
         setWidgetSettings(index, newSettings);
     };
 
     const resourceList = useMemo(
         () =>
-            safeObjectValues(data[resourceKey]).map((resource, i: number) => {
+            safeObjectValues(data[dataSource]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
-                console.log(widget.settings[resourceKey][resource.path])
+                console.log(widget.settings[dataSource][resource.path]);
                 return (
                     <Flex
                         key={i}
@@ -69,7 +67,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                             readOnly
                         />
                         <NumberInput
-                            defaultValue={widget?.settings?.[resourceKey]?.[resource.path]?.highlightStages?.yellow}
+                            defaultValue={widget?.settings?.[dataSource]?.[resource.path]?.highlightStages?.yellow}
                             onChange={(val: number | string) => modifyHighlightStage(resource.path, "yellow", val)}
                             min={0}
                             max={100}
@@ -78,7 +76,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                             className={classes.percentInput}
                         />
                         <NumberInput
-                            defaultValue={widget?.settings?.[resourceKey]?.[resource.path]?.highlightStages?.red}
+                            defaultValue={widget?.settings?.[dataSource]?.[resource.path]?.highlightStages?.red}
                             onChange={(val: number | string) => modifyHighlightStage(resource.path, "red", val)}
                             min={0}
                             max={100}
@@ -98,7 +96,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                     </Flex>
                 );
             }),
-        [widget?.settings.target, widget?.settings?.[resourceKey]]
+        [widget?.settings.target, widget?.settings?.[dataSource]]
     );
 
     return (

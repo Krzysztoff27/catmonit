@@ -1,42 +1,84 @@
 import { Button, Combobox, Group, TextInput, useCombobox } from "@mantine/core";
 import { IconChevronDown, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo } from "react";
 import classes from "./LayoutControls.module.css";
+import { useLayouts } from "../../../../contexts/LayoutContext/LayoutContext";
+import { LayoutInfoInDatabase } from "../../../../types/api.types";
+import { isEmpty, isObject, trim, trimStart } from "lodash";
+import { useField } from "@mantine/form";
+import useNotifications from "../../../../hooks/useNotifications";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { isFileLoadingAllowed } from "vite";
 
 const LayoutControls = ({}): React.JSX.Element => {
-    const [layouts, setLayouts] = useState(["New layout 1", "New layout 2", "New layout 3", "New layout 4", "New layout 5", "New layout 6", "New layout 7"]);
-    const { layoutName } = useParams();
-    const navigate = useNavigate();
+    const { currentLayout, loading, layouts, renameCurrentLayout, removeLayout, createNewLayout, setCurrent } = useLayouts();
+    const { sendErrorNotification } = useNotifications();
+
+    const field = useField({
+        initialValue: currentLayout?.info.name || "",
+        validateOnChange: true,
+        validate: (value) =>
+            isEmpty(trim(value))
+                ? "Layout name cannot be empty."
+                : !/^[A-Za-z0-9 ]+$/.test(trim(value)!)
+                ? "Name contains invalid characters."
+                : isObject((layouts || []).find((l) => l.name === trim(value) && l.id !== currentLayout?.info.id))
+                ? "Layout with that name already exists"
+                : null,
+    });
+
     const combobox = useCombobox();
 
-    const options = layouts.map((item) => (
-        <Combobox.Option
-            value={item}
-            key={item}
-        >
-            {item}
-        </Combobox.Option>
-    ));
+    const options = useMemo(() => [...(layouts || []), { name: "+ Create new layout", id: "+" } as LayoutInfoInDatabase], [layouts]);
 
-    const onRemove = () => {
-        const currentIndex = layouts.findIndex((name) => name === layoutName);
-        const newLayouts = [...layouts];
-        newLayouts.splice(currentIndex, 1);
-        setLayouts(newLayouts);
-        const layoutToDisplay = currentIndex > 0 ? currentIndex - 1 : 0;
-        navigate(`/editor/${encodeURI(newLayouts[layoutToDisplay])}`);
+    const comboboxOptions = useMemo(
+        () =>
+            options.map(({ name, id }: LayoutInfoInDatabase, i) => (
+                <Combobox.Option
+                    key={i}
+                    value={id}
+                >
+                    {name}
+                </Combobox.Option>
+            )),
+        [options]
+    );
+
+    const onRemove = async () => {
+        if (!currentLayout) return;
+        const currentIndex = layouts.findIndex(({ name }) => name === currentLayout?.info.name);
+        const indexToDisplay = currentIndex > 0 ? currentIndex - 1 : 0;
+        setCurrent(layouts[indexToDisplay].id);
+        await removeLayout(currentLayout?.info.id);
     };
+
+    const onInputBlur = async () => {
+        field
+            .validate()
+            .then((message) => !message && renameCurrentLayout(field.getValue()!))
+            .catch((err) => sendErrorNotification(err.status));
+    };
+
+    const onSubmit = async (val) => {
+        if (val === "+") val = await createNewLayout();
+        combobox.closeDropdown();
+        setCurrent(val);
+    };
+
+    useEffect(() => {
+        field.setValue(currentLayout?.info?.name || "Loading");
+    }, [currentLayout?.info?.name]);
+
+    useEffect(() => {
+        field.setError(null);
+    }, [currentLayout?.info.id]);
 
     return (
         <Combobox
             width={200}
             store={combobox}
             position="bottom-start"
-            onOptionSubmit={(val) => {
-                navigate(`/editor/${encodeURI(val)}`);
-                combobox.closeDropdown();
-            }}
+            onOptionSubmit={onSubmit}
             classNames={{
                 dropdown: classes.dropdownMenu,
                 option: classes.option,
@@ -47,39 +89,45 @@ const LayoutControls = ({}): React.JSX.Element => {
                 gap={0}
                 className={classes.layoutGroup}
             >
-                <Combobox.Target>
-                    <Button
-                        onClick={() => combobox.toggleDropdown()}
-                        variant="default"
-                        className={`${classes.dropdownButton} ${classes.button}`}
-                    >
-                        <IconChevronDown size={18} />
-                    </Button>
-                </Combobox.Target>
-
                 <TextInput
-                    value={layoutName}
-                    onChange={() => {}}
-                    radius="0"
+                    {...field.getInputProps()}
+                    radius="sm"
                     className={classes.textInput}
                     classNames={{
                         input: classes.textInputInput,
                     }}
                     variant="filled"
+                    onBlur={onInputBlur}
+                    disabled={loading}
+                    leftSection={
+                        <Combobox.Target>
+                            <Button
+                                onClick={() => combobox.toggleDropdown()}
+                                variant="default"
+                                className={`${classes.dropdownButton} ${classes.button}`}
+                                disabled={loading}
+                                c={field.error ? "red.6" : loading ? "dimmed" : ""}
+                            >
+                                <IconChevronDown size={18} />
+                            </Button>
+                        </Combobox.Target>
+                    }
+                    rightSection={
+                        <Button
+                            onClick={onRemove}
+                            variant="default"
+                            className={`${classes.deleteButton} ${classes.button}`}
+                            disabled={layouts?.length <= 1 || loading}
+                            c={field.error ? "red.6" : layouts?.length <= 1 || loading ? "dimmed" : ""}
+                        >
+                            <IconTrash size={18} />
+                        </Button>
+                    }
                 />
-
-                <Button
-                    disabled={layouts.length <= 1}
-                    onClick={onRemove}
-                    variant="default"
-                    className={`${classes.deleteButton} ${classes.button}`}
-                >
-                    <IconTrash size={16} />
-                </Button>
             </Group>
 
             <Combobox.Dropdown>
-                <Combobox.Options>{options.length === 0 ? <Combobox.Empty>Nothing found</Combobox.Empty> : options}</Combobox.Options>
+                <Combobox.Options>{options.length === 0 ? <Combobox.Empty>Nothing found</Combobox.Empty> : comboboxOptions}</Combobox.Options>
             </Combobox.Dropdown>
         </Combobox>
     );

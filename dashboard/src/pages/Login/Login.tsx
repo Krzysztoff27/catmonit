@@ -5,12 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { TokenRequestForm } from "../../types/api.types.ts";
 import { useFetch } from "@mantine/hooks";
 import useApiRequests from "../../hooks/useApiRequests.ts";
+import useNotifications from "../../hooks/useNotifications.tsx";
+import { capitalize } from "lodash";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { error, loading, data: user } = useFetch("user");
     const { sendRequest } = useApiRequests();
     const { setAccessToken, setRefreshToken } = useAuth();
+    const { sendErrorNotification } = useNotifications();
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
@@ -29,24 +32,29 @@ export default function LoginPage() {
 
     async function authenticate(values: TokenRequestForm) {
         const jsonResponse = await sendRequest(
-            "/token",
             "POST",
+            "/api/login",
             {
                 headers: {
                     Accept: "application/json",
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Content-Type": "application/json",
                 },
             },
-            new URLSearchParams({
+            JSON.stringify({
                 username: values.username,
                 password: values.password,
-            })
+            }),
+            (res, _) => {
+                sendErrorNotification(
+                    res.status,
+                    res.status === 401 ? { title: "Invalid credentials", message: "Either login or password is incorrect." } : {}
+                );
+            }
         );
 
-        if (!jsonResponse?.access_token) return;
+        if (!jsonResponse?.token) return;
 
-        setAccessToken(jsonResponse.access_token);
-        setRefreshToken(jsonResponse.refresh_token);
+        setAccessToken(jsonResponse.token);
         navigate("/");
     }
 

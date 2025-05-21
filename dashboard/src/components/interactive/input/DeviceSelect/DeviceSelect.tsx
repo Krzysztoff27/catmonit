@@ -17,7 +17,7 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
     const source = overridenDataSource || getWidgetConfig(widget).dataSource;
 
     if (!source) {
-        //console.warn(`[DeviceSelect.tsx]\n
+        console.warn(`[DeviceSelect.tsx]\n
         // Missing data source for the select component.
         // Widgets of type ${widget.type} have no default "dataSource" defined and "overridenDataSource" was not provided.`);
     }
@@ -51,8 +51,8 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
     };
 
     const changeTarget = (target: string | null) => {
-        setWidgetSettings(index, { ...widget.settings, target });
-        onChange?.(target);
+        setWidgetSettings(index, { ...widget.settings, target: target || null });
+        onChange?.(target || null);
     };
 
     return (
