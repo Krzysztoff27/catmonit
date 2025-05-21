@@ -28,7 +28,7 @@ namespace webapi.Controllers.http.layout
             if (authRes.res != null) return authRes.res;
             try
             {
-                List<string> layoutNames = LayoutHelper.getLayoutNames(authRes.payload.id);
+                List<LayoutIDandName> layoutNames = LayoutHelper.getLayoutNamesAndIDs(authRes.payload.id);
                 return Json(layoutNames);
             }
             catch (InternalServerError)
@@ -37,16 +37,17 @@ namespace webapi.Controllers.http.layout
             }
         }
         [HttpGet]
-        [Route("layout/{name}")]
-        public IActionResult GetLayout(string name)
+        [Route("layout/{layoutID}")]
+        public IActionResult GetLayout(Guid layoutID)
         {
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
             try
             {
-                JsonElement? json = LayoutHelper.getLayout(authRes.payload.id, name);
-                return (json == null ? Utils.returnVal(400, "layout doesn't exist") : Json(json));
+                LayoutInfo layoutInfo = LayoutHelper.getLayout(layoutID);
+
+                return (layoutInfo.data == null ? Utils.returnVal(400, "layout doesn't exist") : Json(layoutInfo));
             }
             catch (InternalServerError)
             {
@@ -72,16 +73,8 @@ namespace webapi.Controllers.http.layout
                     {
                         return Utils.returnVal(400, "layout name or data is empty");
                     }
-                    bool res = LayoutHelper.addOrUpdateLayout(authRes.payload.id, layoutName, layoutJson);
-                    if (res)
-                    {
-                        return Utils.returnVal(200, "layout created");
-                    }
-                    else
-                    {
-                        return Utils.returnVal(200, "layout updated");
-                    }
-                    ;
+                    LayoutIDandName res = LayoutHelper.addOrUpdateLayout(authRes.payload.id, layoutName, layoutJson);
+                    return Json(res);
                 }catch (InternalServerError) 
                 {  
                     return Utils.returnVal(500); 
@@ -89,29 +82,28 @@ namespace webapi.Controllers.http.layout
             }
         }
         [HttpPut]
-        [Route("rename/{layoutName}")]
-        public IActionResult RenameLayout(string layoutName)
+        [Route("rename/{LayoutID}")]
+        public IActionResult RenameLayout(Guid LayoutID)
         {
             string newName = Request.Query["new_name"].ToString();
-            if (!isCorrect(layoutName) || (!isCorrect(newName))) return Utils.returnVal(400, "incorrect layout name");
+            if (!isCorrect(newName)) return Utils.returnVal(400, "incorrect layout name");
 
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
-            return LayoutHelper.renameLayout(authRes.payload.id, layoutName, newName);
+            return LayoutHelper.renameLayout(authRes.payload.id, LayoutID, newName);
         }
         [HttpDelete]
-        [Route("delete/{layoutName}")]
-        public IActionResult DeleteLayout(string layoutName)
+        [Route("delete/{layoutID}")]
+        public IActionResult DeleteLayout(Guid layoutID)
         {
-            if (!isCorrect(layoutName)) return Utils.returnVal(400, "incorrect layout name");
 
             authResult authRes = Utils.Authenticate(Request);
             if (authRes.res != null) return authRes.res;
 
             try
             {
-                bool res = LayoutHelper.deleteLayout(authRes.payload.id, layoutName);
-                return res ? Utils.returnVal(200, "removed successfuly") : Utils.returnVal(400, "layout doesn;t exist");
+                bool res = LayoutHelper.deleteLayout(layoutID);
+                return res ? Utils.returnVal(200, "removed successfuly") : Utils.returnVal(400, "layout doesn't exist");
             }catch (InternalServerError)
             {
                 return Utils.returnVal(500);
