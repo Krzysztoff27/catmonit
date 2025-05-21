@@ -1,15 +1,17 @@
-version: "3.8"
-
 services:
   dnsmasq:
-    image: dockurr/dnsmasq
-    container_name: catmonit-dns
+    image: jpillora/dnsmasq
+    container_name: dnsmasq
     restart: unless-stopped
-    environment:
-      DNS1: "api-web.local=10.10.51.3"
-      DNS2: "api-machines.local=10.10.51.3"
+    command:
+      - "--log-facility=-"
+      - "--address=/api-machines.local/10.10.51.3"
+      - "--address=/api-web.local/10.10.51.3"
+      - "--listen-address=0.0.0.0"
+      - "--no-daemon"
+      - "--log-queries"
     ports:
-      - "5353:53/udp"
-      - "5353:53/tcp"
+      - "53:53/udp"
+      - "53:53/tcp"
     cap_add:
       - NET_ADMIN
