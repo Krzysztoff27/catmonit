@@ -80,6 +80,7 @@ services:
     - "traefik.http.routers.api-machines-ip.entrypoints=apisecure"
     - "traefik.http.routers.api-machines-ip.tls=true"
     - "traefik.http.routers.api-machines-ip.service=api-machines"
+    - "traefik.http.services.api-machines.loadbalancer.server.scheme=h2c"
 
     # ROUTER 3: API-WEB domain access on port 443
     - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
