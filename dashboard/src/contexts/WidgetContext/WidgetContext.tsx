@@ -8,9 +8,7 @@ import { WidgetConfig, WidgetLimits } from "../../types/config.types";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { useLayouts } from "../LayoutContext/LayoutContext";
 import { useData } from "../DataContext/DataContext";
-import urlConfig from "../../config/url.config";
 import { safeObjectEntries, safeObjectValues } from "../../utils/object";
-import { preview } from "vite";
 
 interface WidgetContextType {
     widgets: WidgetData[];
