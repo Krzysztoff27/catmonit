@@ -122,7 +122,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     _logger.LogInformation("Processed message from {Hostname}", request.Hostname);
                     //DEBUG
                     Console.OutputEncoding = System.Text.Encoding.UTF8;
-                    Console.WriteLine(JsonSerializer.Serialize(response));
+                    Console.WriteLine(JsonSerializer.Serialize(response, Utils.JsonOption));
                     //DEBUG
                 }
                 catch (Exception ex)
@@ -139,7 +139,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     Status = "OK",
                     Count = responses.Count,
                     Data = responses
-                })
+                }, Utils.JsonOption)
             };
         }
         catch (IOException ex)
@@ -153,7 +153,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     Status = "ClientDisconnected",
                     Count = responses.Count,
                     Data = responses
-                })
+                }, Utils.JsonOption)
             };
         }
         catch (OperationCanceledException)
@@ -167,7 +167,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     Status = "Cancelled",
                     Count = responses.Count,
                     Data = responses
-                })
+                }, Utils.JsonOption)
             };
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
@@ -181,7 +181,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                     Status = "Cancelled",
                     Count = responses.Count,
                     Data = responses
-                })
+                }, Utils.JsonOption)
             };
         }
         catch (Exception ex)

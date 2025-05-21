@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using webapi.Helpers;
@@ -21,6 +22,12 @@ namespace webapi.webapi
     }
     public class Utils
     {
+
+        public static JsonSerializerOptions JsonOption { get; set; } = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        };
         public static void assert(bool value)
         {
             Debug.Assert(value);

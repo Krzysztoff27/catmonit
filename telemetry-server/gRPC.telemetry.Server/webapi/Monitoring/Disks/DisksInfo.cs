@@ -26,7 +26,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         {
             AutoCandidates = MonitoredDevices
             .Values
-            .OrderBy(device => device.DisksInfo
+            .OrderByDescending(device => device.DisksInfo
                 .Where(disk => disk.Capacity > 0)
                 .DefaultIfEmpty()
                 .Average(disk => (double)((float)disk.Usage / (float)disk.Capacity)))

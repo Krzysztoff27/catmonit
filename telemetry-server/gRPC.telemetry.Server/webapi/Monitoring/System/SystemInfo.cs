@@ -40,13 +40,12 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public ConcurrentDictionary<Guid, OneDeviceSystemWarningsHolder> SystemWarnings { get; set; } = new();
         public void CalculateBestAutoCandidates(int n)
         {
-            AutoCandidates = MonitoredDevices
-                .Values
-                .OrderByDescending(device => device.systemInfo.ramTotalBytes)
-                .Take(n)
-                .Select(device => device.deviceInfo.uuid)
-                .ToList();
-
+            var AutoCandidates = MonitoredDevices
+            .Values
+            .OrderByDescending(device => (device.systemInfo.cpuUsagePercent *1f) + (((float)device.systemInfo.ramUsedBytes / (float)device.systemInfo.ramTotalBytes)*70f))
+            .Take(n)
+            .Select(device => device.deviceInfo.uuid)
+            .ToList();
         }
         public void CalculateWarnings()
         {

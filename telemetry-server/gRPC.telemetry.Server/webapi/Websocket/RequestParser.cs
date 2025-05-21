@@ -28,19 +28,19 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                     {
                         NetworkDeviceInfo di = new NetworkDeviceInfo();
 
-                        di.DeviceInfo = getDeviceInfoFromResponse(response);
+                        di.deviceInfo = getDeviceInfoFromResponse(response);
 
                         foreach (NetworkPayload pl in (List<NetworkPayload>)response.Payload)
                         {
                             if (pl.IsMain == true)
                             {
-                                di.MainPayload = pl;
+                                di.mainPayload = pl;
                                 break;
                             }
                         }
-                        di.Networks = ((List<NetworkPayload>)response.Payload).Except(new List<NetworkPayload>{di.MainPayload}).ToList();
+                        di.Networks = ((List<NetworkPayload>)response.Payload).Except(new List<NetworkPayload>{di.mainPayload}).ToList();
 
-                        NetworkInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.uuid, di);
+                        NetworkInfo.Instance.AddOrUpdateDevice(di.deviceInfo.uuid, di);
 
                         break;
                     }
@@ -60,11 +60,11 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                     {
                         SharesDeviceInfo di = new SharesDeviceInfo();
 
-                        di.DeviceInfo = getDeviceInfoFromResponse(response);
+                        di.deviceInfo = getDeviceInfoFromResponse(response);
 
-                        di.SharesInfo = (List<SharePayload>)response.Payload;
+                        di.sharesInfo = (List<SharePayload>)response.Payload;
 
-                        SharesInfo.Instance.AddOrUpdateDevice(di.DeviceInfo.uuid, di);
+                        SharesInfo.Instance.AddOrUpdateDevice(di.deviceInfo.uuid, di);
 
                         break;
                     }

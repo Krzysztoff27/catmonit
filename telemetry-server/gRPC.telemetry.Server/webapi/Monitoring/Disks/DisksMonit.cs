@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
 using webapi.Monitoring;
+using webapi.webapi;
 
 namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
@@ -51,7 +52,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             }
 
 
-            return JsonSerializer.Serialize(nr);
+            return JsonSerializer.Serialize(nr, Utils.JsonOption);
         }
         
         public override void onSubscribe(Subscriber subber)

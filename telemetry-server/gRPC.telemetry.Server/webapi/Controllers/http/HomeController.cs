@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
+using webapi.webapi;
 
 namespace webapi.Controllers.http
 {
@@ -9,10 +11,10 @@ namespace webapi.Controllers.http
     public class HomeController : Controller
     {
         [HttpGet]
-        public JsonResult Get()
+        public IActionResult Get()
         {
             var data = new { Message = "Hello, JSON!", Time = DateTime.UtcNow };
-            return Json(data);
+            return Utils.returnVal(200, JsonSerializer.Serialize(data, Utils.JsonOption));
         }
     }
 }
