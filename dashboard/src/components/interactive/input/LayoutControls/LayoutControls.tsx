@@ -15,7 +15,7 @@ const LayoutControls = ({}): React.JSX.Element => {
     const { sendErrorNotification } = useNotifications();
 
     const field = useField({
-        initialValue: currentLayout?.info.name,
+        initialValue: currentLayout?.info.name || "",
         validateOnChange: true,
         validate: (value) =>
             isEmpty(trim(value))
@@ -56,7 +56,7 @@ const LayoutControls = ({}): React.JSX.Element => {
         field
             .validate()
             .then((message) => !message && renameCurrentLayout(field.getValue()!))
-            .catch((err) => console.error(err));
+            .catch((err) => sendErrorNotification(err.status));
     };
 
     const onSubmit = async (val) => {

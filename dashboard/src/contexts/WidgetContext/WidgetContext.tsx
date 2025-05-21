@@ -1,14 +1,15 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
-import { isEmpty, isNull } from "lodash";
+import { isEmpty, isNull, isUndefined } from "lodash";
 import { WidgetPropertiesContent, WidgetContent } from "../../types/components.types";
 import { WidgetConfig, WidgetLimits } from "../../types/config.types";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { useLayouts } from "../LayoutContext/LayoutContext";
 import { useData } from "../DataContext/DataContext";
 import urlConfig from "../../config/url.config";
+import { safeObjectEntries } from "../../utils/object";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -37,13 +38,40 @@ interface WidgetProviderProps {
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
 export function WidgetProvider({ children }: WidgetProviderProps) {
-    const { currentLayout } = useLayouts();
+    const { currentLayout, updateCurrentLayout } = useLayouts();
     const { websockets, data } = useData();
-    const [widgets, setWidgets] = useState<WidgetData[]>(currentLayout?.data || []);
+    const [widgets, setWidgets] = useState<WidgetData[]>([]);
     const [selected, setSelected] = useState<null | number>(null);
+
+    useEffect(() => {
+        setWidgets(currentLayout?.data || []);
+        const subscriptions = {};
+
+        currentLayout?.data?.forEach((widget: WidgetData) => {
+            const config = getWidgetConfig(widget);
+
+            if (!config.isReferingToSingularResource) return;
+
+            if (isUndefined(subscriptions[config.dataSource])) {
+                subscriptions[config.dataSource] = {
+                    resourceUuids: [],
+                    autoNumber: 0,
+                };
+            }
+
+            if (isNull(widget.settings.target)) subscriptions[config.dataSource].autoNumber++;
+            else subscriptions[config.dataSource].resourceUuids.push(widget.settings.target);
+        });
+
+        safeObjectEntries(subscriptions).map(([dataSource, { resourceUuids, autoNumber }]) => {
+            websockets[dataSource].updateSubscribedResources(resourceUuids);
+            websockets[dataSource].updateAutoResources(autoNumber);
+        });
+    }, [currentLayout?.data]);
 
     const saveStateToDatabase = useDebouncedCallback(() => {
         console.log("saved");
+        updateCurrentLayout(widgets);
     }, 2000);
 
     const saveState = () => {
@@ -58,7 +86,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const getWidgetContent = (widget: WidgetData) => {
         const content = getWidgetConfig(widget).content;
         if (!content) {
-            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+            console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
         }
         return content;
     };
@@ -66,7 +94,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const getWidgetPropertiesContent = (widget: WidgetData) => {
         const propertiesContent = getWidgetConfig(widget).propertiesContent;
         if (!propertiesContent) {
-            //console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
+            console.warn(`${widget.type} widget does not have it's content property set in the configuration. This will probably result in error.`);
         }
         return propertiesContent;
     };
@@ -169,7 +197,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         const source = config.dataSource;
 
         if (!source) {
-            //console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
+            console.warn(`getWidgetData(): widget type "${widget.type}" has no dataSource in its config — will always return undefined.`);
             return;
         }
 

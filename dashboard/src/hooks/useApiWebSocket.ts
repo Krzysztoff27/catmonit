@@ -11,6 +11,7 @@ export interface useApiWebSocketReturn {
     updateSubscribedResources: (resourceUuids: string[]) => void;
     addSubscribedResource: (resourceUuid: string) => void;
     removeSubscribedResource: (resourceUuid: string) => void;
+    updateAutoResources: (count: number) => void;
     incrementAutoResources: (incrementBy?: number) => void;
     decrementAutoResources: (decrementBy?: number) => void;
     updateNumberOfWarnings: (numberOfWarnings: number) => void;
@@ -56,6 +57,10 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
         setSubscription((prev) => ({ ...prev, devices: [...(prev?.devices ?? []).filter((e) => e !== resourceUuid)] } as WebSocketStart));
     };
 
+    const updateAutoResources = (count: number = 0) => {
+        setSubscription((prev) => ({ ...prev, auto: count } as WebSocketStart));
+    };
+
     const incrementAutoResources = (incrementBy: number = 1) => {
         setSubscription((prev) => ({ ...prev, auto: (prev?.auto ?? 0) + incrementBy } as WebSocketStart));
     };
@@ -90,6 +95,7 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
         updateNumberOfErrors,
         addSubscribedResource,
         removeSubscribedResource,
+        updateAutoResources,
         incrementAutoResources,
         decrementAutoResources,
         unsubscribe,

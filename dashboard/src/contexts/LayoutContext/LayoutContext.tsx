@@ -13,7 +13,7 @@ interface LayoutContextType {
     setCurrent: (name: string) => void;
     getLayouts: () => Promise<string[] | undefined>;
     getLayout: (name: string) => Promise<LayoutInDatabase | undefined>;
-    updateLayout: (name: string, data: any) => Promise<any>;
+    updateCurrentLayout: (data: any) => Promise<any>;
     renameCurrentLayout: (newName: string) => Promise<any>;
     removeLayout: (name: string) => Promise<any>;
     createNewLayout: () => Promise<string>;
@@ -44,8 +44,8 @@ export function LayoutProvider({ children }) {
     const renameCurrentLayout = async (newName: string) => {
         if (currentLayout?.info.name === newName) return;
         const res = await renameLayout(cookies.layout_id, newName);
-        console.log(res);
         refresh();
+        return res;
     };
 
     const removeLayout = async (id: string) => {
@@ -55,6 +55,11 @@ export function LayoutProvider({ children }) {
 
     const updateLayout = async (id: string, data: any) => {
         return await sendRequest("PUT", `/layout/update/${id}`, undefined, JSON.stringify(data));
+    };
+
+    const updateCurrentLayout = async (data: any) => {
+        if (!currentLayout?.info.id) return null;
+        return await updateLayout(currentLayout?.info.id, data);
     };
 
     const createNewLayout = async () => {
@@ -68,7 +73,7 @@ export function LayoutProvider({ children }) {
         while (`${appendedNumber}` === defaultNameNumbersUsed[appendedNumber - 1]) appendedNumber++;
 
         const name = `New layout ${appendedNumber}`;
-        const res = await sendRequest("PUT", `/layout/create/${name}`, undefined, JSON.stringify({}));
+        const res = await sendRequest("PUT", `/layout/create/${name}`, undefined, JSON.stringify([]));
         refresh();
         return res.id;
     };
@@ -77,7 +82,6 @@ export function LayoutProvider({ children }) {
         if (loading) return;
 
         const getCurrentLayout = async () => {
-            console.log(cookies.layout_id);
             if (isEmpty(layouts)) {
                 const id = await createNewLayout();
                 setCurrent(id);
@@ -108,7 +112,7 @@ export function LayoutProvider({ children }) {
         setCurrent,
         getLayout,
         getLayouts,
-        updateLayout,
+        updateCurrentLayout,
         renameCurrentLayout,
         removeLayout,
         createNewLayout,

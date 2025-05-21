@@ -21,6 +21,8 @@ export function DataProvider({ children }) {
         disks: websockets.disks.last,
     };
 
+    console.log(data);
+
     const value = {
         websockets,
         data,

@@ -14,29 +14,24 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const data = getWidgetData(widget);
     const config = getWidgetConfig(widget);
     const dataSource: string = config.dataSource ?? "";
-    const resourceKey =
-        {
-            disks: "disks",
-            fileShares: "fileShares",
-        }[dataSource] ?? "";
     const selectedDevice = widget?.settings?.target;
 
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
         const newData = getData(dataSource)[target];
-        const newResourceData = safeObjectValues(newData[resourceKey]);
+        const newResourceData = safeObjectValues(newData[dataSource]);
         const newResourceSettings = newResourceData.map(({ path }) => ({ path, hidden: false, yellowStage: 75, redStage: 90 }));
-        setWidgetSettings(index, { ...widget.settings, target, [resourceKey]: newResourceSettings });
+        setWidgetSettings(index, { ...widget.settings, target, [dataSource]: newResourceSettings });
     };
 
     const isResourceHidden = (path: string) => {
-        return widget?.settings?.[resourceKey]?.find((resource) => resource.path === path).hidden;
+        return widget?.settings?.[dataSource]?.find((resource) => resource.path === path).hidden;
     };
 
     const toggleResourceHidden = (path: string) => {
         const newSettings = widget.settings;
-        const diskIndex = newSettings[resourceKey].findIndex((resource) => resource.path === path);
-        newSettings[resourceKey][diskIndex].hidden = !newSettings[resourceKey][diskIndex].hidden;
+        const diskIndex = newSettings[dataSource].findIndex((resource) => resource.path === path);
+        newSettings[dataSource][diskIndex].hidden = !newSettings[dataSource][diskIndex].hidden;
         setWidgetSettings(index, newSettings);
     };
 
@@ -54,7 +49,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const resourceList = useMemo(
         () =>
-            safeObjectValues(data[resourceKey]).map((resource, i: number) => {
+            safeObjectValues(data[dataSource]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
                 return (
                     <Flex
