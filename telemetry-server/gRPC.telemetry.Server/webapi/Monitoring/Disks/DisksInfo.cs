@@ -5,7 +5,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 {
     public class TresholdsDisk
     {
-        public const int SpaceWarningTresholdValue = 10; // precent
+        public const int SpaceWarningTresholdValue = 90; // precent
     }
     
     public class OneDeviceDiskWarningsHolder
