@@ -12,6 +12,7 @@
     background-color: var(--background-color-6);
     z-index: 300;
     width: 240px;
+    min-height: 100px;
     image-rendering: crisp-edges;
 }
 

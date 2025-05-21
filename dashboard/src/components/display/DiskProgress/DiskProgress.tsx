@@ -1,5 +1,6 @@
 import { Group, Progress, Stack, Text } from "@mantine/core";
 import { Disk } from "../../../types/api.types";
+import { formatBytes } from "../../../utils/formatBytes";
 
 interface DiskProgressProps extends Disk {
     highlightStages: {
@@ -32,7 +33,7 @@ function DiskProgress({ path, storageCurrent, storageLimit, highlightStages }: D
                     fz="sm"
                     miw="120"
                 >
-                    {storageCurrent}GB / {storageLimit}GB
+                    {formatBytes(storageCurrent)} / {formatBytes(storageLimit)}
                 </Text>
             </Group>
         </Stack>

@@ -1,10 +1,10 @@
 import { Stack, Title } from "@mantine/core";
-import { DrawerContentProps } from "../../../types/components.types";
+import { WidgetPropertiesContentProps } from "../../../types/components.types";
 import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import { safeObjectValues } from "../../../utils/object";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
-function DeviceStatusDrawer({ index }: DrawerContentProps) {
+function DeviceStatusDrawer({ index }: WidgetPropertiesContentProps) {
     const { getWidget } = useWidgets();
     const widget = getWidget(index);
 

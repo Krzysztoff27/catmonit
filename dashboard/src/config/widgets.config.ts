@@ -71,6 +71,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         dataSource: "storage",
         isReferingToSingularResource: true,
+        image: "/images/widgets/overall_device_storage.png",
     },
     DEVICE_STATUS: {
         name: "device status info",
@@ -89,7 +90,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         },
         dataSource: "storage",
         isReferingToSingularResource: true,
-        image: "/images/widgets/detailed_device_storage.png",
+        image: "/images/widgets/device_status.png",
     },
     FILE_SHARES: {
         name: "file share widget",

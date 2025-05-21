@@ -2,13 +2,12 @@ import { Text, Flex, Box } from "@mantine/core";
 import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
 import { WidgetContentProps } from "../../../types/components.types";
-import { GRID_SIZE_PX } from "../../../config/widgets.config";
 import classes from "./OverallDeviceStorageWidget.module.css";
 import { DeviceDiskData } from "../../../types/api.types";
-import { useEffect } from "react";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import { formatBytes } from "../../../utils/formatBytes";
 
 function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     // DATA CALCULAIONS ETC.
@@ -17,15 +16,32 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
 
     if (!widget || !widget.rect) {
         console.warn("Widget or rect not available:", widget);
-        return null; // Or render fallback UI
+        return null;
     }
 
     const { w, h } = widget.rect;
-    console.log("Width:", w, "Height:", h);
 
-    const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+    const chartScale = Math.min(w, h);
+    const minSize = 150;
+    const maxSize = 320;
+
+    //CHART SIZE
+    const chartSize = minSize + (chartScale - 2) * ((maxSize - minSize) / 2);
+    const cappedChartSize = Math.min(Math.max(chartSize, minSize), maxSize);
+
+    //FONT SIZE
+    const fontSize = 16 + (chartScale - 2) * 2;
+    const labelSize = 16 + (23 - 16) * ((chartScale - 2) / (4 - 2));
+
+    //THICKNESS
+    const minThickness = 20;
+    const maxThickness = 40;
+    const thickness = minThickness + ((chartSize - minSize) * (maxThickness - minThickness)) / (maxSize - minSize);
+
+    const { disks } = data as DeviceDiskData;
     const disksArray = safeObjectValues(disks);
+
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
     const total = disksArray?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
     const used = disksArray?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
     const free = total - used;
@@ -34,27 +50,21 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
         {
             name: "Used",
             value: used,
-            color: "blue",
+            displayValue: formatBytes(used),
+            color: "#4c6ef5", //or #3d53a9
         },
         {
             name: "Free",
             value: free,
-            color: "var(--background-color-3)",
+            displayValue: formatBytes(free),
+            color: "var(--background-color-5)",
         },
     ];
-    // creating labels, calculating % etc.
-    const chartLabel = formattedData.map((item) => `${item.name}\n ${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`).join("\n");
 
-    // RESPONSIVENESS
     const { ref } = useElementSize();
-    // const { ref, width, height } = useElementSize();
-    //     const baseChartSize = 170;
-    //     const chartScale = Math.min(num_cols, num_rows);
-    //     const scaleMultiplier = chartScale <= 2 ? 1 : 1 + (chartScale - 2) * 0.25;
-    //     const chartSize = baseChartSize * scaleMultiplier;
-    const textDirection = w >= 3 && h >= 3 && !(w == 4 && h == 3) ? "row" : "column"; // column for under each other, row for side by side
-    const layoutDirection = w > h ? "row" : "column"; // column for under each other, row for side by side
-    console.log(textDirection);
+    const textDirection = w >= 3 && h >= 3 && !(w == 4 && h == 3) ? "row" : "column";
+    const layoutDirection = w > h ? "row" : "column";
+    
     return (
         <Box
             ref={ref}
@@ -64,56 +74,67 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
             <DeviceTitleOneLine data={data} />
             <Flex
                 direction={layoutDirection}
-                // {/* Flex container for centering elements horizontally and spacing them evenly */}
                 className={classes.centeredContainer}
+                w="100%"
+                h="100%"
             >
                 <Flex
                     align="center"
                     justify="center"
                     w="100%"
                     h="100%"
+                    pos="relative"
                 >
                     <DonutChart
                         data={formattedData}
                         withTooltip={false}
-                        size={170}
-                        h={170}
-                        w={170}
-                        chartLabel={`${used}GB/${total}GB`}
+                        size={cappedChartSize}
+                        h={cappedChartSize}
+                        w={cappedChartSize}
+                        thickness={thickness}
                         className={classes.chart}
-                        bg="red"
+                        chartLabel=""
                     />
+                    <Text
+                        pos="absolute"
+                        top="50%"
+                        left="50%"
+                        fz={labelSize}
+                        style={{
+                            transform: "translate(-50%, -50%)",
+                            whiteSpace: "pre-line",
+                            textAlign: "center",
+                        }}
+                    >
+                        {`${formatBytes(used)}\n/${formatBytes(total)}`}
+                    </Text>
                 </Flex>
 
-                {/* <Flex
-                    display={h < 3 && w < 3 ? "none" : "initial"}
-                    direction={layoutDirection}
-                    align="center"
-                    justify="center"
-                    className={classes.textContainer}
-                > */}
                 <Flex
-                    display={h < 3 && w < 3 ? "none" : "initial"}
+                    display={h < 3 && w < 3 ? "none" : "flex"}
                     direction={textDirection}
-                    justify="space-evenly"
+                    gap="xl"
+                    justify="center"
                     align="center"
-                    style={{ width: "100%", height: "100%" }}
+                    w="100%"
+                    h="100%"
                 >
                     {formattedData.map((item, index) => (
-                        <Text
+                        <Flex
                             key={index}
-                            ta="center"
-                            // style={{ whiteSpace: "pre-line" }}
+                            direction="column"
+                            align="center"
                         >
-                            <span style={{ fontWeight: 600 }}>{item.name}</span>
-                            <br />
-                            <span>{`${item.value}GB (${((item.value / total) * 100).toFixed(1)}%)`}</span>
-                            <br />
-                            <br />
-                        </Text>
+                            <Text
+                                fw={600}
+                                style={{ fontSize }}
+                            >
+                                {item.name}
+                            </Text>
+                            <Text style={{ fontSize: fontSize - 2 }}>{`${item.displayValue} (${((item.value / total) * 100).toFixed(1)}%)`}</Text>
+                        </Flex>
                     ))}
                 </Flex>
-                {/* </Flex> */}
             </Flex>
         </Box>
     );

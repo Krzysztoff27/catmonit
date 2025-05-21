@@ -6,7 +6,6 @@ import DiskProgress from "../../display/DiskProgress/DiskProgress";
 import classes from "./DetailedDeviceStorageWidget.module.css";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
-import Widget from "../../layout/Widget/Widget";
 
 function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
