@@ -29,10 +29,8 @@ $vols = Get-Volume | Where-Object DriveLetter | Select-Object DriveLetter, Objec
 
 try {
     $events = Get-WinEvent -FilterHashtable @{
-        #LogName = 'System'
-        #ProviderName = 'disk'
-        LogName = 'Application'
-        ProviderName = 'TelemetryTestSource'
+        LogName = 'System'
+        ProviderName = 'disk'
         Level = 2,3
         StartTime = (Get-Date).AddDays(-1)
     } -MaxEvents 30
