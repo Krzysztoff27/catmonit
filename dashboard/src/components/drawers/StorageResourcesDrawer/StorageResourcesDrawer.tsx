@@ -16,7 +16,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const dataSource: string = config.dataSource ?? "";
     const resourceKey =
         {
-            storage: "disks",
+            disks: "disks",
             fileShares: "fileShares",
         }[dataSource] ?? "";
     const selectedDevice = widget?.settings?.target;

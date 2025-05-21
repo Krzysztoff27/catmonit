@@ -1,4 +1,4 @@
-import urlConfig from "../config/url.config.ts";
+import URL_CONFIG from "../config/url.config.ts";
 import { normalizePath } from "../utils/api.ts";
 import useAuth from "./useAuth.ts";
 
@@ -43,7 +43,7 @@ const handleFetch = async (
 };
 
 export const useApiRequests = () => {
-    const API_URL: string = urlConfig.api_requests;
+    const API_URL: string = URL_CONFIG.api_requests;
     const { authOptions, refreshOptions, setAccessToken, setRefreshToken } = useAuth();
 
     const getPath = (path: string): string => (API_URL ? `${API_URL}${normalizePath(path)}` : "");
@@ -65,8 +65,8 @@ export const useApiRequests = () => {
     };
 
     const sendRequest = async (
-        path: string,
         method: string = "GET",
+        path: string,
         options: RequestInit = {},
         body: BodyInit | undefined = undefined,
         errorCallback: (response: Response, body: { [key: string]: any }) => void = parseAndHandleError

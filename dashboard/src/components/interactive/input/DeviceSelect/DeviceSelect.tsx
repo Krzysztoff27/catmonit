@@ -51,8 +51,8 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
     };
 
     const changeTarget = (target: string | null) => {
-        setWidgetSettings(index, { ...widget.settings, target });
-        onChange?.(target);
+        setWidgetSettings(index, { ...widget.settings, target: target || null });
+        onChange?.(target || null);
     };
 
     return (

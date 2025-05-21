@@ -1,6 +1,6 @@
 const API_CONFIG = {
     deviceTimeout: {
-        storage: 30 * 1000,
+        disks: 30 * 1000,
     },
 };
 

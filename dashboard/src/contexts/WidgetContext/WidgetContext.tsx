@@ -2,9 +2,13 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { WidgetData } from "../../types/api.types";
 import { Layout, LayoutItem, Rect } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
-import { isEmpty } from "lodash";
+import { isEmpty, isNull } from "lodash";
 import { WidgetPropertiesContent, WidgetContent } from "../../types/components.types";
 import { WidgetConfig, WidgetLimits } from "../../types/config.types";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { useLayouts } from "../LayoutContext/LayoutContext";
+import { useData } from "../DataContext/DataContext";
+import urlConfig from "../../config/url.config";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -25,26 +29,29 @@ interface WidgetContextType {
     getWidgetPropertiesContent: (widget: WidgetData) => WidgetPropertiesContent | undefined;
 }
 
+interface WidgetProviderProps {
+    children: React.ReactNode;
+    initialData: any;
+    currentLayout?: string;
+}
+
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
-export function WidgetProvider({ children, initialData }: { children: React.ReactNode; initialData: any }) {
-    const [widgets, setWidgets] = useState<WidgetData[]>([
-        {
-            type: "DETAILED_DEVICE_STORAGE",
-            rect: {
-                x: 0,
-                y: 0,
-                w: 2,
-                h: 2,
-            },
-            settings: WIDGETS_CONFIG.DETAILED_DEVICE_STORAGE.initialSettings,
-            version: 0,
-        },
-    ]);
+export function WidgetProvider({ children, initialData }: WidgetProviderProps) {
+    const { currentLayout } = useLayouts();
+    const { websockets } = useData();
+    const [widgets, setWidgets] = useState<WidgetData[]>(currentLayout?.data || []);
     const [data, setData] = useState(initialData);
     const [selected, setSelected] = useState<null | number>(null);
 
-    const saveStateToDatabase = () => {};
+    const saveStateToDatabase = useDebouncedCallback(() => {
+        console.log("saved");
+    }, 2000);
+
+    const saveState = () => {
+        console.log("saving");
+        saveStateToDatabase();
+    };
 
     const getWidgetConfig = (widget: WidgetData) => WIDGETS_CONFIG?.[widget?.type] ?? {};
 
@@ -87,7 +94,7 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
                 return widget;
             })
         );
-        saveStateToDatabase();
+        saveState();
     };
 
     const setWidgetRect = (index: number, newRect: Rect) => {
@@ -100,10 +107,17 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
             };
             return newWidgets;
         });
-        saveStateToDatabase();
+        saveState();
     };
 
     const setWidgetSettings = (index: number, newSettings: any) => {
+        const widget = widgets[index];
+        const config = getWidgetConfig(widget);
+
+        if (config.isReferingToSingularResource && widget.settings?.target !== newSettings?.target) {
+            websockets[config.dataSource]?.replaceSubscribedResource(widget.settings.target, newSettings.target);
+        }
+
         setWidgets((prev) => {
             const newWidgets = [...prev];
             newWidgets[index] = {
@@ -113,16 +127,23 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
             };
             return newWidgets;
         });
-        saveStateToDatabase();
+        saveState();
     };
 
     const createWidget = (type: string | null | undefined, layoutItem: LayoutItem) => {
         if (!type) return;
+
+        const config = WIDGETS_CONFIG[type];
+
+        if (config.isReferingToSingularResource) {
+            websockets[config.dataSource].incrementAutoResources();
+        }
+
         setWidgets((prev) => [
             ...prev,
             {
                 type,
-                settings: WIDGETS_CONFIG[type].initialSettings,
+                settings: config.initialSettings,
                 rect: getItemRect(layoutItem),
                 version: 0,
             } as WidgetData,
@@ -130,8 +151,16 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
     };
 
     const deleteWidget = (index: number | string) => {
+        const widget = widgets[index];
+        const config = getWidgetConfig(widget);
+
+        if (config.isReferingToSingularResource) {
+            if (isNull(widget.settings.target)) websockets[config.dataSource].decrementAutoResources();
+            else websockets[config.dataSource].removeSubscribedResource(widget.settings.target);
+        }
+
         setWidgets((prev: WidgetData[]) => prev.filter((e, i) => i !== index));
-        saveStateToDatabase();
+        saveState();
     };
 
     const getWidgetData = (widget: WidgetData) => {
@@ -162,14 +191,14 @@ export function WidgetProvider({ children, initialData }: { children: React.Reac
 
     const layout = useMemo(
         () =>
-            widgets.map((widget: WidgetData, i): LayoutItem => {
+            widgets?.map?.((widget: WidgetData, i): LayoutItem => {
                 return {
                     i: `${i}`,
                     ...widget.rect,
                     ...getWidgetConfig(widget).limits,
                     isResizable: true,
                 };
-            }),
+            }) || [],
         [widgets]
     );
 

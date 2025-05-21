@@ -1,5 +1,5 @@
 export const dummies = {
-    storage: {
+    disks: {
         "1": {
             uuid: "1",
             hostname: "Tux",

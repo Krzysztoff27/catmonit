@@ -16,6 +16,6 @@
     font-size: var(--mantine-font-size-xs) !important;
     color: var(--background-color-2);
     margin-top: auto !important;
-    padding: var(--mantine-spacing-xs) 0 !important;
+    padding: 0 !important;
     z-index: 200;
 }

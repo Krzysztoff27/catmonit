@@ -12,7 +12,7 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
 
     useEffect(() => {
         const ts = new Date(timestamp).getTime();
-        const timeout = API_CONFIG.deviceTimeout.storage;
+        const timeout = API_CONFIG.deviceTimeout.disks;
 
         const update = () => {
             const now = Date.now();

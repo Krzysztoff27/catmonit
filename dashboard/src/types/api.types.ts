@@ -37,3 +37,20 @@ export interface WidgetData {
     settings: any;
     version: number;
 }
+
+export interface LayoutInfoInDatabase {
+    id: string;
+    name: string;
+}
+export interface LayoutInDatabase {
+    info: LayoutInfoInDatabase;
+    data: WidgetData[];
+}
+
+export interface WebSocketStart {
+    message: "start";
+    devices?: string[]; // uuids
+    auto?: number; // amount of automatically provided resources
+    warningsCount?: number;
+    errorsCount?: number;
+}

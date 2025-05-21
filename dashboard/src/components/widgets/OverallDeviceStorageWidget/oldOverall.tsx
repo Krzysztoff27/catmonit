@@ -21,7 +21,6 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
     }
 
     const { w, h } = widget.rect;
-    console.log("Width:", w, "Height:", h);
 
     const { hostname, ip, disks } = data as DeviceDiskData; //rename to data later
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
@@ -54,7 +53,6 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
     //     const chartSize = baseChartSize * scaleMultiplier;
     const textDirection = w >= 3 && h >= 3 && !(w == 4 && h == 3) ? "row" : "column"; // column for under each other, row for side by side
     const layoutDirection = w > h ? "row" : "column"; // column for under each other, row for side by side
-    console.log(textDirection);
     return (
         <Box
             ref={ref}
