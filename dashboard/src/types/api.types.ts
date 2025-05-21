@@ -6,8 +6,10 @@ export interface TokenRequestForm {
 export interface Device {
     uuid: string;
     hostname: string;
-    ip: string;
+    ipAddress: string;
     mask: string;
+    os: string;
+    lastUpdated: string;
 }
 
 export interface DeviceCpuData extends Device {

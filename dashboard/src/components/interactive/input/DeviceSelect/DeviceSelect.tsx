@@ -4,6 +4,7 @@ import { safeObjectValues } from "../../../../utils/object";
 import classes from "./DeviceSelect.module.css";
 import { useWidgets } from "../../../../contexts/WidgetContext/WidgetContext";
 import { WidgetData } from "../../../../types/api.types";
+import useFetch from "../../../../hooks/useFetch";
 
 interface DeviceSelectProps {
     index: number;
@@ -13,7 +14,8 @@ interface DeviceSelectProps {
 }
 
 function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: DeviceSelectProps) {
-    const { setWidgetSettings, getData, getWidgetConfig } = useWidgets();
+    const {data, loading} = useFetch('/device/getAllDevices');
+    const { setWidgetSettings, getWidgetConfig } = useWidgets();
     const source = overridenDataSource || getWidgetConfig(widget).dataSource;
 
     if (!source) {
@@ -22,7 +24,7 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
         // Widgets of type ${widget.type} have no default "dataSource" defined and "overridenDataSource" was not provided.`);
     }
 
-    const data = source ? getData(source) : {};
+
     const selectData = [
         {
             value: "",
