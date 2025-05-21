@@ -1,17 +1,12 @@
 services:
   dnsmasq:
     image: jpillora/dnsmasq
-    container_name: dnsmasq
+    container_name: catmonit-dns
     restart: unless-stopped
-    command:
-      - "--log-facility=-"
-      - "--address=/api-machines.local/10.10.51.3"
-      - "--address=/api-web.local/10.10.51.3"
-      - "--listen-address=0.0.0.0"
-      - "--no-daemon"
-      - "--log-queries"
     ports:
-      - "53:53/udp"
-      - "53:53/tcp"
+      - "5353:53/udp"
+      - "5353:53/tcp"
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
     cap_add:
       - NET_ADMIN
