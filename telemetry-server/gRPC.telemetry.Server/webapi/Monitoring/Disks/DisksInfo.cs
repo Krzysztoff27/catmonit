@@ -35,6 +35,10 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
             return Message == other.Message && Source == other.Source && Timestamp == other.Timestamp && MountPoint == other.MountPoint;
         }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Message, Source, Timestamp, MountPoint);
+        }
 
     }
 
@@ -77,13 +81,13 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                             id => new OneDeviceDiskWarningsHolder
                             {
                                 deviceInfo = deviceInfo.DeviceInfo,
-                                warnings = new List<string> { $"Disk ({disk.MountPoint}) storage is low ({100-((float)disk.Usage / (float)disk.Capacity * 100)}%). Please free up storage." }
+                                warnings = new List<string> { $"Disk ({disk.MountPoint}) storage is low ({Math.Round(100-((float)disk.Usage / (float)disk.Capacity * 100))}%). Please free up storage." }
                             },
                             (id, existingHolder) =>
                             {
                                 lock (existingHolder)
                                 {
-                                    existingHolder.warnings.Add($"Disk ({disk.MountPoint}) storage is low ({100 - ((float)disk.Usage / (float)disk.Capacity * 100)}%). Please free up storage.");
+                                    existingHolder.warnings.Add($"Disk ({disk.MountPoint}) storage is low ({Math.Round(100 - ((float)disk.Usage / (float)disk.Capacity * 100))}%). Please free up storage.");
                                 }
                                 return existingHolder;
                             }
