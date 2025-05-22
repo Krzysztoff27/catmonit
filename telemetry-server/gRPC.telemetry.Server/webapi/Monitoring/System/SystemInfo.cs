@@ -8,6 +8,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public const int CPUwarningTresholdValue = 85; // precent
         public const int RAMwarningTresholdValue = 85; // percent
         public const int warningTresholdTimes = 5; // times 
+        public static TimeSpan errorCutoffTime = TimeSpan.FromDays(1);
     }
     public class SingleDeviceHistoricalSystemInfo
     {
@@ -20,11 +21,27 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         public deviceInfo deviceInfo { get; set; }
         public systemPayload systemInfo { get; set; }
     }
+    
+    public class SystemErrorsPayloadWithNormalTimestamp
+    {
+        public string Message { get; set; }
+        public string Source { get; set; }
+        public DateTime Timestamp { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not SystemErrorsPayloadWithNormalTimestamp other)
+                return false;
+
+            return Message == other.Message && Source == other.Source && Timestamp == other.Timestamp;
+        }
+
+    }
 
     public class SystemErrorInfo
     {
         public deviceInfo deviceInfo { get; set; }
-        public List<SystemErrorsPayload> SystemErrorsPayloads { get; set; }
+        public List<SystemErrorsPayloadWithNormalTimestamp> SystemErrorsPayloads { get; set; }
     }
     public class OneDeviceSystemWarningsHolder
     {
@@ -34,7 +51,8 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
     public class SystemInfoSnapshotHolder : ServiceContentSnapshotHolder<SystemDeviceInfo>
     {
-        public int totalWarningsCount = 0;
+        public int totalWarningCount = 0;
+        public int totalErrorCount = 0;
         public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
         public ConcurrentDictionary<Guid, SingleDeviceHistoricalSystemInfo> AllDevicesHistoricalSystemInfo { get; set; }
         public ConcurrentDictionary<Guid, OneDeviceSystemWarningsHolder> SystemWarnings { get; set; } = new();
@@ -49,7 +67,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
         }
         public void CalculateWarnings()
         {
-            totalWarningsCount = 0;
+            totalWarningCount = 0;
             SystemWarnings = new();
             foreach((Guid id, SingleDeviceHistoricalSystemInfo historicalInfo) in AllDevicesHistoricalSystemInfo)
             {
@@ -63,7 +81,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     {
                         SystemWarnings[id] = new OneDeviceSystemWarningsHolder { deviceInfo= MonitoredDevices[id].deviceInfo, warnings = new List<string>{ $"CPU usage is high ({MonitoredDevices[id].systemInfo.cpuUsagePercent}%)." } };
                     }
-                    totalWarningsCount++;
+                    totalWarningCount++;
                 }
 
                 if (historicalInfo.timesRamUsageover85percent > TresholdsSystem.warningTresholdTimes)
@@ -76,7 +94,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     {
                         SystemWarnings.TryAdd(id, new OneDeviceSystemWarningsHolder { deviceInfo = MonitoredDevices[id].deviceInfo, warnings = new List<string> { $"RAM usage is high ({(float)MonitoredDevices[id].systemInfo.ramUsedBytes / (float)MonitoredDevices[id].systemInfo.ramTotalBytes * 100}%)." } });
                     }
-                    totalWarningsCount++;
+                    totalWarningCount++;
                 }
             }
         }
@@ -87,6 +105,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
     }
     public class SystemInfo : ServiceContentInfo<SystemDeviceInfo>
     {
+        public int totalErrorCount { get; set; } = 0;
         public ConcurrentDictionary<Guid, SingleDeviceHistoricalSystemInfo> historicalWarningInfo { get; set; } = new();
         public ConcurrentDictionary<Guid, SystemErrorInfo> SystemErrorsDictionary { get; set; } = new();
         public static SystemInfo Instance { get; set; } = new SystemInfo();
@@ -96,20 +115,38 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             base.RemoveStaleDevices(dev => dev.deviceInfo.lastUpdated, staleThreshold);
 
             // Cutoff time
-            var cutoffTime = DateTimeOffset.UtcNow - staleThreshold;
-            var cutoffUnixTimestamp = cutoffTime.ToUnixTimeMilliseconds();
+            var cutoffTime = DateTimeOffset.UtcNow - TresholdsSystem.errorCutoffTime;
 
+            var keysToRemove = new List<Guid>();
+
+            int removedErrors = 0;
             // Clean up errors
             foreach (var entry in SystemErrorsDictionary)
             {
+                var key = entry.Key;
                 var errorInfo = entry.Value;
+
                 if (errorInfo?.SystemErrorsPayloads != null)
                 {
+                    var errorCountBefore = errorInfo.SystemErrorsPayloads.Count;
                     errorInfo.SystemErrorsPayloads = errorInfo.SystemErrorsPayloads
-                        .Where(payload => payload.Timestamp >= cutoffUnixTimestamp)
+                        .Where(payload => payload.Timestamp >= cutoffTime)
                         .ToList();
+                    removedErrors += errorCountBefore - errorInfo.SystemErrorsPayloads.Count;
+                    if (!errorInfo.SystemErrorsPayloads.Any())
+                    {
+                        keysToRemove.Add(key);
+                    }
                 }
             }
+            totalErrorCount -= removedErrors;
+
+            // Remove SystemErrorInfos with no payloads
+            foreach (var key in keysToRemove)
+            {
+                SystemErrorsDictionary.TryRemove(key, out _);
+            }
+
         }
         public SystemInfoSnapshotHolder snapShot()
         {
@@ -118,20 +155,37 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             snapshotHolder.MonitoredDevices = base.GetDeviceSnapshot();
             snapshotHolder.SystemErrorsDictionary = SystemErrorsDictionary;
             snapshotHolder.AllDevicesHistoricalSystemInfo = historicalWarningInfo;
+            snapshotHolder.totalErrorCount = totalErrorCount;
             return snapshotHolder;
         }
         public void AddOrUpdateErrors(SystemErrorInfo error)
         {
             var uuid = error.deviceInfo.uuid;
+            int insertedCount = 0;
 
             SystemErrorsDictionary.AddOrUpdate(uuid,
-                error,
-                (key, existingError) =>
+                addValueFactory: key =>
+                {
+                    // New entry, count all payloads
+                    if (error.SystemErrorsPayloads != null)
+                    {
+                        insertedCount = error.SystemErrorsPayloads.Count;
+                    }
+
+                    return new SystemErrorInfo
+                    {
+                        deviceInfo = error.deviceInfo,
+                        SystemErrorsPayloads = error.SystemErrorsPayloads != null
+                            ? new List<SystemErrorsPayloadWithNormalTimestamp>(error.SystemErrorsPayloads)
+                            : new List<SystemErrorsPayloadWithNormalTimestamp>()
+                    };
+                },
+                updateValueFactory: (key, existingError) =>
                 {
                     existingError.deviceInfo = error.deviceInfo;
 
                     if (existingError.SystemErrorsPayloads == null)
-                        existingError.SystemErrorsPayloads = new List<SystemErrorsPayload>();
+                        existingError.SystemErrorsPayloads = new List<SystemErrorsPayloadWithNormalTimestamp>();
 
                     if (error.SystemErrorsPayloads != null)
                     {
@@ -140,12 +194,15 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                             if (!existingError.SystemErrorsPayloads.Contains(payload))
                             {
                                 existingError.SystemErrorsPayloads.Add(payload);
+                                insertedCount++;
                             }
                         }
                     }
 
                     return existingError;
                 });
+
+            totalErrorCount += insertedCount;
         }
         public override void onDeviceUpsert(SystemDeviceInfo device)
         {

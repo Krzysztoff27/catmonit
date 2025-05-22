@@ -50,7 +50,7 @@ namespace gRPC.telemetry.Server.webapi.Services
                     _logger.LogError(ex, "Error in CleanupService execution");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }

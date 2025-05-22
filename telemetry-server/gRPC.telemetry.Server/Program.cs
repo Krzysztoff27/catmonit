@@ -6,6 +6,8 @@ using webapi.Monitoring;
 using gRPC.telemetry.Server.webapi.Services;
 using gRPC.telemetry.Server.webapi.Websocket.Network;
 using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
+using gRPC.telemetry.Server.webapi.Monitoring.Network;
+
 
 
 
@@ -152,6 +154,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 #endif
+
+DisksMonit.Instance.StartMonitoring();
+SharesMonit.Instance.StartMonitoring();
+NetworkMonit.Instance.StartMonitoring();
+SystemMonit.Instance.StartMonitoring();
 
 DeviceHelper.SynchronizeDataWithDB();
 app.Run();

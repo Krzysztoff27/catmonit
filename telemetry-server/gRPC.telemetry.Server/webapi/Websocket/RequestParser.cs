@@ -112,7 +112,14 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         di.deviceInfo = getDeviceInfoFromResponse(response);
 
-                        di.SystemErrorsPayloads = (List<SystemErrorsPayload>)response.Payload;
+                        di.SystemErrorsPayloads =
+                            (((List<SystemErrorsPayload>)response.Payload).Select(e => new SystemErrorsPayloadWithNormalTimestamp
+                            {
+                                Message = e.Message,
+                                Source = e.Source,
+                                Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).DateTime
+                            })
+                        .ToList());
 
                         SystemInfo.Instance.AddOrUpdateErrors(di);
 

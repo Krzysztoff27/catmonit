@@ -47,9 +47,26 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     nr.autoDevices[systemDeviceInfos.AutoCandidates[i]] = systemDeviceInfos.MonitoredDevices[systemDeviceInfos.AutoCandidates[i]];
                 }
 
-                // TODO: better error selection
-                nr.errors = systemDeviceInfos.SystemErrorsDictionary;
-                int warningsToGet = (systemDeviceInfos.totalWarningsCount > subber.warningCount ? systemDeviceInfos.totalWarningsCount : subber.warningCount);
+
+
+
+
+                int countErr = 0;
+
+                foreach (var kvp in systemDeviceInfos.SystemErrorsDictionary)
+                {
+                    var errorCount = kvp.Value.SystemErrorsPayloads?.Count ?? 0;
+
+                    if (errorCount == 0)
+                        continue;
+
+                    nr.errors.TryAdd(kvp.Key, kvp.Value);
+                    countErr += errorCount;
+                    if (countErr >= subber.errorCount) break;
+                }
+
+
+
 
 
                 int count = 0;
@@ -61,24 +78,15 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     if (warningCount == 0)
                         continue;
 
-                    if (count + warningCount <= warningsToGet)
-                    {
-                        nr.warnings.TryAdd(kvp.Key, kvp.Value);
-                        count += warningCount;
-                    }
-                    else
-                    {
-                        var partialWarnings = kvp.Value.warnings.Take(warningsToGet - count).ToList();
+                    nr.warnings.TryAdd(kvp.Key, kvp.Value);
+                    count += warningCount;
 
-                        nr.warnings.TryAdd(kvp.Key, new OneDeviceSystemWarningsHolder
-                        {
-                            deviceInfo = kvp.Value.deviceInfo,
-                            warnings = partialWarnings
-                        });
-
-                        break;
-                    }
+                    if (count >= subber.warningCount) break;
                 }
+
+
+                nr.totalWarningCount = systemDeviceInfos.totalWarningCount;
+                nr.totalErrorCount = systemDeviceInfos.totalErrorCount;
 
                 return JsonSerializer.Serialize(nr, Utils.JsonOption);
             }
