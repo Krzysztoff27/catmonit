@@ -27,7 +27,7 @@ export interface WidgetConfig {
     image?: string;
     icon: TablerIcon;
     content: WidgetContent;
-    propertiesContent?: WidgetPropertiesContent; // TODO specify the props
+    propertiesContent?: WidgetPropertiesContent;
     limits: WidgetLimits;
     initialSettings: any;
     dataSource: "disks" | "fileShares" | "network" | "system" | "";

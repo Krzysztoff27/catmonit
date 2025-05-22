@@ -8,7 +8,7 @@ import { timePassedRounded } from "../../../utils/timeFormats";
 import { useState, useEffect } from "react";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import { IconCpu } from "@tabler/icons-react";
-//@TODO make sure it's okay to refresh it this way
+
 function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentProps) {
     const { ref } = useElementSize();
     const device = data as Device;

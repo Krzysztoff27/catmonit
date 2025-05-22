@@ -32,7 +32,7 @@ export interface DiskInfo {
     usage: number;
     capacity: number;
 }
-//@TODO should we leave it as optional?
+
 export interface Device {
     deviceInfo: DeviceInfo;
     systemInfo?: SystemInfo;
