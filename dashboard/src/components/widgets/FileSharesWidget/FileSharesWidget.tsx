@@ -14,8 +14,7 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
 
     const prepareData = () => {
         if (!height || !fileShares) return fileShares ?? [];
-
-        const numberOfSlots = Math.floor((height + 12) / 44);
+        const numberOfSlots = Math.floor(height / 44);
         const visibleDisksPaths = safeObjectValues(settings?.fileShares ?? {})
             .filter(({ hidden }) => !hidden)
             .map(({ path }) => path);

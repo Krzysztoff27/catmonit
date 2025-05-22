@@ -1,6 +1,6 @@
-import { Box, Stack, Title } from "@mantine/core";
+import { Box, Stack } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { DiskInfo, Device } from "../../../types/api.types";
+import { DiskInfo } from "../../../types/api.types";
 import { WidgetContentProps } from "../../../types/components.types";
 import DiskProgress from "../../display/DiskProgress/DiskProgress";
 import classes from "./DetailedDeviceStorageWidget.module.css";
@@ -14,7 +14,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
     const prepareData = () => {
         if (!height || !disks) return disks ?? [];
 
-        const numberOfSlots = Math.floor((height + 12) / 44);
+        const numberOfSlots = Math.floor(height / 44);
         const visibleDisksPaths = safeObjectValues(settings?.disks ?? {})
             .filter(({ hidden }) => !hidden)
             .map(({ path }) => path);

@@ -30,7 +30,8 @@
         "react-grid-layout": "^1.5.1",
         "react-router-dom": "^7.5.3",
         "react-use-websocket": "^4.13.0",
-        "recharts": "^2.15.3"
+        "recharts": "^2.15.3",
+        "uuid": "^11.1.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.22.0",

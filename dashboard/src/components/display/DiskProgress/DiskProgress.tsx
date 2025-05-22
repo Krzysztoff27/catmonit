@@ -1,6 +1,8 @@
 import { Group, Progress, Stack, Text } from "@mantine/core";
 import { DiskInfo, Device } from "../../../types/api.types";
 import { formatBytes } from "../../../utils/formatBytes";
+import { useElementSize } from "@mantine/hooks";
+import ScrollingText from "../ScrollingText/ScrollingText";
 
 interface DiskProgressProps {
     path: String;
@@ -13,24 +15,34 @@ interface DiskProgressProps {
 }
 
 function DiskProgress({ path, usage, capacity, highlightStages }: DiskProgressProps) {
+    const { ref, width } = useElementSize();
     const value = (usage / capacity) * 100;
     const color = value >= highlightStages.red ? "red" : value >= highlightStages.yellow ? "yellow" : "var(--mantine-color-text)";
 
+    console.log(width);
+
     return (
         <Stack gap={0}>
-            <Text
-                fz="xs"
-                fw="500"
+            <ScrollingText
+                w={`${width}px`}
+                m="none"
                 mb="-8px"
+                lh="16px"
             >
-                {path}
-            </Text>
+                <Text
+                    fz="xs"
+                    fw="500"
+                >
+                    {path}
+                </Text>
+            </ScrollingText>
             <Group>
                 <Progress
                     value={value}
                     color={color}
                     flex="1"
                     size="sm"
+                    ref={ref}
                 />
                 <Text
                     fz="sm"
