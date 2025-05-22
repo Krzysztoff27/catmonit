@@ -1,6 +1,7 @@
 import { Box, Group, GroupProps, Stack, Text } from "@mantine/core";
 import { IconServer2 } from "@tabler/icons-react";
 import { Device } from "../../../types/api.types";
+import ScrollingText from "../ScrollingText/ScrollingText";
 
 interface DeviceTitleProps extends GroupProps {
     data: Device;
@@ -26,13 +27,15 @@ function DeviceTitle({ data, size = "var(--mantine-font-size-lg)", iconSize = 44
                 />
             </Box>
             <Stack gap="0">
-                <Text
-                    fz={size}
-                    lh="xs"
-                    fw="600"
-                >
-                    {data?.deviceInfo?.hostname ?? "Not set"}
-                </Text>
+                <ScrollingText w='300'>
+                    <Text
+                        fz={size}
+                        lh="xs"
+                        fw="600"
+                    >
+                        {data?.deviceInfo?.hostname ?? "Not set"}
+                    </Text>
+                </ScrollingText>
                 <Text
                     fz={`calc(${size} * 0.75)`}
                     lh="xs"

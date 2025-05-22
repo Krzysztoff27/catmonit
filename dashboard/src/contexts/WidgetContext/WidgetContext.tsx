@@ -266,6 +266,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         [widgets]
     );
 
+
     const value = {
         widgets,
         layout,
