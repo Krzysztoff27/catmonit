@@ -26,7 +26,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             minW: 6,
             maxW: 10,
         },
-        initialSettings: {},
+        initialSettings: {sources: []},
         isReferingToSingularResource: false,
         dataSource: "",
         image: "/images/widgets/alerts.png",

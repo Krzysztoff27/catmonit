@@ -1,58 +1,114 @@
 import { Group, ScrollArea, Stack } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlertCount from "../../display/AlertCount/AlertCount";
 import AlertListElement from "../../display/AlertListElement/AlertListElement";
 import { WidgetContentProps } from "../../../types/components.types";
-import { Alert } from "../../../types/api.types";
-import { dummies } from "../../../pages/Editor/dummies";
+import { Alert, ErrorInfo, WarningInfo } from "../../../types/api.types";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import { useCookies } from "react-cookie";
+import { safeObjectValues } from "../../../utils/object";
+import { useData } from "../../../contexts/DataContext/DataContext";
+
 function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
     //source: trust me bro
-    const [alerts, setAlerts] = useState<Record<string, Alert>>(dummies.alerts as Record<string, Alert>);
-    const [hiddenAlerts, setHiddenAlerts] = useState<Record<string, Alert>>({});
+    const { getData } = useWidgets();
+    const [cookies, setCookies] = useCookies(["hiddenAlerts"]);
+    const [hiddenIds, setHiddenIds] = useState<string[]>(cookies.hiddenAlerts ?? []);
 
-    const handleRemove = (idToRemove: number) => {
-        setAlerts((prev) => {
-            const updated = { ...prev };
-            let removedAlert: Alert | undefined;
+    const { websockets } = useData();
 
-            for (const key in updated) {
-                if (updated[key].id === idToRemove) {
-                    removedAlert = updated[key];
-                    delete updated[key];
-                    break;
-                }
-            }
-
-            if (removedAlert) {
-                setHiddenAlerts((prevHidden) => ({
-                    ...prevHidden,
-                    [removedAlert.id]: removedAlert,
-                }));
-            }
-
-            return updated;
+    useEffect(() => {
+        setHiddenIds(cookies.hiddenAlerts ?? []);
+        (settings?.sources ?? []).forEach((source) => {
+            websockets[source].updateNumberOfWarnings(10 + (cookies.hiddenAlerts?.length ?? 0));
         });
+    }, [cookies.hiddenAlerts]);
+
+    function prepareData() {
+        const combinedAlerts = (settings?.sources ?? []).reduce(
+            (prev, source: string) => {
+                const data = getData(source);
+                return {
+                    warnings: [...prev.warnings, ...safeObjectValues(data.warnings)],
+                    errors: [...prev.errors, ...safeObjectValues(data.errors)],
+                };
+            },
+            { warnings: [], errors: [] }
+        );
+
+        const getAlertArray = (type: "warnings" | "errors") =>
+            combinedAlerts[type].reduce(
+                (prev: Alert[], warningInfo: WarningInfo | ErrorInfo) => [
+                    ...prev,
+                    ...warningInfo[type].map(
+                        (message: string) =>
+                            ({
+                                message,
+                                deviceInfo: warningInfo.deviceInfo,
+                                isWarning: type === "warnings",
+                                id: `${warningInfo.deviceInfo.uuid}:::${message}`,
+                            } as Alert)
+                    ),
+                ],
+                []
+            );
+
+        return [...getAlertArray("errors"), ...getAlertArray("warnings")]
+        .filter((alert: Alert) => !hiddenIds.includes?.(alert.id));
+        //const used = disksArray?.reduce((prev, d) => prev + d.usage, 0) ?? 0;
+    }
+    const handleVisibilty = (id: string) => {
+        console.log("visibility changed")
+        const index = hiddenIds.findIndex(e => e === id);
+        if (index !== -1) {
+            setCookies("hiddenAlerts", hiddenIds.toSpliced(index, 1));
+        }
+        else {
+            setCookies("hiddenAlerts", [...hiddenIds, id]);
+        }
+        // setAlerts((prev) => {
+        //     const updated = { ...prev };
+        //     let removedAlert: Alert | undefined;
+
+        //     for (const key in updated) {
+        //         if (updated[key].id === idToRemove) {
+        //             removedAlert = updated[key];
+        //             delete updated[key];
+        //             break;
+        //         }
+        //     }
+
+        //     if (removedAlert) {
+        //         setHiddenAlerts((prevHidden) => ({
+        //             ...prevHidden,
+        //             [removedAlert.id]: removedAlert,
+        //         }));
+        //     }
+
+        //     return updated;
+        // });
     };
     // Add restore function
-    const restoreAlert = (idToRestore: number) => {
-        setHiddenAlerts((prevHidden) => {
-            const updatedHidden = { ...prevHidden };
-            const alertToRestore = updatedHidden[idToRestore];
-            if (!alertToRestore) return prevHidden;
+    // const restoreAlert = (idToRestore: number) => {
+    //     setHiddenAlerts((prevHidden) => {
+    //         const updatedHidden = { ...prevHidden };
+    //         const alertToRestore = updatedHidden[idToRestore];
+    //         if (!alertToRestore) return prevHidden;
 
-            setAlerts((prev) => ({
-                ...prev,
-                [alertToRestore.id]: alertToRestore,
-            }));
+    //         setAlerts((prev) => ({
+    //             ...prev,
+    //             [alertToRestore.id]: alertToRestore,
+    //         }));
 
-            delete updatedHidden[idToRestore];
-            return updatedHidden;
-        });
-    };
+    //         delete updatedHidden[idToRestore];
+    //         return updatedHidden;
+    //     });
+    // };
 
-    const allAlerts = Object.values(alerts);
-    const criticalCount = allAlerts.filter((a) => !a.isWarning).length;
-    const mediumCount = allAlerts.filter((a) => a.isWarning).length;
+    const alerts: Alert[] = prepareData();
+
+    const criticalCount = alerts.filter((a) => !a.isWarning).length;
+    const mediumCount = alerts.filter((a) => a.isWarning).length;
 
     return (
         <Group
@@ -77,11 +133,14 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
                     gap="xs"
                     pr="lg"
                 >
-                    {allAlerts.map((alert) => (
+                    {alerts.map((alert) => (
                         <AlertListElement
                             key={alert.id}
                             alert={alert}
-                            onRemove={() => handleRemove(alert.id)}
+                            onRemove={(e) =>{
+                                e.stopPropagation();
+                                handleVisibilty(alert.id)
+                            }}
                         />
                     ))}
                 </Stack>

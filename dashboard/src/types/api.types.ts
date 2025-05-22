@@ -21,6 +21,7 @@ export interface SystemInfo {
     lastBootTimestamp: string;
 }
 
+
 export interface ShareInfo {
     sharePath: string;
     usage: number;
@@ -56,6 +57,13 @@ export interface APIResponse {
     autoDevices: Record<string, Device | null>;
     warnings?: Record<string, WarningInfo>;
     errors?: Record<string, ErrorInfo>;
+}
+
+export interface Alert {
+    deviceInfo: DeviceInfo;
+    message: string;
+    isWarning: boolean;
+    id: string;
 }
 
 export interface WidgetData {

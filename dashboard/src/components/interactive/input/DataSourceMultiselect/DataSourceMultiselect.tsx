@@ -10,9 +10,9 @@ interface DataSourceMultiselectProps {
 }
 
 const SELECT_DATA = [
-    { value: "storage", label: "Storage" },
+    { value: "disks", label: "Storage" },
     // { value: "network", label: "Network" },
-    { value: "fileShares", label: "File Shares" },
+    // { value: "fileShares", label: "File Shares" },
     { value: "system", label: "System" },
 ];
 

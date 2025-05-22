@@ -19,8 +19,6 @@ function DiskProgress({ path, usage, capacity, highlightStages }: DiskProgressPr
     const value = (usage / capacity) * 100;
     const color = value >= highlightStages.red ? "red" : value >= highlightStages.yellow ? "yellow" : "var(--mantine-color-text)";
 
-    console.log(width);
-
     return (
         <Stack gap={0}>
             <ScrollingText
