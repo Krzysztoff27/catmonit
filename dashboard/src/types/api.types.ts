@@ -28,9 +28,9 @@ export interface ShareInfo {
 }
 
 export interface DiskInfo {
-    MountPoint: string;
-    Usage: number;
-    Capacity: number;
+    mountPoint: string;
+    usage: number;
+    capacity: number;
 }
 //@TODO should we leave it as optional?
 export interface Device {
