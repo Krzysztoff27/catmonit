@@ -1,16 +1,19 @@
 import { Group, Progress, Stack, Text } from "@mantine/core";
-import { Disk } from "../../../types/api.types";
+import { DiskInfo, Device } from "../../../types/api.types";
 import { formatBytes } from "../../../utils/formatBytes";
 
-interface DiskProgressProps extends Disk {
+interface DiskProgressProps {
+    path: String;
+    usage: number;
+    capacity: number;
     highlightStages: {
         yellow: number;
         red: number;
     };
 }
 
-function DiskProgress({ path, storageCurrent, storageLimit, highlightStages }: DiskProgressProps) {
-    const value = (storageCurrent / storageLimit) * 100;
+function DiskProgress({ path, usage, capacity, highlightStages }: DiskProgressProps) {
+    const value = (usage / capacity) * 100;
     const color = value >= highlightStages.red ? "red" : value >= highlightStages.yellow ? "yellow" : "var(--mantine-color-text)";
 
     return (
@@ -33,7 +36,7 @@ function DiskProgress({ path, storageCurrent, storageLimit, highlightStages }: D
                     fz="sm"
                     miw="120"
                 >
-                    {formatBytes(storageCurrent)} / {formatBytes(storageLimit)}
+                    {formatBytes(usage)} / {formatBytes(capacity)}
                 </Text>
             </Group>
         </Stack>
