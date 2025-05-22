@@ -5,5 +5,6 @@ const theme = createTheme({
     defaultRadius: "md",
     scale: 1,
     cursorType: "pointer",
+    primaryColor: 'indigo',
 });
 export default theme;
