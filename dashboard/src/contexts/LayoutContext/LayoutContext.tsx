@@ -16,7 +16,7 @@ interface LayoutContextType {
     updateCurrentLayout: (data: any) => Promise<any>;
     renameCurrentLayout: (newName: string) => Promise<any>;
     removeLayout: (name: string) => Promise<any>;
-    createNewLayout: () => Promise<string>;
+    createNewLayout: () => Promise<void>;
 }
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
@@ -24,17 +24,28 @@ const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 export function LayoutProvider({ children }) {
     const { loading, data: layouts, refresh } = useFetch("/layout/layouts");
     const [cookies, setCookies] = useCookies(["layout_id"]);
+    // the updates during create new layout created like 4 racing conditions
+    // cookies only updated after next render
+    // thats why useState that copies the cookies is needed
+    const [selectedLayoutId, setSelectedLayoutId] = useState<string | undefined>(cookies.layout_id);
     const [currentLayout, setCurrentLayout] = useState<LayoutInDatabase | undefined>(undefined);
     const { sendRequest } = useApiRequests();
 
-    const setCurrent = (id: string) => setCookies("layout_id", id, { path: "/" });
+    const setCurrent = (id: string) => {
+        setCookies("layout_id", id, { path: "/" });
+        setSelectedLayoutId(id);
+    };
 
     const getLayouts = async (): Promise<string[] | undefined> => {
         return await sendRequest("GET", `/layout/layouts`);
     };
 
     const getLayout = async (id: string): Promise<LayoutInDatabase | undefined> => {
-        return await sendRequest("GET", `/layout/layout/${id}`);
+        if (!id) return;
+
+        const layout = await sendRequest("GET", `/layout/layout/${id}`, undefined, undefined, () => {});
+        if (!layout || layout?.message) return; // if error or message
+        return layout as LayoutInDatabase;
     };
 
     const renameLayout = async (id: string, newName: string) => {
@@ -63,46 +74,59 @@ export function LayoutProvider({ children }) {
     };
 
     const createNewLayout = async () => {
-        let appendedNumber: number = 1;
+        let appendedNumber = 1;
 
         const defaultNameNumbersUsed = (layouts || [])
             .map(({ name }) => name.match(/(?<=New layout )\d+$/gm))
             .flat()
-            .sort((a, b) => (parseInt(a) > parseInt(b) ? 1 : -1));
+            .filter(Boolean)
+            .map(Number)
+            .sort((a, b) => a - b);
 
-        while (`${appendedNumber}` === defaultNameNumbersUsed[appendedNumber - 1]) appendedNumber++;
+        while (defaultNameNumbersUsed.includes(appendedNumber)) appendedNumber++;
 
         const name = `New layout ${appendedNumber}`;
         const res = await sendRequest("PUT", `/layout/create/${name}`, undefined, JSON.stringify([]));
+
+        const newLayout: LayoutInDatabase = { info: { id: res.id, name }, data: [] };
+
+        setCurrent(res.id); // updates both cookie + local state
+        setCurrentLayout(newLayout);
         refresh();
-        return res.id;
     };
 
     useEffect(() => {
-        if (loading) return;
+        if (!selectedLayoutId && cookies.layout_id) {
+            setSelectedLayoutId(cookies.layout_id);
+        }
+    }, []);
 
-        const getCurrentLayout = async () => {
+    useEffect(() => {
+        if (loading || !layouts || isUndefined(selectedLayoutId)) return;
+
+        const initLayout = async () => {
             if (isEmpty(layouts)) {
-                const id = await createNewLayout();
-                setCurrent(id);
-                setCurrentLayout(await getLayout(id));
+                await createNewLayout();
                 return;
             }
 
-            const doesntExist = isUndefined((layouts || []).find((l: LayoutInfoInDatabase) => l.id === cookies.layout_id));
-
-            if (doesntExist) {
-                setCurrent(layouts[0].id);
-                setCurrentLayout(await getLayout(layouts[0].id));
-                return;
+            if (selectedLayoutId) {
+                const layout = await getLayout(selectedLayoutId);
+                if (layout) {
+                    setCurrentLayout(layout);
+                    return;
+                }
             }
 
-            const layout = await getLayout(cookies.layout_id);
-            setCurrentLayout(layout);
+            // If we got here, fallback to the first layout
+            const fallback = layouts[0];
+            setCurrent(fallback.id);
+            const layout = await getLayout(fallback.id);
+            if (layout) setCurrentLayout(layout);
         };
 
-        getCurrentLayout();
-    }, [loading, cookies.layout_id]);
+        initLayout();
+    }, [loading, layouts, selectedLayoutId]);
 
     const value = {
         loading,

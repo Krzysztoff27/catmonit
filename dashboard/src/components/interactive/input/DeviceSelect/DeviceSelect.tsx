@@ -65,7 +65,7 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
             <Title order={4}>Target</Title>
             <Select
                 unselectable="off"
-                placeholder="Auto"
+                placeholder="Automatic selection"
                 data={selectData}
                 value={widget.settings.target}
                 onChange={changeTarget}

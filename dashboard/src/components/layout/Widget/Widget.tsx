@@ -1,14 +1,15 @@
-import { ActionIcon, Box, Center, Flex, FlexProps, Group, Paper, PaperProps, Stack, Text, Title } from "@mantine/core";
+import { ActionIcon, Box, Center, Flex, FlexProps, Group, Loader, Paper, PaperProps, Stack, Text, Title } from "@mantine/core";
 import { IconInfoCircle, IconInfoCircleFilled, IconX } from "@tabler/icons-react";
 import classes from "./Widget.module.css";
 import { LayoutItem } from "../../../types/reactGridLayout.types";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { WidgetData } from "../../../types/api.types";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import TimeoutRingProgress from "../../display/TimeoutRingProgress/TimeoutRingProgress";
 import { dummies } from "../../../pages/Editor/dummies";
 import { safeObjectValues } from "../../../utils/object";
 import { isNull } from "lodash";
+import WidgetBoard from "../WidgetBoard/WidgetBoard";
 
 interface WidgetProps extends FlexProps {
     index: number; // if index = -1 then its a ghost component
@@ -25,6 +26,40 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
         const WidgetContent = getWidgetContent(widget);
         const config = getWidgetConfig(widget);
         const data = index !== -1 ? getWidgetData(widget) : safeObjectValues(dummies[config?.dataSource ?? ""])[0];
+        const [fallback, setFallback] = useState<React.ReactNode>(
+            <Loader
+                type="bars"
+                size="xs"
+                color="var(--mantine-color-text)"
+            />
+        );
+
+        useEffect(() => {
+            setFallback(
+                <Loader
+                    type="bars"
+                    size="xs"
+                    color="var(--mantine-color-text)"
+                />
+            );
+
+            const timeout = setTimeout(() => {
+                setFallback(
+                    <>
+                        <Text size="md">{widget.settings.target ? "No connection" : "No results"}</Text>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            ta="center"
+                        >
+                            {widget.settings.target ?? "Automatic assignment"}
+                        </Text>
+                    </>
+                );
+            }, 500);
+
+            return () => clearTimeout(timeout);
+        }, [widget.settings]);
 
         return (
             <Flex
@@ -71,14 +106,9 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                                 justify="center"
                                 flex="1"
                                 h="100%"
+                                pb="48px"
                             >
-                                <Text size="md">{widget.settings.target ? "No connection" : "No results"}</Text>
-                                <Text
-                                    size="xs"
-                                    c="dimmed"
-                                >
-                                    {widget.settings.target ?? "Automatic assignment"}
-                                </Text>
+                                {fallback}
                             </Stack>
                         ) : (
                             WidgetContent && (
