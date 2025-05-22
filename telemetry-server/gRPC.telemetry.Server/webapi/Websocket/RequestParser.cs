@@ -33,7 +33,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
             return (sbyte)count;
         }
-        private static deviceInfo getDeviceInfoFromResponse(ResponseModel response)
+        public static deviceInfo getDeviceInfoFromResponse(ResponseModel response)
         {
             var deviceInfo = new deviceInfo();
             deviceInfo.lastUpdated = response.Timestamp;

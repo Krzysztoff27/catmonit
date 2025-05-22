@@ -100,14 +100,7 @@ public class TelemetryService : gRPC.telemetry.TelemetryService.TelemetryService
                         {
                             if (first)
                             {
-                                DeviceHelper.OnDeviceConnected(new gRPC.telemetry.Server.webapi.Monitoring.deviceInfo
-                                {
-                                    lastUpdated = response.Timestamp,
-                                    hostname = response.Hostname,
-                                    ipAddress = response.IpAddress,
-                                    uuid = guid,
-                                    os = response.Os
-                                });
+                                DeviceHelper.OnDeviceConnected( RequestParser.getDeviceInfoFromResponse(response) );
                                 first = false;
                             }
                             RequestParser.onResponseReceived(guid, response);

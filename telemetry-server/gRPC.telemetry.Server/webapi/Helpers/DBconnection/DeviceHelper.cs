@@ -103,7 +103,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
             {
                 var tempDeviceInfos = new ConcurrentDictionary<Guid, deviceInfo>();
 
-                using (var reader = ConHelper.ExecuteReader("SELECT device_id, last_seen, hostname, ip_adress, os FROM devices;", new Dictionary<string, object>()))
+                using (var reader = ConHelper.ExecuteReader("SELECT device_id, last_seen, hostname, ip_adress, network_mask, os FROM devices;", new Dictionary<string, object>()))
                 {
                     while (reader.Read())
                     {
@@ -113,7 +113,8 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                             lastUpdated = reader.GetDateTime(1),
                             hostname = reader.IsDBNull(2) ? "" : reader.GetString(2),
                             ipAddress = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                            os = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                            mask = reader.IsDBNull(4) ? (sbyte)0 : (sbyte)((Int16)reader["network_mask"]),
+                            os = reader.IsDBNull(5) ? "" : reader.GetString(5),
                         };
 
                         tempDeviceInfos[deviceInfo.uuid] = deviceInfo;
