@@ -84,7 +84,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine($"user: {subber.userID}, autocount: {subber.autoDevicesCount}, error count: {subber.errorCount}");
+                Console.WriteLine($"user: {subber.userID}, autocount: {subber.autoDevicesCount}, error count: {subber.errorCount}, error:{e.Message}");
                 return "";
             }
         }
