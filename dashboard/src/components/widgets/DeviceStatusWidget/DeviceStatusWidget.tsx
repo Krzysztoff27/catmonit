@@ -1,22 +1,25 @@
 import { Box, Stack, Title, Text, Flex, Group } from "@mantine/core";
 import { WidgetContentProps } from "../../../types/components.types";
-import classes from "./DeviceStatusWidget.module.css";
 import { useElementSize } from "@mantine/hooks";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import MetricProgress from "../../display/MetricProgress/MetricProgress";
-import { IconCpu } from "@tabler/icons-react";
+import { Device } from "../../../types/api.types";
 import { timePassedRounded } from "../../../utils/timeFormats";
 import { useState, useEffect } from "react";
-
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import { IconCpu } from "@tabler/icons-react";
 //@TODO make sure it's okay to refresh it this way
 function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentProps) {
     const { ref } = useElementSize();
-    const deviceData = data;
+    const device = data as Device;
+    const { getWidget } = useWidgets();
 
-    if (!deviceData) return null;
+    if (!device || !device.systemInfo) return null;
+
+    const systemInfo = device.systemInfo;
 
     const getBootDate = (): Date | null => {
-        const ts = deviceData.bootTimestamp;
+        const ts = systemInfo.lastBootTimestamp;
         if (typeof ts === "number") {
             const ms = ts > 1e12 ? ts : ts * 1000;
             const date = new Date(ms);
@@ -45,7 +48,7 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
         }, interval);
 
         return () => clearTimeout(timer);
-    }, [deviceData.bootTimestamp, uptimeNow]);
+    }, [systemInfo.lastBootTimestamp, uptimeNow]);
 
     const bootDate = getBootDate();
 
@@ -57,13 +60,10 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
         }
     }
     return (
-        <Box
-            className={classes.container}
-            {...props}
-        >
-            <Stack className={classes.stack}>
+        <Box {...props}>
+            <Stack>
                 <DeviceTitleOneLine
-                    data={deviceData}
+                    data={device}
                     mb="6"
                 />
 
@@ -73,76 +73,73 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
                 >
                     <MetricProgress
                         label="CPU Usage"
-                        used={deviceData.cpu ?? 0}
+                        used={systemInfo.cpuUsagePercent ?? 0}
                         total={100}
                         isPercentage
                     />
 
                     <MetricProgress
                         label="RAM usage"
-                        used={deviceData.ramUsed ?? 0}
-                        total={deviceData.ramMax ?? 0}
+                        used={systemInfo.ramUsedBytes ?? 0}
+                        total={systemInfo.ramTotalBytes ?? 0}
                     />
                     <MetricProgress
                         label="Swap usage"
-                        used={deviceData.swapUsed ?? 0}
-                        total={deviceData.swapMax ?? 0}
+                        used={systemInfo.pagefileUsedBytes ?? 0}
+                        total={systemInfo.pagefileTotalBytes ?? 0}
                     />
 
-                    <Stack gap={0}>
-                        <Text
-                            fz="xs"
-                            fw={500}
-                        >
-                            CPU load averages
-                        </Text>
-                        <Flex
-                            gap="sm"
-                            wrap="wrap"
-                            fz="md"
-                        >
-                            <Flex
-                                gap="sm"
-                                wrap="wrap"
-                                fz="md"
-                            >
-                                {["1m", "5m", "15m"].map((label, i) => (
-                                    <Text key={label}>
-                                        {Array.isArray(deviceData.cpuLoadAverage) && deviceData.cpuLoadAverage[i] != null
-                                            ? deviceData.cpuLoadAverage[i].toFixed(2)
-                                            : "N/A"}{" "}
-                                        <Text
-                                            component="span"
-                                            fz="xs"
-                                            span
-                                            c="var(--background-color-2)"
-                                        >
-                                            {label}
+                    {getWidget(index).rect.h > 2 && (
+                        <>
+                            <Stack gap={0}>
+                                <Text
+                                    fz="xs"
+                                    fw={500}
+                                >
+                                    CPU load averages
+                                </Text>
+                                <Flex
+                                    gap="sm"
+                                    wrap="wrap"
+                                    fz="md"
+                                >
+                                    {["1m", "5m", "15m"].map((label) => (
+                                        <Text key={label}>
+                                            N/A{" "}
+                                            <Text
+                                                component="span"
+                                                fz="xs"
+                                                span
+                                                c="var(--background-color-2)"
+                                            >
+                                                {label}
+                                            </Text>
                                         </Text>
-                                    </Text>
-                                ))}
-                            </Flex>
-                        </Flex>
-                    </Stack>
+                                    ))}
+                                </Flex>
+                            </Stack>
 
-                    <Group gap={5}>
-                        <Text
-                            fz="sm"
-                            fw={500}
-                        >
-                            Uptime:
-                        </Text>
-                        <Text fz="sm">{uptimeDisplay}</Text>
-                    </Group>
-                    <Group gap={5}>
-                        <IconCpu />
-                        <Text
-                            fz="sm"
-                            fw="500"
-                        >
-                            Cores: {deviceData.cpuCoreNumber != null ? deviceData.cpuCoreNumber : "N/A"}
-                        </Text>
-                    </Group>
+                            <Group gap={5}>
+                                <Text
+                                    fz="sm"
+                                    fw={500}
+                                >
+                                    Uptime:
+                                </Text>
+                                <Text fz="sm">{bootDate ? `${timePassedRounded(bootDate)[0]} ${timePassedRounded(bootDate)[1]}` : "N/A"}</Text>
+                            </Group>
+
+                            <Group gap={5}>
+                                <IconCpu />
+                                <Text
+                                    fz="sm"
+                                    fw="500"
+                                >
+                                    Cores: N/A
+                                </Text>
+                            </Group>
+                        </>
+                    )}
                 </Stack>
             </Stack>
         </Box>
