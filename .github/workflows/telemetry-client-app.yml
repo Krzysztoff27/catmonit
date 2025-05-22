@@ -53,6 +53,8 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: "CatMonit Telemetry Client ${{ github.ref_name }}"
           generate_release_notes: true
+          prerelease: true
+          make_latest: true
           files: catmonit-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
