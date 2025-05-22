@@ -1,4 +1,4 @@
-﻿name: Build and Release
+﻿name: Build and Release (Windows)
 
 on:
   release:
@@ -6,20 +6,32 @@ on:
 
 jobs:
   build:
-    if: github.event.release.target_commitish == 'telemetry-client'
+    runs-on: windows-latest
 
-    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Ensure tags and history are available
+
+      - name: Verify release commit is on telemetry-client branch
+        run: |
+          $releaseSha = "${{ github.event.release.target_commitish }}"
+          git fetch origin telemetry-client
+          $mergeBase = git merge-base origin/telemetry-client $releaseSha
+          if ($mergeBase -ne $releaseSha) {
+            Write-Host "Release commit is not on telemetry-client branch. Exiting."
+            exit 1
+          }
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -27,26 +39,26 @@ jobs:
           pip install pyinstaller
 
       - name: Build executable
-        working-directory: telemetry-client/src/windows
+        working-directory: telemetry-client/src
         run: pyinstaller service.spec
 
-      - name: Prepare ZIP archive for release
+      - name: Prepare ZIP artifact
         run: |
-          TAG_NAME="${{ github.event.release.tag_name }}"
-          mkdir release
-          cp telemetry-client/src/windows/dist/CatMonitTelemetryClient.exe release/
-          cp telemetry-client/src/windows/installer/*.ps1 release/
-          cd release
-          zip "../catmonit-${TAG_NAME}.zip" *
+          $tag = "${{ github.ref_name }}"
+          $zipName = "catmonit-$tag.zip"
+          New-Item -ItemType Directory -Path release
+          Copy-Item telemetry-client/src/dist/CatMonitTelemetryClient.exe -Destination release/
+          Copy-Item telemetry-client/src/installer/*.ps1 -Destination release/
+          Compress-Archive -Path release/* -DestinationPath $zipName
 
-      - name: Upload ZIP archive to the same GitHub Release
+      - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
-          name: "CatMonit Telemetry Client ${{ github.event.release.tag_name }}"
+          tag_name: ${{ github.ref_name }}
+          name: "CatMonit Telemetry Client ${{ github.ref_name }}"
           generate_release_notes: true
           prerelease: true
           make_latest: true
-          files: catmonit-${{ github.event.release.tag_name }}.zip
+          files: catmonit-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
