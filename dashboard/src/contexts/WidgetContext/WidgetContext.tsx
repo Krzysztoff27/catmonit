@@ -9,6 +9,8 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { useLayouts } from "../LayoutContext/LayoutContext";
 import { useData } from "../DataContext/DataContext";
 import { safeObjectEntries, safeObjectKeys, safeObjectValues } from "../../utils/object";
+import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
+import { v4 as uuidv4 } from "uuid";
 
 interface WidgetContextType {
     widgets: WidgetData[];
@@ -36,10 +38,12 @@ interface WidgetProviderProps {
 
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
+const WIDGET_TYPES = safeObjectKeys(WIDGETS_CONFIG);
+const emptyAutoRetrievalOrders = WIDGET_TYPES.reduce((prev, type) => ({ ...prev, [type]: [] }), {});
+
 export function WidgetProvider({ children }: WidgetProviderProps) {
-    const WIDGET_TYPES = safeObjectKeys(WIDGETS_CONFIG);
     const { currentLayout, updateCurrentLayout } = useLayouts();
-    const [autoRetrievalOrders, setAutoRetrievalOrders] = useState(WIDGET_TYPES.reduce((prev, type) => ({ ...prev, [type]: [] }), {}));
+    const [autoRetrievalOrders, setAutoRetrievalOrders] = useState(emptyAutoRetrievalOrders);
     const { websockets, data } = useData();
     const [widgets, setWidgets] = useState<WidgetData[]>([]);
     const [selected, setSelected] = useState<null | number>(null);
@@ -47,7 +51,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const removeFromAutoRetrievalOrders = (widget: WidgetData) => {
         setAutoRetrievalOrders((prev) => {
             const newAutoRetrievalOrders = prev;
-            newAutoRetrievalOrders[widget.type].filter((e) => e !== widget.index);
+            newAutoRetrievalOrders[widget.type] = newAutoRetrievalOrders[widget.type].filter((e) => e !== widget.uuid);
             return newAutoRetrievalOrders;
         });
     };
@@ -55,7 +59,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const appendToAutoRetrievalOrders = (widget: WidgetData) => {
         setAutoRetrievalOrders((prev) => {
             const newAutoRetrievalOrders = prev;
-            newAutoRetrievalOrders[widget.type].push(widget.index);
+            newAutoRetrievalOrders[widget.type].push(widget.uuid);
             return newAutoRetrievalOrders;
         });
     };
@@ -63,29 +67,29 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     useEffect(() => {
         setWidgets(currentLayout?.data || []);
         const subscriptions = {};
+        const newAutoRetrievalOrders = emptyAutoRetrievalOrders;
 
-        currentLayout?.data?.forEach((widget: WidgetData, index) => {
+        currentLayout?.data?.forEach((widget: WidgetData) => {
             const config = getWidgetConfig(widget);
 
             if (!config.isReferingToSingularResource) return;
 
             if (isUndefined(subscriptions[config.dataSource])) {
                 subscriptions[config.dataSource] = {
-                    resourceUuids: [], // save which resources set widgets need
-                    autoWidgetIndexes: [], // save which widgets are set to auto
+                    devices: [], // save which resources set widgets need
+                    auto: 0, // save how many auto we need
                 };
             }
-            console.log(widget);
-            if (isNull(widget.settings.target)) {
-                subscriptions[config.dataSource].autoWidgetIndexes.push(index);
-            } else {
-                subscriptions[config.dataSource].resourceUuids.push(widget.settings.target);
+            if (!isNull(widget.settings.target)) {
+                return subscriptions[config.dataSource].devices.push(widget.settings.target);
             }
+            subscriptions[config.dataSource].auto++;
+            newAutoRetrievalOrders[widget.type].push(widget.uuid);
         });
 
-        safeObjectEntries(subscriptions).forEach(([dataSource, { resourceUuids, autoWidgetIndexes }]) => {
-            websockets[dataSource].updateSubscription({ devices: resourceUuids, auto: autoWidgetIndexes.length } as WebSocketStart);
-            setAutoRetrievalOrders((prev) => ({ ...prev, [dataSource]: autoWidgetIndexes }));
+        setAutoRetrievalOrders(newAutoRetrievalOrders);
+        safeObjectEntries(subscriptions).forEach(([dataSource, subscription]) => {
+            websockets[dataSource].updateSubscription(subscription as WebSocketStart);
         });
     }, [currentLayout?.data]);
 
@@ -187,17 +191,18 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         if (!type) return;
 
         const config = WIDGETS_CONFIG[type];
+        const uuid = uuidv4();
 
         if (config.isReferingToSingularResource) {
             websockets[config.dataSource].incrementAutoResources();
-            appendToAutoRetrievalOrders({ type, index: widgets.length } as WidgetData);
+            appendToAutoRetrievalOrders({ type, uuid } as WidgetData);
         }
 
         setWidgets((prev) => [
             ...prev,
             {
                 type,
-                index: widgets.length,
+                uuid,
                 settings: config.initialSettings,
                 rect: getItemRect(layoutItem),
                 version: 0,
@@ -236,8 +241,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
 
         const target = widget?.settings?.target;
         if (target) return data[source].monitoredDevices[target];
-
-        const index = autoRetrievalOrders[widget.type].findIndex((idx: number) => idx === widget.index);
+        const index = autoRetrievalOrders[widget.type].findIndex((uuid: string) => uuid === widget.uuid);
         return safeObjectValues(data[source]?.autoDevices)[index];
     };
 

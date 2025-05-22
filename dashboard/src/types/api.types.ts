@@ -59,7 +59,7 @@ export interface APIResponse {
 }
 
 export interface WidgetData {
-    index: number;
+    uuid: string;
     type: string;
     rect: {
         x: number;
