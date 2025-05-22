@@ -28,7 +28,7 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: Overall
     const { w, h } = widget.rect;
 
     const chartScale = Math.min(w, h);
-    const minSize = 150;
+    const minSize = 120;
     const maxSize = 320;
 
     //CHART SIZE
@@ -37,7 +37,7 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: Overall
 
     //FONT SIZE
     const fontSize = 16 + (chartScale - 2) * 2;
-    const labelSize = 16 + (23 - 16) * ((chartScale - 2) / (4 - 2));
+    const labelSize = 13 + (23 - 13) * ((chartScale - 2) / (4 - 2));
 
     //THICKNESS
     const minThickness = 20;
@@ -75,13 +75,14 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: Overall
             ref={ref}
             className={classes.container}
             {...props}
+            
         >
             <DeviceTitleOneLine data={data} />
             <Flex
                 direction={layoutDirection}
                 className={classes.centeredContainer}
                 w="100%"
-                h="100%"
+                h="calc(100% - 72px)"
             >
                 <Flex
                     align="center"
