@@ -1,11 +1,14 @@
 import { Group, GroupProps, Text } from "@mantine/core";
 import { IconServer2 } from "@tabler/icons-react";
 import { Device } from "../../../types/api.types";
+import ScrollingText from "../ScrollingText/ScrollingText";
+
 interface DeviceTitleProps extends GroupProps {
     data: Device;
 }
 
 function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
+    console.log(data);
     return (
         <Group
             gap="8"
@@ -16,18 +19,25 @@ function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
                 size={24}
                 stroke={2.2}
             />
-            <Text
-                fz="lg"
-                lh="xs"
-                fw="600"
+            <ScrollingText
+                flex="1"
+                style={{ overflow: "hidden" }}
             >
-                {data?.deviceInfo?.hostname ?? "Not set"}
-            </Text>
+                <Text
+                    fz="lg"
+                    lh="xs"
+                    fw="600"
+                >
+                    {data?.deviceInfo?.hostname ?? "Not set"}
+                </Text>
+            </ScrollingText>
             <Text
                 fz="sm"
                 ml="auto"
+                flex="1"
+                ta="right"
             >
-                {data?.deviceInfo?.ipAddress && data?.deviceInfo?.mask ? `${data?.deviceInfo?.ipAddress}/${data?.deviceInfo?.mask}` : ""}
+                {data?.deviceInfo?.ipAddress ? data?.deviceInfo?.ipAddress : ""}/{data?.deviceInfo?.mask ? data?.deviceInfo?.mask : ""}
             </Text>
         </Group>
     );

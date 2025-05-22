@@ -3,7 +3,7 @@ import { IconCheck } from "@tabler/icons-react";
 import { safeObjectValues } from "../../../../utils/object";
 import classes from "./DeviceSelect.module.css";
 import { useWidgets } from "../../../../contexts/WidgetContext/WidgetContext";
-import { WidgetData } from "../../../../types/api.types";
+import { Device, DeviceInfo, WidgetData } from "../../../../types/api.types";
 import useFetch from "../../../../hooks/useFetch";
 
 interface DeviceSelectProps {
@@ -31,24 +31,26 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
             value: "",
             label: "Automatic selection",
         },
-        ...safeObjectValues(data).map((device) => ({
-            value: device.uuid,
-            label: `${device.hostname} (${device.ip}${device.mask})`,
+        ...safeObjectValues(data).map((deviceInfo) => ({
+            value: deviceInfo.uuid,
+            label: `${deviceInfo?.hostname} (${deviceInfo?.ipAddress}/${deviceInfo?.mask})`,
         })),
     ];
 
     const renderOption: SelectProps["renderOption"] = ({ option, checked }) => {
-        const device = data[option.value];
-        if (!device) return <i>{option.label}</i>;
+        const deviceInfo: DeviceInfo = data[option.value];
+        if (!deviceInfo) return <i>{option.label}</i>;
         return (
             <Flex className={classes.selectOption}>
                 <Flex className={classes.deviceInfo}>
                     {checked && <IconCheck size={16} />}
-                    <Text fz="sm">{device?.hostname}</Text>
+                    <Text fz="sm">{deviceInfo?.hostname}</Text>
                 </Flex>
-                <Text className={classes.ipMask}>
-                    {device?.ip} {device?.mask}
-                </Text>
+                <Flex className={classes.deviceInfo.mask}>
+                    <Text fz="sm">
+                        {deviceInfo?.ipAddress}/{deviceInfo?.mask}
+                    </Text>
+                </Flex>
             </Flex>
         );
     };

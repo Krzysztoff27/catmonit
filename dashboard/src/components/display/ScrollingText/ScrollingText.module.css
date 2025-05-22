@@ -4,7 +4,6 @@
     overflow-y: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    color: var(--mantine-color-red-6);
     align-items: center;
     font-size: var(--mantine-font-size-sm);
 
