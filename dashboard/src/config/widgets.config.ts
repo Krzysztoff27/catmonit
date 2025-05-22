@@ -82,7 +82,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
             maxW: 10,
         },
         initialSettings: {
-            target: undefined,
+            target: null,
             automatic: true,
         },
         dataSource: "system",

@@ -45,12 +45,17 @@ export interface WarningInfo {
     warnings: string[];
 }
 
+export interface ErrorInfo {
+    deviceInfo: DeviceInfo;
+    error: string[];
+}
+
 export interface APIResponse {
     responseTime: string;
     monitoredDevices: Record<string, Device | null>;
     autoDevices: Record<string, Device | null>;
     warnings?: Record<string, WarningInfo>;
-    errors?: Record<string, string>;
+    errors?: Record<string, ErrorInfo>;
 }
 
 export interface WidgetData {

@@ -3,19 +3,25 @@ import { DonutChart } from "@mantine/charts";
 import { useElementSize } from "@mantine/hooks";
 import { WidgetContentProps } from "../../../types/components.types";
 import classes from "./OverallDeviceStorageWidget.module.css";
-import { DeviceDiskData } from "../../../types/api.types";
+import { DeviceInfo, DiskInfo } from "../../../types/api.types";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import { formatBytes } from "../../../utils/formatBytes";
 
-function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
+interface OverallDeviceStorageWidgetProps extends WidgetContentProps {
+    data: {
+        deviceInfo: DeviceInfo;
+        disksInfo?: DiskInfo[];
+    };
+}
+
+function OverallDeviceStorageWidget({ index, data, settings, ...props }: OverallDeviceStorageWidgetProps) {
     // DATA CALCULAIONS ETC.
     const { getWidget } = useWidgets();
     const widget = getWidget(index);
 
     if (!widget || !widget.rect) {
-        console.warn("Widget or rect not available:", widget);
         return null;
     }
 
@@ -38,12 +44,11 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
     const maxThickness = 40;
     const thickness = minThickness + ((chartSize - minSize) * (maxThickness - minThickness)) / (maxSize - minSize);
 
-    const { disks } = data as DeviceDiskData;
-    const disksArray = safeObjectValues(disks);
+    const disksArray = safeObjectValues(data.disksInfo ?? []); //@TODO: [] or {}? I guess [] in this case
 
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-    const total = disksArray?.reduce((sum, d) => sum + d.storageLimit, 0) ?? 0;
-    const used = disksArray?.reduce((sum, d) => sum + d.storageCurrent, 0) ?? 0;
+    const used = disksArray?.reduce((sum, d) => sum + d.usage, 0) ?? 0;
+    const total = disksArray?.reduce((sum, d) => sum + d.capacity, 0) ?? 0;
     const free = total - used;
 
     const formattedData = [
@@ -64,7 +69,7 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: WidgetC
     const { ref } = useElementSize();
     const textDirection = w >= 3 && h >= 3 && !(w == 4 && h == 3) ? "row" : "column";
     const layoutDirection = w > h ? "row" : "column";
-    
+
     return (
         <Box
             ref={ref}
