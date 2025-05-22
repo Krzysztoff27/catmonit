@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, FlexProps, Paper, PaperProps } from "@mantine/core";
+import { ActionIcon, Flex, FlexProps, Paper, PaperProps, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import classes from "./Widget.module.css";
 import { LayoutItem } from "../../../types/reactGridLayout.types";
@@ -53,12 +53,24 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                     pb={showTimestamp ? "xl" : "md"}
                     withBorder
                 >
-                    {WidgetContent && (
-                        <WidgetContent
-                            index={index}
-                            data={data}
-                            settings={widget?.settings}
-                        />
+                    {!data && config.dataSource ? (
+                        <>
+                            <Text
+                                size="xs"
+                                w="200px"
+                                c="dimmed"
+                            >
+                                {widget.settings.target ?? "Automatic assignment"}
+                            </Text>
+                        </>
+                    ) : (
+                        WidgetContent && (
+                            <WidgetContent
+                                index={index}
+                                data={data}
+                                settings={widget?.settings}
+                            />
+                        )
                     )}
                     {showTimestamp && (
                         <TimeoutRingProgress

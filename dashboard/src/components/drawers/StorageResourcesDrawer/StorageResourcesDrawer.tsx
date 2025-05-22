@@ -54,7 +54,6 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
         () =>
             safeObjectValues(data?.[dataSource]).map((resource, i: number) => {
                 const hidden = isResourceHidden(resource.path);
-                console.log(widget.settings[dataSource][resource.path]);
                 return (
                     <Flex
                         key={i}
