@@ -23,6 +23,10 @@
     color: var(--mantine-color-dimmed) !important;
 }
 
+.textInputSection:last-of-type {
+    width: 72px !important;
+}
+
 .dropdownMenu {
     background: var(--background-color-7) !important;
 }

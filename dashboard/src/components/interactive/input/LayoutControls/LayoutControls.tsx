@@ -1,14 +1,13 @@
 import { Button, Combobox, Group, ScrollArea, TextInput, useCombobox } from "@mantine/core";
-import { IconChevronDown, IconTrash } from "@tabler/icons-react";
+import { IconChevronDown, IconDeviceDesktop, IconTrash } from "@tabler/icons-react";
 import { useEffect, useMemo } from "react";
 import classes from "./LayoutControls.module.css";
 import { useLayouts } from "../../../../contexts/LayoutContext/LayoutContext";
 import { LayoutInfoInDatabase } from "../../../../types/api.types";
-import { isEmpty, isObject, trim, trimStart } from "lodash";
+import { isEmpty, isObject, trim } from "lodash";
 import { useField } from "@mantine/form";
 import useNotifications from "../../../../hooks/useNotifications";
-import { useDebouncedCallback } from "@mantine/hooks";
-import { isFileLoadingAllowed } from "vite";
+import { Link } from "react-router-dom";
 
 const LayoutControls = ({}): React.JSX.Element => {
     const { currentLayout, loading, layouts, renameCurrentLayout, removeLayout, createNewLayout, setCurrent } = useLayouts();
@@ -95,6 +94,7 @@ const LayoutControls = ({}): React.JSX.Element => {
                     className={classes.textInput}
                     classNames={{
                         input: classes.textInputInput,
+                        section: classes.textInputSection,
                     }}
                     variant="filled"
                     onBlur={onInputBlur}
@@ -113,15 +113,27 @@ const LayoutControls = ({}): React.JSX.Element => {
                         </Combobox.Target>
                     }
                     rightSection={
-                        <Button
-                            onClick={onRemove}
-                            variant="default"
-                            className={`${classes.deleteButton} ${classes.button}`}
-                            disabled={layouts?.length <= 1 || loading}
-                            c={field.error ? "red.6" : layouts?.length <= 1 || loading ? "dimmed" : ""}
-                        >
-                            <IconTrash size={18} />
-                        </Button>
+                        <>
+                            <Button
+                                component={Link}
+                                to={`/dashboard/${currentLayout?.info.id}`}
+                                variant="default"
+                                disabled={loading}
+                                c={field.error ? "red.6" : layouts?.length <= 1 || loading ? "dimmed" : ""}
+                                className={`${classes.deleteButton} ${classes.button}`}
+                            >
+                                <IconDeviceDesktop size={18} />
+                            </Button>
+                            <Button
+                                onClick={onRemove}
+                                variant="default"
+                                className={`${classes.deleteButton} ${classes.button}`}
+                                disabled={layouts?.length <= 1 || loading}
+                                c={field.error ? "red.6" : layouts?.length <= 1 || loading ? "dimmed" : ""}
+                            >
+                                <IconTrash size={18} />
+                            </Button>
+                        </>
                     }
                 />
             </Group>

@@ -18,13 +18,7 @@ export interface WidgetPropertiesContentProps {
 export type WidgetPropertiesContent = ComponentType<WidgetPropertiesContentProps>;
 
 export interface WidgetLayoutProps {
-    selected?: number | null;
-    onDragStart?: ItemCallback;
-    onDrag?: ItemCallback;
-    onDragStop?: ItemCallback;
-    onResizeStart?: ItemCallback;
-    onResize?: ItemCallback;
-    onResizeStop?: ItemCallback;
+    editable?: boolean;
     onDrop?: (layout: Layout, item: LayoutItem, e: Event) => void;
     droppingItem?: { i: string; w: number; h: number };
 }

@@ -33,8 +33,7 @@ function FileSharesWidget({ index, data, settings, ...props }: WidgetContentProp
 
     useEffect(() => {
         updateSettings();
-    }, [data, settings.target]);
-    updateSettings();
+    }, [data, settings?.target]);
 
     const prepareData = () => {
         if (!height || !fileShares) return fileShares ?? [];

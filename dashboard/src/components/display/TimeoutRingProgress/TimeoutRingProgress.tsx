@@ -28,9 +28,10 @@ const TimeoutRingProgress = ({ timestamp, source, ...props }: TimeoutRingProgres
         return () => cancelAnimationFrame(animationRef.current!);
     }, [timestamp]);
 
-    const [date, time, _] = timestamp?.split?.(/[TZ\.]+/) || ["", ""];
+    const localString = new Date(timestamp).toLocaleString();
+    // const [date, time, _] = timestamp?.split?.(/[TZ\.]+/) || ["", ""];
 
-    const message = timestamp ? `Last update ${date} ${time}` : "Couldn't reach";
+    const message = timestamp ? `Updated ${localString}` : "Couldn't reach";
 
     return (
         <Group

@@ -9,7 +9,7 @@ import Widget from "../Widget/Widget";
 import { Layout, LayoutItem } from "../../../types/reactGridLayout.types";
 import { useEffect } from "react";
 
-function WidgetBoard({ onResizeStart, onResize, onResizeStop, onDrop, droppingItem }: WidgetLayoutProps) {
+function WidgetBoard({ editable = true, onDrop, droppingItem }: WidgetLayoutProps) {
     const { widgets, layout, deleteWidget, setWidgetRects, setSelected, selected } = useWidgets();
 
     const { width, ref } = useElementSize();
@@ -71,14 +71,13 @@ function WidgetBoard({ onResizeStart, onResize, onResizeStop, onDrop, droppingIt
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
+            draggableCancel=".no-drag, button, input, .mantine-ActionIcon-root"
             onDragStart={onDragStart}
             onDragStop={onDragStop}
-            onResizeStart={onResizeStart}
-            onResize={onResize}
-            onResizeStop={onResizeStop}
             onDrop={onDrop}
-            isDroppable={true}
-            isResizable={true}
+            isDraggable={editable}
+            isDroppable={editable}
+            isResizable={editable}
             droppingItem={droppingItem}
             innerRef={ref}
             margin={[GRID_MARGIN_PX, GRID_MARGIN_PX]}

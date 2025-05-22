@@ -46,9 +46,7 @@ const AlertDrawer = ({ index }: WidgetPropertiesContentProps): React.JSX.Element
 
     const allAlerts = [...getAlertArray("errors"), ...getAlertArray("warnings")];
 
-    const hiddenAlerts = allAlerts.filter((alert) =>
-        cookies.hiddenAlerts?.includes(alert.id)
-    );
+    const hiddenAlerts = allAlerts.filter((alert) => cookies.hiddenAlerts?.includes(alert.id));
 
     const handleRestore = (id: string) => {
         const updated = cookies.hiddenAlerts?.filter((alertId: string) => alertId !== id);
@@ -57,16 +55,36 @@ const AlertDrawer = ({ index }: WidgetPropertiesContentProps): React.JSX.Element
 
     return (
         <Stack>
-            <DataSourceMultiselect index={index} widget={widget} />
+            <DataSourceMultiselect
+                index={index}
+                widget={widget}
+            />
             {hiddenAlerts.length === 0 && <Text>No hidden alerts</Text>}
             <Title order={4}>Hidden alerts: </Title>
             {hiddenAlerts.map((alert) => (
-                <Group key={alert.id} gap="sm" p="xs" style={{ borderBottom: "1px solid #ddd" }}>
-                    <DeviceTitleOneLine data={alert} style={{ overflow: "hidden"}}/>
-                    <Text size="sm" style={{ flex: 1 }}>
+                <Group
+                    key={alert.id}
+                    gap="sm"
+                    p="xs"
+                    style={{ borderBottom: "1px solid var(--background-color-4)" }}
+                >
+                    <DeviceTitleOneLine
+                        data={alert}
+                        style={{ overflow: "hidden" }}
+                        w="100%"
+                    />
+                    <Text
+                        size="sm"
+                        style={{ flex: 1 }}
+                    >
                         {alert.message}
                     </Text>
-                    <Button size="xs" onClick={() => handleRestore(alert.id)} color="indigo.6">
+                    <Button
+                        size="xs"
+                        onClick={() => handleRestore(alert.id)}
+                        variant="white"
+                        c="black"
+                    >
                         Restore
                     </Button>
                 </Group>

@@ -14,12 +14,11 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
     const device = data as Device;
     const { getWidget } = useWidgets();
 
-    if (!device || !device.systemInfo) return null;
-
     const systemInfo = device.systemInfo;
 
     const getBootDate = (): Date | null => {
-        const ts = systemInfo.lastBootTimestamp;
+        const ts = systemInfo?.lastBootTimestamp;
+        if (!ts) return null;
         if (typeof ts === "number") {
             const ms = ts > 1e12 ? ts : ts * 1000;
             const date = new Date(ms);
@@ -48,7 +47,7 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
         }, interval);
 
         return () => clearTimeout(timer);
-    }, [systemInfo.lastBootTimestamp, uptimeNow]);
+    }, [systemInfo?.lastBootTimestamp, uptimeNow]);
 
     const bootDate = getBootDate();
 
@@ -59,6 +58,9 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
             uptimeDisplay = `${uptimeValue} ${uptimeUnit}`;
         }
     }
+
+    if (!device || !device.systemInfo) return null;
+
     return (
         <Box {...props}>
             <Stack>
@@ -73,20 +75,20 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
                 >
                     <MetricProgress
                         label="CPU Usage"
-                        used={systemInfo.cpuUsagePercent ?? 0}
+                        used={systemInfo?.cpuUsagePercent ?? 0}
                         total={100}
                         isPercentage
                     />
 
                     <MetricProgress
                         label="RAM usage"
-                        used={systemInfo.ramUsedBytes ?? 0}
-                        total={systemInfo.ramTotalBytes ?? 0}
+                        used={systemInfo?.ramUsedBytes ?? 0}
+                        total={systemInfo?.ramTotalBytes ?? 0}
                     />
                     <MetricProgress
                         label="Swap usage"
-                        used={systemInfo.pagefileUsedBytes ?? 0}
-                        total={systemInfo.pagefileTotalBytes ?? 0}
+                        used={systemInfo?.pagefileUsedBytes ?? 0}
+                        total={systemInfo?.pagefileTotalBytes ?? 0}
                     />
 
                     {getWidget(index).rect.h > 2 && (
