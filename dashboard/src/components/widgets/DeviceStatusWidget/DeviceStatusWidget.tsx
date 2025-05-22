@@ -1,18 +1,18 @@
 import { Box, Stack, Title, Text, Flex, Group } from "@mantine/core";
 import { WidgetContentProps } from "../../../types/components.types";
-import classes from "./DeviceStatusWidget.module.css";
 import { useElementSize } from "@mantine/hooks";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import MetricProgress from "../../display/MetricProgress/MetricProgress";
 import { Device } from "../../../types/api.types";
-import { IconCpu } from "@tabler/icons-react";
 import { timePassedRounded } from "../../../utils/timeFormats";
 import { useState, useEffect } from "react";
-
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import { IconCpu } from "@tabler/icons-react";
 //@TODO make sure it's okay to refresh it this way
 function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentProps) {
     const { ref } = useElementSize();
     const device = data as Device;
+    const { getWidget } = useWidgets();
 
     if (!device || !device.systemInfo) return null;
 
@@ -60,18 +60,8 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
         }
     }
     return (
-        <Box
-            className={classes.container}
-            {...props}
-        >
-            <Stack className={classes.stack}>
-                <Title
-                    order={3}
-                    className={classes.title}
-                >
-                    Performance
-                </Title>
-
+        <Box {...props}>
+            <Stack>
                 <DeviceTitleOneLine
                     data={device}
                     mb="6"
@@ -98,62 +88,58 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
                         used={systemInfo.pagefileUsedBytes ?? 0}
                         total={systemInfo.pagefileTotalBytes ?? 0}
                     />
-     {/* backend trolled me and now tells me it's not possible for now to get this data 🙄 "If he wanted, he would"!! */}
 
-                    {/* <Stack gap={0}>
-                        <Text
-                            fz="xs"
-                            fw={500}
-                        >
-                            CPU load averages
-                        </Text>
-                            <Flex
-                            gap="sm"
-                            wrap="wrap"
-                            fz="md"
-                        >
-                            <Flex
-                                gap="sm"
-                                wrap="wrap"
-                                fz="md"
-                            >
-                                {["1m", "5m", "15m"].map((label, i) => (
-                                    <Text key={label}>
-                                        {Array.isArray(systemInfo.cpuLoadAverage) && systemInfo.cpuLoadAverage[i] != null
-                                            ? systemInfo.cpuLoadAverage[i].toFixed(2)
-                                            : "N/A"}{" "}
-                                        <Text
-                                            component="span"
-                                            fz="xs"
-                                            span
-                                            c="var(--background-color-2)"
-                                        >
-                                            {label}
+                    {getWidget(index).rect.h > 2 && (
+                        <>
+                            <Stack gap={0}>
+                                <Text
+                                    fz="xs"
+                                    fw={500}
+                                >
+                                    CPU load averages
+                                </Text>
+                                <Flex
+                                    gap="sm"
+                                    wrap="wrap"
+                                    fz="md"
+                                >
+                                    {["1m", "5m", "15m"].map((label) => (
+                                        <Text key={label}>
+                                            N/A{" "}
+                                            <Text
+                                                component="span"
+                                                fz="xs"
+                                                span
+                                                c="var(--background-color-2)"
+                                            >
+                                                {label}
+                                            </Text>
                                         </Text>
-                                    </Text>
-                                ))}
-                            </Flex> 
-                        </Flex>
-                    </Stack>*/}
+                                    ))}
+                                </Flex>
+                            </Stack>
 
-                    <Group gap={5}>
-                        <Text
-                            fz="sm"
-                            fw={500}
-                        >
-                            Uptime:
-                        </Text>
-                        <Text fz="sm">{uptimeDisplay}</Text>
-                    </Group>
-                    {/* <Group gap={5}>
-                        <IconCpu />
-                        <Text
-                            fz="sm"
-                            fw="500"
-                        >
-                            Cores: {systemInfo.cpuCoreNumber != null ? systemInfo.cpuCoreNumber : "N/A"}
-                        </Text>
-                    </Group> */}
+                            <Group gap={5}>
+                                <Text
+                                    fz="sm"
+                                    fw={500}
+                                >
+                                    Uptime:
+                                </Text>
+                                <Text fz="sm">{bootDate ? `${timePassedRounded(bootDate)[0]} ${timePassedRounded(bootDate)[1]}` : "N/A"}</Text>
+                            </Group>
+
+                            <Group gap={5}>
+                                <IconCpu />
+                                <Text
+                                    fz="sm"
+                                    fw="500"
+                                >
+                                    Cores: N/A
+                                </Text>
+                            </Group>
+                        </>
+                    )}
                 </Stack>
             </Stack>
         </Box>

@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, FlexProps, Paper, PaperProps, Text } from "@mantine/core";
+import { ActionIcon, Center, Flex, FlexProps, Paper, PaperProps, Stack, Text, Title } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import classes from "./Widget.module.css";
 import { LayoutItem } from "../../../types/reactGridLayout.types";
@@ -53,17 +53,32 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                     pb={showTimestamp ? "xl" : "md"}
                     withBorder
                 >
+                    {config.title && (
+                        <Title
+                            order={3}
+                            className={classes.title}
+                            mb="md"
+                        >
+                            {config.title}
+                        </Title>
+                    )}
                     {!data && config.dataSource ? (
-                        <>
-                            <Text size="lg">No connection</Text>
+                        <Stack
+                            gap="0"
+                            align="center"
+                            justify="center"
+                            flex="1"
+                            h="100%"
+                            pb="78px"
+                        >
+                            <Text size="md">{widget.settings.target ? "No connection" : "No results"}</Text>
                             <Text
                                 size="xs"
-                                w="200px"
                                 c="dimmed"
                             >
                                 {widget.settings.target ?? "Automatic assignment"}
                             </Text>
-                        </>
+                        </Stack>
                     ) : (
                         WidgetContent && (
                             <WidgetContent

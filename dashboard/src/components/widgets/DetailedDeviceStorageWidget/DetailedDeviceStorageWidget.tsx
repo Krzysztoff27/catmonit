@@ -9,7 +9,6 @@ import { safeObjectValues } from "../../../utils/object";
 
 function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
-    const getDiskPath = (disk: DiskInfo) => disk.mountPoint;
     const disks: DiskInfo[] = data?.disksInfo ?? [];
 
     const prepareData = () => {
@@ -38,12 +37,6 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
             {...props}
         >
             <Stack className={classes.stack}>
-                <Title
-                    order={3}
-                    className={classes.title}
-                >
-                    Storage
-                </Title>
                 <DeviceTitleOneLine
                     data={data}
                     mb="6"
@@ -55,10 +48,10 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     {preparedData.map((disk: DiskInfo, i) => (
                         <DiskProgress
                             key={i}
-                            highlightStages={settings?.disks?.[getDiskPath(disk)]?.highlightStages ?? { red: 100, yellow: 100 }}
-                            path={getDiskPath(disk)}
-                            usage={disk.usage}
-                            capacity={disk.capacity}
+                            highlightStages={settings?.disks?.[disk?.mountPoint]?.highlightStages ?? { red: 100, yellow: 100 }}
+                            path={disk?.mountPoint}
+                            usage={disk?.usage}
+                            capacity={disk?.capacity}
                         />
                     ))}
                 </Stack>
