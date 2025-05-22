@@ -28,10 +28,10 @@ class SystemUsageCached(BaseModel):
     last_boot_timestamp: int
 
 class NetworkCached(BaseModel):
-    interface: str
-    ip_address: str
-    ip_mask: str
-    is_main: bool
+    interface: str = ""
+    ip_address: str = ""
+    ip_mask: str = ""
+    is_main: bool = False
 
 #JSON output parser for unified error messages handling
 def _parse_json_output(output: str, context: str):
@@ -177,14 +177,16 @@ def get_network_cached() -> Dict[str, NetworkCached]:
     interfaces = {}
 
     for interface, addrs in psutil.net_if_addrs().items():
+        iface_data = NetworkCached()
+
         for addr in addrs:
             if addr.family == socket.AF_INET:
-                NetworkCached.ip_address = addr.address
-                NetworkCached.ip_mask = addr.netmask
+                iface_data.ip_address = addr.address
+                iface_data.ip_mask = addr.netmask
                 if addr.address == main_ip:
-                    NetworkCached.is_main = True
+                    iface_data.is_main = True
                 break
-        interfaces[interface] = NetworkCached
+        interfaces[interface] = iface_data
 
     return interfaces
 
