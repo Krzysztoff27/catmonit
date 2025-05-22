@@ -71,6 +71,7 @@ function WidgetBoard({ editable = true, onDrop, droppingItem }: WidgetLayoutProp
             rowHeight={GRID_SIZE_PX}
             measureBeforeMount
             draggableHandle=".drag-handle"
+            draggableCancel=".no-drag, button, input, .mantine-ActionIcon-root"
             onDragStart={onDragStart}
             onDragStop={onDragStop}
             onDrop={onDrop}

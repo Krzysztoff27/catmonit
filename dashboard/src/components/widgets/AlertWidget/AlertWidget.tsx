@@ -59,56 +59,9 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
         setAlerts(newAlerts);
     }, [data, settings?.sources]);
 
-    function prepareData() {
-        //const used = disksArray?.reduce((prev, d) => prev + d.usage, 0) ?? 0;
-    }
-
-    const handleVisibilty = (id: string) => {
-        console.log("visibility changed");
-        const index = hiddenIds.findIndex((e) => e === id);
-        if (index !== -1) {
-            setCookies("hiddenAlerts", hiddenIds.toSpliced(index, 1));
-        } else {
-            setCookies("hiddenAlerts", [...hiddenIds, id]);
-        }
-        // setAlerts((prev) => {
-        //     const updated = { ...prev };
-        //     let removedAlert: Alert | undefined;
-
-        //     for (const key in updated) {
-        //         if (updated[key].id === idToRemove) {
-        //             removedAlert = updated[key];
-        //             delete updated[key];
-        //             break;
-        //         }
-        //     }
-
-        //     if (removedAlert) {
-        //         setHiddenAlerts((prevHidden) => ({
-        //             ...prevHidden,
-        //             [removedAlert.id]: removedAlert,
-        //         }));
-        //     }
-
-        //     return updated;
-        // });
+    const hideAlert = (id: string) => {
+        if (!hiddenIds.includes(id)) setCookies("hiddenAlerts", [...hiddenIds, id]);
     };
-    // Add restore function
-    // const restoreAlert = (idToRestore: number) => {
-    //     setHiddenAlerts((prevHidden) => {
-    //         const updatedHidden = { ...prevHidden };
-    //         const alertToRestore = updatedHidden[idToRestore];
-    //         if (!alertToRestore) return prevHidden;
-
-    //         setAlerts((prev) => ({
-    //             ...prev,
-    //             [alertToRestore.id]: alertToRestore,
-    //         }));
-
-    //         delete updatedHidden[idToRestore];
-    //         return updatedHidden;
-    //     });
-    // };
 
     const criticalCount = alerts.filter((a) => !a.isWarning).length;
     const mediumCount = alerts.filter((a) => a.isWarning).length;
@@ -142,7 +95,7 @@ function AlertWidget({ data, settings, ...props }: WidgetContentProps) {
                             alert={alert}
                             onRemove={(e) => {
                                 e.stopPropagation();
-                                handleVisibilty(alert.id);
+                                hideAlert(alert.id);
                             }}
                         />
                     ))}

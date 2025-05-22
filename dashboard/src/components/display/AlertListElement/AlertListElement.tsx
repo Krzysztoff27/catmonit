@@ -59,12 +59,16 @@ function AlertListElement({ alert, onRemove }: AlertListElementProps) {
                     pr="xs"
                     ml="auto"
                 >
-                    <ActionIcon onClick={onRemove} bg="none" style={{ cursor: "pointer", zIndex: 301, pointerEvents: 'auto' }}>
+                    <ActionIcon
+                        onClick={(e) => onRemove(e)}
+                        className="no-drag"
+                        bg="none"
+                        style={{ cursor: "pointer", zIndex: 301, pointerEvents: "auto" }}
+                    >
                         <IconEyeOff
                             stroke={2.5}
                             size={18}
                             color="var(--background-color-3)"
-                            
                         />
                     </ActionIcon>
                 </Flex>
