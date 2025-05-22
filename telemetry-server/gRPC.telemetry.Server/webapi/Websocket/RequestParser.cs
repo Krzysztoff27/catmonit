@@ -3,6 +3,7 @@ using gRPC.telemetry.Server.webapi.Helpers.DBconnection;
 using gRPC.telemetry.Server.webapi.Monitoring;
 using gRPC.telemetry.Server.webapi.Monitoring.Network;
 using System;
+using System.Net;
 using System.Runtime.Intrinsics.X86;
 using webapi.webapi;
 
@@ -10,6 +11,28 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 {
     public class RequestParser
     {
+        static sbyte ConvertMaskToCidr(string mask)
+        {
+            IPAddress ip;
+            if (!IPAddress.TryParse(mask, out ip))
+                return 0;
+
+            byte[] bytes = ip.GetAddressBytes();
+            int count = 0;
+
+            foreach (byte b in bytes)
+            {
+                for (int i = 7; i >= 0; i--)
+                {
+                    if ((b & (1 << i)) != 0)
+                        count++;
+                    else
+                        break;
+                }
+            }
+
+            return (sbyte)count;
+        }
         private static deviceInfo getDeviceInfoFromResponse(ResponseModel response)
         {
             var deviceInfo = new deviceInfo();
@@ -17,6 +40,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
             deviceInfo.hostname = response.Hostname;
             deviceInfo.ipAddress = response.IpAddress;
             deviceInfo.uuid = Guid.Parse(response.Uuid);
+            deviceInfo.mask = ConvertMaskToCidr(response.IpMask);
             deviceInfo.os = response.Os;
             return deviceInfo;
         }

@@ -35,15 +35,16 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 return;
             }
             var sb = new StringBuilder();
-            sb.AppendLine("INSERT INTO devices (device_id, last_seen, hostname, ip_adress, os) VALUES ");
+            sb.AppendLine("INSERT INTO devices (device_id, last_seen, hostname, ip_adress, network_mask, os) VALUES ");
             var parameters = new Dictionary<string, object>();
             for (int i = 0; i < devices.Count; i++)
             {
-                sb.AppendLine($"(@deviceID{i}, @lastSeen{i}, @hostname{i}, @ipAddress{i}, @os{i}){(i < devices.Count - 1 ? "," : "")}");
+                sb.AppendLine($"(@deviceID{i}, @lastSeen{i}, @hostname{i}, @ipAddress{i}, @networkMask{i}, @os{i}){(i < devices.Count - 1 ? "," : "")}");
                 parameters.Add($"@deviceID{i}", devices[i].uuid);
                 parameters.Add($"@lastSeen{i}", devices[i].lastUpdated);
                 parameters.Add($"@hostname{i}", (object?)devices[i].hostname ?? DBNull.Value);
                 parameters.Add($"@ipAddress{i}", (object?)devices[i].ipAddress ?? DBNull.Value);
+                parameters.Add($"@networkMask{i}", (object?)(Int16)devices[i].mask ?? DBNull.Value);
                 parameters.Add($"@os{i}", (object?)devices[i].os ?? DBNull.Value);
             }
 
@@ -52,6 +53,7 @@ namespace gRPC.telemetry.Server.webapi.Helpers.DBconnection
                 SET last_seen = EXCLUDED.last_seen,
                     hostname = EXCLUDED.hostname,
                     ip_adress = EXCLUDED.ip_adress,
+                    network_mask = EXCLUDED.network_mask,
                     os = EXCLUDED.os;
             ");
 

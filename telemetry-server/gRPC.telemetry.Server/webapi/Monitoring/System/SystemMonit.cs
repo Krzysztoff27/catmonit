@@ -42,7 +42,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                     }
                 }
 
-                for (int i = 0; i < (subber.autoDevicesCount < systemDeviceInfos.AutoCandidates.Count ? subber.autoDevicesCount : systemDeviceInfos.AutoCandidates.Count); i++)
+                for (int i = 0; i < (subber.autoDevicesCount < systemDeviceInfos.MonitoredDevices.Count ? subber.autoDevicesCount : systemDeviceInfos.MonitoredDevices.Count); i++)
                 {
                     nr.autoDevices[systemDeviceInfos.AutoCandidates[i]] = systemDeviceInfos.MonitoredDevices[systemDeviceInfos.AutoCandidates[i]];
                 }
