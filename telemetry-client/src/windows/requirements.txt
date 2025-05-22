@@ -1,6 +1,4 @@
 ﻿grpcio
-asyncio
-time
 pydantic
 socket
 subprocess
