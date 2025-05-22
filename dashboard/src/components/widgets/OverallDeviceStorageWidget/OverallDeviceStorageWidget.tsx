@@ -44,7 +44,7 @@ function OverallDeviceStorageWidget({ index, data, settings, ...props }: Overall
     const maxThickness = 40;
     const thickness = minThickness + ((chartSize - minSize) * (maxThickness - minThickness)) / (maxSize - minSize);
 
-    const disksArray = safeObjectValues(data.disksInfo ?? []); //@TODO: [] or {}? I guess [] in this case
+    const disksArray = safeObjectValues(data.disksInfo ?? []);
 
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
     const used = disksArray?.reduce((sum, d) => sum + d.usage, 0) ?? 0;
