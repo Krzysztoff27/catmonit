@@ -74,6 +74,8 @@ services:
     - "traefik.http.routers.api-machines.tls=true"
     - "traefik.http.routers.api-machines.service=api-machines"
     - "traefik.http.services.api-machines.loadbalancer.server.port=5001"
+    - "traefik.http.services.api-machines.loadbalancer.forwardingTimeouts.idle=0"
+    - "traefik.http.services.api-machines.loadbalancer.forwardingTimeouts.response=0"
 
     # ROUTER 2: API-MACHINES IP access on port 445
     - "traefik.http.routers.api-machines-ip.rule=Host(`10.10.51.3`)"
