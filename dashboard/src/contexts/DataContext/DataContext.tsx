@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo } from "react";
 import useApiWebSocket, { useApiWebSocketReturn } from "../../hooks/useApiWebSocket";
 import { APIResponse } from "../../types/api.types";
 

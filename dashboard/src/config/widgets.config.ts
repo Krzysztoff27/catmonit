@@ -31,6 +31,26 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         dataSource: "",
         image: "/images/widgets/alerts.png",
     },
+    OVERALL_DEVICE_STORAGE: {
+        name: "overall device's disks",
+        title: "Total storage",
+        icon: IconChartDonut,
+        content: OverallDeviceStorageWidget,
+        propertiesContent: OverallDeviceStorageDrawer,
+        limits: {
+            minH: 2,
+            maxH: 4,
+            minW: 2,
+            maxW: 4,
+        },
+        initialSettings: {
+            target: null,
+            automatic: true,
+        },
+        dataSource: "disks",
+        isReferingToSingularResource: true,
+        image: "/images/widgets/overall_device_storage.png",
+    },
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
         title: "Storage",
@@ -51,26 +71,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         dataSource: "disks",
         isReferingToSingularResource: true,
         image: "/images/widgets/detailed_device_storage.png",
-    },
-    OVERALL_DEVICE_STORAGE: {
-        name: "overall device's disks",
-        title: "Total storage",
-        icon: IconChartDonut,
-        content: OverallDeviceStorageWidget,
-        propertiesContent: OverallDeviceStorageDrawer,
-        limits: {
-            minH: 2,
-            maxH: 4,
-            minW: 2,
-            maxW: 4,
-        },
-        initialSettings: {
-            target: null,
-            automatic: true,
-        },
-        dataSource: "disks",
-        isReferingToSingularResource: true,
-        image: "/images/widgets/overall_device_storage.png",
     },
     FILE_SHARES: {
         name: "file share widget",

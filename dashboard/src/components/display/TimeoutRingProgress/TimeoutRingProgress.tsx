@@ -1,18 +1,20 @@
 import { Group, GroupProps, RingProgress, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import API_CONFIG from "../../../config/api.config";
+import { IconX } from "@tabler/icons-react";
 
 interface TimeoutRingProgressProps extends GroupProps {
     timestamp: string;
+    source: string;
 }
 
-const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps): React.JSX.Element => {
+const TimeoutRingProgress = ({ timestamp, source, ...props }: TimeoutRingProgressProps): React.JSX.Element => {
     const [value, setValue] = useState(0);
     const animationRef = useRef<number>(0);
 
     useEffect(() => {
         const ts = new Date(timestamp).getTime();
-        const timeout = API_CONFIG.deviceTimeout.disks;
+        const timeout = API_CONFIG.deviceTimeout[source];
 
         const update = () => {
             const now = Date.now();
@@ -26,7 +28,9 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
         return () => cancelAnimationFrame(animationRef.current!);
     }, [timestamp]);
 
-    const [date, time, _] = timestamp?.split?.(/[TZ\.]+/) || ["01.01.1970", "00:00"];
+    const [date, time, _] = timestamp?.split?.(/[TZ\.]+/) || ["", ""];
+
+    const message = timestamp ? `Last update ${date} ${time}` : "Couldn't reach";
 
     return (
         <Group
@@ -34,21 +38,30 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
             align="center"
             {...props}
         >
-            <RingProgress
-                size={18}
-                thickness={4}
-                sections={[{ value: value, color: "dimmed" }]}
-                style={{
-                    transform: "scale(80%)",
-                }}
-            />
+            {timestamp ? (
+                <RingProgress
+                    size={18}
+                    thickness={4}
+                    sections={[{ value: value, color: "dimmed" }]}
+                    style={{
+                        transform: "scale(80%)",
+                    }}
+                />
+            ) : (
+                <IconX
+                    size={18}
+                    stroke={2.5}
+                    color="var(--mantine-color-dimmed)"
+                    style={{ transform: "scale(80%)" }}
+                />
+            )}
             <Text
                 size="12px"
                 c="dimmed"
                 fw="800"
                 ff="monospace"
             >
-                LU {`${date} ${time}`}
+                {message}
             </Text>
         </Group>
     );

@@ -5,6 +5,7 @@ import { Layout, LayoutItem } from "../../types/reactGridLayout.types";
 import WIDGETS_CONFIG from "../../config/widgets.config";
 import WidgetBoard from "../../components/layout/WidgetBoard/WidgetBoard";
 import FloatingControls from "../../components/layout/FloatingControls/FloatingControls";
+import SavingLoader from "../../components/display/SavingLoader/SavingLoader";
 
 const Editor = (): React.JSX.Element => {
     const { createWidget } = useWidgets();
@@ -25,16 +26,6 @@ const Editor = (): React.JSX.Element => {
             flex={1}
             h="100vh"
         >
-            {/* <WidgetDrawer
-                component={WidgetPropertiesContent!}
-                index={selected!}
-                position="right"
-                size="sm"
-                overlayProps={{ backgroundOpacity: 0 }}
-                opened={isOpened}
-                onClose={closeWidgetDrawer}
-            /> */}
-
             <WidgetBoard
                 onDrop={onDrop}
                 droppingItem={currentDroppingItem}

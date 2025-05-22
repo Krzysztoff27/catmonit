@@ -25,7 +25,7 @@ export const useCornerManager = () => {
 };
 
 export function CornerManagerProvider({ children }: { children: React.ReactNode }) {
-    const [cornerMap, setCornerMap] = useState<CornerMap>({ topLeft: "layoutMenu", bottomRight: "widgetProperties" });
+    const [cornerMap, setCornerMap] = useState<CornerMap>({ topLeft: "layoutMenu", bottomRight: "widgetProperties", topRight: "saveIndicator" });
 
     const assignCorner = (corner: Corner, floaterId: FloaterID) => {
         setCornerMap((prev) => {

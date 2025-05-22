@@ -9,13 +9,13 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { useLayouts } from "../LayoutContext/LayoutContext";
 import { useData } from "../DataContext/DataContext";
 import { safeObjectEntries, safeObjectKeys, safeObjectValues } from "../../utils/object";
-import { checkDomainOfScale } from "recharts/types/util/ChartUtils";
 import { v4 as uuidv4 } from "uuid";
 
 interface WidgetContextType {
     widgets: WidgetData[];
     layout: LayoutItem[];
     selected: number | null;
+    isSaving: boolean;
     setSelected: (a: ((prev: number | null) => number | null) | number | null) => void;
     getData: (source: string) => any;
     getWidget: (index: number) => WidgetData;
@@ -47,6 +47,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     const { websockets, data } = useData();
     const [widgets, setWidgets] = useState<WidgetData[]>([]);
     const [selected, setSelected] = useState<null | number>(null);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const removeFromAutoRetrievalOrders = (widget: WidgetData) => {
         setAutoRetrievalOrders((prev) => {
@@ -93,12 +94,12 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
     }, [currentLayout?.data]);
 
     const saveStateToDatabase = useDebouncedCallback(() => {
-        console.log("saved");
+        setIsSaving(false);
         updateCurrentLayout(widgets);
-    }, 2000);
+    }, 1000);
 
     const saveState = () => {
-        console.log("saving");
+        setIsSaving(true);
         saveStateToDatabase();
     };
 
@@ -239,7 +240,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         if (!isSingular) return data[source] ?? {};
 
         const target = widget?.settings?.target;
-        if (target) return data[source].monitoredDevices[target];
+        if (target) return data[source]?.monitoredDevices?.[target] ?? {};
         const index = autoRetrievalOrders[widget.type].findIndex((uuid: string) => uuid === widget.uuid);
         return safeObjectValues(data[source]?.autoDevices)[index];
     };
@@ -265,12 +266,12 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         [widgets]
     );
 
-
     const value = {
         widgets,
         layout,
         selected,
         setSelected,
+        isSaving,
         getData,
         getWidget,
         createWidget,

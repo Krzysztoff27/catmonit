@@ -123,6 +123,7 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                             (!isNull(widget.settings?.target) ? (
                                 <TimeoutRingProgress
                                     timestamp={data?.deviceInfo?.lastUpdated}
+                                    source={config.dataSource}
                                     className={classes.timeout}
                                 />
                             ) : (

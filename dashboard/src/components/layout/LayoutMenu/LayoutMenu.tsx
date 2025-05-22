@@ -18,7 +18,6 @@ const LayoutMenu = ({ isDraggingDroppable, setIsDraggingDroppable, currentDropTy
         >
             <Stack className={classes.navbar}>
                 <LayoutControls />
-                <Space h="md" />
                 {expanded && (
                     <WidgetMenu
                         isDragging={isDraggingDroppable}
