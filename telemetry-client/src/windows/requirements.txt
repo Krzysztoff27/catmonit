@@ -13,3 +13,13 @@ PyYAML
 grpcio-tools
 pywin32
 ssl
+logging
+sys
+os
+yaml
+pathlib
+threading
+win32serviceutil
+win32service
+win32event
+servicemanager

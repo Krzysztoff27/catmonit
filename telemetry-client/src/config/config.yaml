@@ -1,3 +1,0 @@
-﻿server_address: "10.10.51.3"
-server_port: "5001"
-cert_path: "/ssl/server.crt"

@@ -19,7 +19,7 @@ logging.basicConfig(
 
 class CatMonitService(win32serviceutil.ServiceFramework):
     _svc_name_ = "CatMonitTelemetryClient"
-    _svc_display_name_ = "CatMonit Telemetry Client"
+    _svc_display_name_ = "CatMonitTelemetryClient"
     _svc_description_ = "Pushes telemetry data to a central server using gRPC."
 
     def __init__(self, args):
@@ -62,10 +62,7 @@ class CatMonitService(win32serviceutil.ServiceFramework):
             logging.info(f"Loaded config: {config}")
 
             stream = TelemetryStream()
-            await stream.open_stream(
-                config.get("server_address", "localhost"),
-                config.get("server_port", "5001")
-            )
+            await stream.open_stream(server_address=config.get("server_address"), server_port=config.get("server_port"))
         except Exception as e:
             logging.exception("Error in run_main: %s", e)
 
@@ -73,7 +70,7 @@ class CatMonitService(win32serviceutil.ServiceFramework):
 def load_config():
     path = os.path.join(os.environ.get("PROGRAM_FILES", "C:\\Program Files"), "CatMonit Telemetry Client", "config.yaml")
 
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8-sig") as f:
         return yaml.safe_load(f)
 
 

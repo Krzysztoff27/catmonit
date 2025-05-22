@@ -1,11 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import glob
 
+logic_dir = os.path.abspath('logic')
+logic_datas = [(f, 'logic') for f in glob.glob(os.path.join(logic_dir, '*.py'))]
 
 a = Analysis(
     ['service.py'],
-    pathex=[],
+    pathex=['.', 'logic'],
     binaries=[],
-    datas=[('../config/config.yaml', 'logic/')],
+    datas=[],
     hiddenimports=['win32timezone'],
     hookspath=[],
     hooksconfig={},
@@ -14,6 +18,8 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+a.datas += Tree('logic', prefix='logic')
+
 pyz = PYZ(a.pure)
 
 exe = EXE(
@@ -22,7 +28,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='CatMonit Telemetry Client',
+    name='CatMonitTelemetryClient',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

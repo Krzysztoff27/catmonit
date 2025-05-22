@@ -8,7 +8,11 @@ import telemetry_pb2_grpc
 import telemetry_pb2
 import utils
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="C:\\Program Files\\CatMonit Telemetry Client\\telemetry.log",
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 class TelemetryStream:
     #Intervals are specified in seconds
@@ -26,11 +30,14 @@ class TelemetryStream:
         self.credentials = grpc.ssl_channel_credentials(root_certificates=trusted_certs)
 
     async def open_stream(self, server_address, server_port):
+        logging.info(server_address)
+        logging.info(server_port)
         while True:
             try:
                 async with grpc.aio.secure_channel(f"{server_address}:{server_port}", self.credentials) as channel:
                     stub = telemetry_pb2_grpc.TelemetryServiceStub(channel)
                     stream = stub.StreamTelemetry()
+                    logging.info("Opened stream")
 
                     last_network_sent = 0
                     last_disk_sent = 0
@@ -70,13 +77,13 @@ class TelemetryStream:
                                 if msg:
                                     #await stream.write(msg)
                                     try:
-                                        logger.debug("Writing to telemetry stream...")
+                                        logging.debug("Writing to telemetry stream...")
                                         await stream.write(msg)
-                                        logger.debug("SystemUsage payload written to stream.")
+                                        logging.debug("SystemUsage payload written to stream.")
                                     except grpc.RpcError as e:
-                                        logger.error(f"gRPC stream error: {e.code()} - {e.details()}")
+                                        logging.error(f"gRPC stream error: {e.code()} - {e.details()}")
                                     except Exception as e:
-                                        logger.exception(f"Unexpected stream error: {e}")
+                                        logging.exception(f"Unexpected stream error: {e}")
                                 last_usage_sent = now
 
                             #Disk Errors
