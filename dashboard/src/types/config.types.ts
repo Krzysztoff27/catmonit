@@ -23,6 +23,7 @@ export interface WidgetLimits {
 
 export interface WidgetConfig {
     name: string;
+    title?: string;
     image?: string;
     icon: TablerIcon;
     content: WidgetContent;

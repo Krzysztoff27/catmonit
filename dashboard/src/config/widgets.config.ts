@@ -33,6 +33,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     },
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
+        title: "Storage",
         icon: IconDatabase,
         content: DetailedDeviceStorageWidget,
         propertiesContent: StorageResourcesDrawer,
@@ -53,6 +54,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     },
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's disks",
+        title: "Total storage",
         icon: IconChartDonut,
         content: OverallDeviceStorageWidget,
         propertiesContent: OverallDeviceStorageDrawer,
@@ -70,27 +72,9 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         isReferingToSingularResource: true,
         image: "/images/widgets/overall_device_storage.png",
     },
-    DEVICE_STATUS: {
-        name: "device status info",
-        icon: IconInfoCircleFilled,
-        content: DeviceStatusWidget,
-        propertiesContent: DeviceStatusDrawer,
-        limits: {
-            minH: 2,
-            maxH: 3,
-            minW: 2,
-            maxW: 10,
-        },
-        initialSettings: {
-            target: undefined,
-            automatic: true,
-        },
-        dataSource: "system",
-        isReferingToSingularResource: true,
-        image: "/images/widgets/device_status.png",
-    },
     FILE_SHARES: {
         name: "file share widget",
+        title: "Fileshares",
         icon: IconFiles,
         content: FileSharesWidget,
         propertiesContent: StorageResourcesDrawer,
@@ -109,8 +93,29 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         isReferingToSingularResource: true,
         image: "/images/widgets/fileshares.png",
     },
+    DEVICE_STATUS: {
+        name: "device status info",
+        title: "Performance",
+        icon: IconInfoCircleFilled,
+        content: DeviceStatusWidget,
+        propertiesContent: DeviceStatusDrawer,
+        limits: {
+            minH: 2,
+            maxH: 3,
+            minW: 2,
+            maxW: 10,
+        },
+        initialSettings: {
+            target: null,
+            automatic: true,
+        },
+        dataSource: "system",
+        isReferingToSingularResource: true,
+        image: "/images/widgets/device_status.png",
+    },
     NETWORK_THROUGHPUT: {
         name: "network throughput",
+        title: "Network throughput",
         icon: IconNetwork,
         content: NetworkThroughputWidget,
         limits: {

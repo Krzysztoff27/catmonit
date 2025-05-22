@@ -5,8 +5,10 @@ import { normalizePath } from "../utils/api";
 import { WebSocketStart } from "../types/api.types";
 import { useEffect, useState } from "react";
 import { isNull } from "lodash";
+import { removeOneFromArray } from "../utils/array";
 
 export interface useApiWebSocketReturn {
+    updateSubscription: (subscription: WebSocketStart) => void;
     replaceSubscribedResource: (oldResourceUuid: string | null, newResourceUuid: string | null) => void;
     updateSubscribedResources: (resourceUuids: string[]) => void;
     addSubscribedResource: (resourceUuid: string) => void;
@@ -36,13 +38,17 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
             let devices = prev?.devices ?? [];
 
             if (isNull(oldResourceUuid)) auto--;
-            else devices = devices.filter((e) => e !== oldResourceUuid);
+            else devices = removeOneFromArray(devices, oldResourceUuid);
 
             if (isNull(newResourceUuid)) auto++;
             else devices.push(newResourceUuid);
 
             return { ...prev, auto, devices } as WebSocketStart;
         });
+    };
+
+    const updateSubscription = (subscription: WebSocketStart) => {
+        setSubscription((prev) => ({ ...prev, ...subscription } as WebSocketStart));
     };
 
     const updateSubscribedResources = (resourceUuids: string[]) => {
@@ -93,6 +99,7 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
         updateSubscribedResources,
         updateNumberOfWarnings,
         updateNumberOfErrors,
+        updateSubscription,
         addSubscribedResource,
         removeSubscribedResource,
         updateAutoResources,

@@ -8,7 +8,6 @@ interface DeviceTitleProps extends GroupProps {
 }
 
 function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
-    console.log(data);
     return (
         <Group
             gap="8"
@@ -34,7 +33,7 @@ function DeviceTitleOneLine({ data, ...props }: DeviceTitleProps) {
             <Text
                 fz="sm"
                 ml="auto"
-                flex="1"
+                w="fit-content"
                 ta="right"
             >
                 {data?.deviceInfo?.ipAddress ? data?.deviceInfo?.ipAddress : ""}/{data?.deviceInfo?.mask ? data?.deviceInfo?.mask : ""}

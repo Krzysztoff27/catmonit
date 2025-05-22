@@ -1,7 +1,6 @@
 import { Box, Group, GroupProps, Stack, Text } from "@mantine/core";
 import { IconServer2 } from "@tabler/icons-react";
 import { Device } from "../../../types/api.types";
-import { isEmpty } from "lodash";
 
 interface DeviceTitleProps extends GroupProps {
     data: Device;
@@ -32,13 +31,13 @@ function DeviceTitle({ data, size = "var(--mantine-font-size-lg)", iconSize = 44
                     lh="xs"
                     fw="600"
                 >
-                    {data.hostname ?? "Not set"}
+                    {data?.deviceInfo?.hostname ?? "Not set"}
                 </Text>
                 <Text
                     fz={`calc(${size} * 0.75)`}
                     lh="xs"
                 >
-                    {data.ip && data.mask ? `${data.ip}/${data.mask}` : ""}
+                    {data?.deviceInfo?.ipAddress ? data?.deviceInfo?.ipAddress : ""}/{data?.deviceInfo?.mask ? data?.deviceInfo?.mask : ""}
                 </Text>
             </Stack>
         </Group>

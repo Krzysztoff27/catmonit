@@ -30,6 +30,8 @@ export function DataProvider({ children }) {
         [websockets.disks.last, websockets.fileShares.last, websockets.system.last, websockets.network.last]
     );
 
+    console.log(data);
+
     const value = {
         websockets,
         data,

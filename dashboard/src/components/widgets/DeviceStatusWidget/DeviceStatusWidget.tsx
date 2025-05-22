@@ -4,7 +4,6 @@ import classes from "./DeviceStatusWidget.module.css";
 import { useElementSize } from "@mantine/hooks";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import MetricProgress from "../../display/MetricProgress/MetricProgress";
-import { DeviceCpuData } from "../../../types/api.types";
 import { IconCpu } from "@tabler/icons-react";
 import { timePassedRounded } from "../../../utils/timeFormats";
 import { useState, useEffect } from "react";
@@ -12,7 +11,7 @@ import { useState, useEffect } from "react";
 //@TODO make sure it's okay to refresh it this way
 function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentProps) {
     const { ref } = useElementSize();
-    const deviceData = data as DeviceCpuData;
+    const deviceData = data;
 
     if (!deviceData) return null;
 
@@ -63,13 +62,6 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
             {...props}
         >
             <Stack className={classes.stack}>
-                <Title
-                    order={3}
-                    className={classes.title}
-                >
-                    Performance
-                </Title>
-
                 <DeviceTitleOneLine
                     data={deviceData}
                     mb="6"

@@ -38,12 +38,6 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
             {...props}
         >
             <Stack className={classes.stack}>
-                <Title
-                    order={3}
-                    className={classes.title}
-                >
-                    File Shares
-                </Title>
                 <DeviceTitleOneLine
                     data={data}
                     mb="6"
@@ -55,10 +49,10 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
                     {preparedData.map((fileShare: ShareInfo, i) => (
                         <DiskProgress
                             key={i}
-                            highlightStages={settings?.fileShares?.[fileShare.sharePath]?.highlightStages ?? { red: 100, yellow: 100 }}
-                            path={fileShare.sharePath}
-                            usage={fileShare.usage}
-                            capacity={fileShare.capacity}
+                            highlightStages={settings?.fileShares?.[fileShare?.sharePath]?.highlightStages ?? { red: 100, yellow: 100 }}
+                            path={fileShare?.sharePath}
+                            usage={fileShare?.usage}
+                            capacity={fileShare?.capacity}
                         />
                     ))}
                 </Stack>

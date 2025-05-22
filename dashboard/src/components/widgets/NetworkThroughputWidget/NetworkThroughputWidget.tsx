@@ -11,12 +11,6 @@ const NetworkThroughputWidget = ({ data, settings, ...props }: WidgetContentProp
             {...props}
         >
             <Stack h="100%">
-                <Title
-                    order={3}
-                    className={classes.title}
-                >
-                    Network throughput
-                </Title>
                 <LineChart
                     className={classes.chart}
                     unit="%"
