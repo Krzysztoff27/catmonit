@@ -6,6 +6,8 @@ on:
 
 jobs:
   build:
+    if: github.event.release.target_commitish == 'telemetry-client'
+
     runs-on: ubuntu-latest
 
     steps:
@@ -13,20 +15,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Ensure release is created from telemetry-client branch
-        run: |
-            TARGET=${{ github.event.release.target_commitish }}
-            COMMIT_SHA=$(git rev-parse "$TARGET")
-            
-            BRANCHES=$(git branch -r --contains "$COMMIT_SHA")
-            echo "Resolved commit SHA: $COMMIT_SHA"
-            echo "Branches containing this commit: $BRANCHES"
-            
-            if [[ "$BRANCHES" != *"origin/telemetry-client"* ]]; then
-              echo "The release is not based on the telemetry-client branch. Exiting."
-              exit 1
-            fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
