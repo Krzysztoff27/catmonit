@@ -1,5 +1,0 @@
-.title {
-    text-transform: capitalize;
-    font-size: calc(var(--mantine-font-size-xl) * 1.25) !important;
-    font-weight: 600 !important;
-}

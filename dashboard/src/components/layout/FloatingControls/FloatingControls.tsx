@@ -1,6 +1,7 @@
 import { useState } from "react";
 import WidgetProperties from "../WidgetProperties/WidgetProperties";
 import LayoutMenu from "../LayoutMenu/LayoutMenu";
+import SavingLoader from "../../display/SavingLoader/SavingLoader";
 
 const FloatingControls = ({ currentDropType, setCurrentDropType }): React.JSX.Element => {
     const [isDraggingDroppable, setIsDraggingDroppable] = useState(false);
@@ -14,6 +15,7 @@ const FloatingControls = ({ currentDropType, setCurrentDropType }): React.JSX.El
                 setCurrentDropType={setCurrentDropType}
             />
             <WidgetProperties />
+            <SavingLoader />
         </>
     );
 };

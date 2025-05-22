@@ -4,15 +4,16 @@ import API_CONFIG from "../../../config/api.config";
 
 interface TimeoutRingProgressProps extends GroupProps {
     timestamp: string;
+    source: string;
 }
 
-const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps): React.JSX.Element => {
+const TimeoutRingProgress = ({ timestamp, source, ...props }: TimeoutRingProgressProps): React.JSX.Element => {
     const [value, setValue] = useState(0);
     const animationRef = useRef<number>(0);
 
     useEffect(() => {
         const ts = new Date(timestamp).getTime();
-        const timeout = API_CONFIG.deviceTimeout.disks;
+        const timeout = API_CONFIG.deviceTimeout[source];
 
         const update = () => {
             const now = Date.now();
@@ -48,7 +49,7 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
                 fw="800"
                 ff="monospace"
             >
-                LU {`${date} ${time}`}
+                Last update {`${date} ${time}`}
             </Text>
         </Group>
     );

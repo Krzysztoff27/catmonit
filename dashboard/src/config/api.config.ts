@@ -5,6 +5,7 @@ const API_CONFIG = {
         disks:      INACTIVE_RESPONSES_CAP * 120 * 1000,
         fileShares: INACTIVE_RESPONSES_CAP * 120 * 1000,
         network:    INACTIVE_RESPONSES_CAP *  30 * 1000,
+        system:     INACTIVE_RESPONSES_CAP *  15 * 1000, 
     },
 };
 
