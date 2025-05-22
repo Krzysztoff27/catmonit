@@ -36,7 +36,8 @@ class TelemetryStream:
                     last_disk_sent = 0
                     last_fileshares_sent = 0
                     last_usage_sent = 0
-                    last_error_sent = 0
+                    last_disk_error_sent = 0
+                    last_system_error_sent = 0
 
                     while True:
                         try:
@@ -79,18 +80,18 @@ class TelemetryStream:
                                 last_usage_sent = now
 
                             #Disk Errors
-                            if now - last_error_sent >= self.error_push_interval:
+                            if now - last_disk_error_sent >= self.error_push_interval:
                                 msg = data_retrieval.get_message("disk_errors")
                                 if msg:
                                     await stream.write(msg)
-                                last_error_sent = now
+                                last_disk_error_sent = now
 
                             #System Errors
-                            if now - last_error_sent >= self.error_push_interval:
+                            if now - last_system_error_sent >= self.error_push_interval:
                                 msg = data_retrieval.get_message("system_errors")
                                 if msg:
                                     await stream.write(msg)
-                                last_error_sent = now
+                                last_system_error_sent = now
 
                             await asyncio.sleep(self.push_interval)
 
