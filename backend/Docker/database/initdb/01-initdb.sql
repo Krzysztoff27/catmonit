@@ -36,7 +36,7 @@ BEGIN
         last_seen TIMESTAMP NOT NULL,
         hostname VARCHAR(255),
         ip_adress VARCHAR(15),
-        network_mask VARCHAR(15),
+        network_mask SMALLINT,
         os VARCHAR(100)
     );
     GRANT ALL PRIVILEGES ON DATABASE catmonit_base TO catmonit_worker;
