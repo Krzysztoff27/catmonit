@@ -260,7 +260,6 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
                     i: `${i}`,
                     ...widget.rect,
                     ...getWidgetConfig(widget).limits,
-                    isResizable: true,
                 };
             }) || [],
         [widgets]

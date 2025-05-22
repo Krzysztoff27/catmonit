@@ -28,18 +28,37 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
 
     const selectData = [
         {
-            value: "",
-            label: "Automatic selection",
+            group: "Automatic",
+            items: [
+                {
+                    value: "",
+                    label: "Highest usage",
+                },
+            ],
         },
-        ...safeObjectValues(data).map((deviceInfo) => ({
-            value: deviceInfo.uuid,
-            label: `${deviceInfo?.hostname} (${deviceInfo?.ipAddress}/${deviceInfo?.mask})`,
-        })),
+        {
+            group: "Choose device",
+            items: safeObjectValues(data).map((deviceInfo) => ({
+                value: deviceInfo.uuid,
+                label: `${deviceInfo?.hostname} (${deviceInfo?.ipAddress}/${deviceInfo?.mask})`,
+            })),
+        },
     ];
 
     const renderOption: SelectProps["renderOption"] = ({ option, checked }) => {
         const deviceInfo: DeviceInfo = data[option.value];
-        if (!deviceInfo) return <i>{option.label}</i>;
+        if (!deviceInfo)
+            return (
+                <Stack gap="0">
+                    {option.label}
+                    <Text
+                        fz={12}
+                        c="dimmed"
+                    >
+                        cycles through others if multiple widgets set to auto
+                    </Text>
+                </Stack>
+            );
         return (
             <Flex className={classes.selectOption}>
                 <Flex className={classes.deviceInfo}>
@@ -63,15 +82,20 @@ function DeviceSelect({ index, widget, onChange, overridenDataSource = "" }: Dev
     return (
         <Stack className={classes.container}>
             <Title order={4}>Target</Title>
-            <Select
-                unselectable="off"
-                placeholder="Automatic selection"
-                description="Automatic will try to display the "
-                data={selectData}
-                value={widget.settings.target}
-                onChange={changeTarget}
-                renderOption={renderOption}
-            />
+            <Stack gap="4">
+                <Select
+                    unselectable="off"
+                    placeholder="Automatic selection"
+                    data={selectData}
+                    value={widget.settings.target ?? ""}
+                    onChange={changeTarget}
+                    renderOption={renderOption}
+                />
+                <Text
+                    c="dimmed"
+                    fz="xs"
+                ></Text>
+            </Stack>
         </Stack>
     );
 }

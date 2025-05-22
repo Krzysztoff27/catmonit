@@ -95,15 +95,15 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                         <Button
                             variant="outline"
                             onClick={() => toggleResourceHidden(path)}
-                            color={resourceSettings.hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
+                            color={resourceSettings?.hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
                             className={classes.toggleButton}
                         >
-                            {resourceSettings.hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
+                            {resourceSettings?.hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
                         </Button>
                     </Flex>
                 );
             }),
-        [widget?.settings.target, widget?.settings?.[resourceKeyInData]]
+        [widget?.settings.target, widget?.settings?.[resourceKeyInData], data]
     );
 
     return (

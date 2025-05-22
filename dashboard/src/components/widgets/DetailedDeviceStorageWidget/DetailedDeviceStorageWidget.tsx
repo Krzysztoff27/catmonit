@@ -32,8 +32,7 @@ function DetailedDeviceStorageWidget({ index, data, settings, ...props }: Widget
 
     useEffect(() => {
         updateSettings();
-    }, [data, settings.target]);
-    updateSettings();
+    }, [data, settings?.target]);
 
     const prepareData = () => {
         if (!height || !disks) return disks ?? [];
