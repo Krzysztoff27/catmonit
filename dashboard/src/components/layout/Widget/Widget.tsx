@@ -115,7 +115,7 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                                 <WidgetContent
                                     index={index}
                                     data={data}
-                                    settings={widget?.settings}
+                                    settings={widget?.settings ?? {}}
                                 />
                             )
                         )}

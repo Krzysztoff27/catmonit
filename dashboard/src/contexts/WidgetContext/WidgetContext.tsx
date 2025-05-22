@@ -80,7 +80,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
                     auto: 0, // save how many auto we need
                 };
             }
-            if (!isNull(widget.settings.target)) {
+            if ((widget?.settings?.target)) {
                 subscriptions[config.dataSource].devices.push(widget.settings.target);
             } else newAutoRetrievalOrders[widget.type].push(widget.uuid);
             subscriptions[config.dataSource].auto++;

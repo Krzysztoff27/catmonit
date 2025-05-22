@@ -44,7 +44,7 @@ function AlertListElement({ alert, onRemove }: AlertListElementProps) {
                     <ScrollingText
                         maw="100%"
                         scroll
-                        c="red"
+                        c={alert.isWarning ? "orange" : "red"}
                     >
                         <IconAlertCircle
                             size={16}
@@ -59,7 +59,7 @@ function AlertListElement({ alert, onRemove }: AlertListElementProps) {
                     pr="xs"
                     ml="auto"
                 >
-                    <ActionIcon onClick={onRemove} style={{ cursor: "pointer", zIndex: 301, pointerEvents: 'auto' }}>
+                    <ActionIcon onClick={onRemove} bg="none" style={{ cursor: "pointer", zIndex: 301, pointerEvents: 'auto' }}>
                         <IconEyeOff
                             stroke={2.5}
                             size={18}
