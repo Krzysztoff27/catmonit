@@ -37,7 +37,7 @@ export interface Device {
     deviceInfo: DeviceInfo;
     systemInfo?: SystemInfo;
     sharesInfo?: ShareInfo[];
-    DisksInfo?: DiskInfo[];
+    disksInfo?: DiskInfo[];
 }
 
 export interface WarningInfo {

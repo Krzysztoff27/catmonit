@@ -48,7 +48,7 @@ const TimeoutRingProgress = ({ timestamp, ...props }: TimeoutRingProgressProps):
                 fw="800"
                 ff="monospace"
             >
-                {`${date} ${time}`}
+                LU {`${date} ${time}`}
             </Text>
         </Group>
     );

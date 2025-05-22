@@ -10,32 +10,27 @@ import { safeObjectValues } from "../../../utils/object";
 function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
     const getDiskPath = (disk: DiskInfo) => disk.mountPoint;
+    const disks: DiskInfo[] = data?.disksInfo ?? [];
 
     const prepareData = () => {
-        if (!height || !data?.DisksInfo) return safeObjectValues(data?.DisksInfo) ?? [];
+        if (!height || !disks) return disks ?? [];
 
         const numberOfSlots = Math.floor((height + 12) / 44);
         const visibleDisksPaths = safeObjectValues(settings?.disks ?? {})
             .filter(({ hidden }) => !hidden)
             .map(({ path }) => path);
 
-        // Find disks matching visible paths, fallback to all disks if none specified
-        const disksData = visibleDisksPaths.length > 0
-            ? visibleDisksPaths
-                .map(path => safeObjectValues(data.DisksInfo).find(disk => getDiskPath(disk) === path))
-                .filter(Boolean) as DiskInfo[]
-            : safeObjectValues(data.DisksInfo);
+        const getDisk = (mountPoint: string) => disks.find((e) => e.mountPoint === mountPoint) as DiskInfo;
+        const disksData = visibleDisksPaths?.map?.(getDisk) ?? disks;
 
         if (settings.automatic) {
-            return disksData
-                .sort((a, b) => (a.Usage / a.Capacity < b.Usage / b.Capacity ? 1 : -1))
-                .slice(0, numberOfSlots);
+            return disksData.sort((a: DiskInfo, b: DiskInfo) => (a.usage / a.capacity < b.usage / b.capacity ? 1 : -1)).slice(0, numberOfSlots);
         }
 
         return disksData.slice(0, numberOfSlots);
     };
 
-    const disksData = prepareData();
+    const preparedData = prepareData();
 
     return (
         <Box
@@ -57,8 +52,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
                     ref={ref}
                     className={classes.progressBarStack}
                 >
-                    {disksData.map((disk: DiskInfo, i) => (
-                        
+                    {preparedData.map((disk: DiskInfo, i) => (
                         <DiskProgress
                             key={i}
                             highlightStages={settings?.disks?.[getDiskPath(disk)]?.highlightStages ?? { red: 100, yellow: 100 }}

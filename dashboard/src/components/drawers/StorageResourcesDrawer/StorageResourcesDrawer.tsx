@@ -2,11 +2,12 @@ import { Button, Flex, Group, NumberInput, ScrollArea, Stack, TextInput, Title }
 import { IconEye, IconEyeOff, IconGripVertical } from "@tabler/icons-react";
 import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 import AutoOrderToggle from "../../interactive/button/AutoOrderToggle/AutoOrderToggle";
-import { safeObjectValues } from "../../../utils/object";
+import { safeObjectKeys, safeObjectValues } from "../../../utils/object";
 import { WidgetPropertiesContentProps } from "../../../types/components.types";
 import DeviceSelect from "../../interactive/input/DeviceSelect/DeviceSelect";
 import classes from "./StorageResourcesDrawer.module.css";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { isEqual } from "lodash";
 
 const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.JSX.Element => {
     const { setWidgetSettings, getWidgetData, getWidgetConfig, getData, getWidget } = useWidgets();
@@ -15,20 +16,44 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
     const config = getWidgetConfig(widget);
     const dataSource: string = config.dataSource ?? "";
     const selectedDevice = widget?.settings?.target;
+    const resourceKeyInData: string =
+        {
+            disks: "disksInfo",
+            fileShares: "sharesInfo",
+        }[dataSource] ?? "";
+    const pathKey: string =
+        {
+            disks: "mountPoint",
+            fileShares: "sharePath",
+        }[dataSource] ?? "";
+
+    const resourceData = data?.[resourceKeyInData] ?? [];
+
+    const updateSettings = () => {
+        let newResourceSettings = widget.settings?.[dataSource] ?? {};
+
+        resourceData.forEach((resource) => {
+            const path = resource[pathKey];
+            if (newResourceSettings[path]) return;
+            newResourceSettings[path] = { path, hidden: false, highlightStages: { yellow: 75, red: 90 } };
+        });
+
+        if (!isEqual(newResourceSettings, widget.settings?.[dataSource] ?? {}))
+            setWidgetSettings(index, { ...widget.settings, [dataSource]: newResourceSettings });
+    };
+
+    useEffect(() => {
+        updateSettings();
+    }, [data]);
+    updateSettings();
 
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
-        const newData = getData(dataSource)[target];
-        const newResourceData = safeObjectValues(newData?.[dataSource]);
-        const newResourceSettings = newResourceData.reduce(
-            (prev, { path }) => ({ ...prev, [path]: { path, hidden: false, highlightStages: { yellow: 75, red: 90 } } }),
-            {}
-        );
-        setWidgetSettings(index, { ...widget.settings, target, [dataSource]: newResourceSettings });
+        setWidgetSettings(index, { ...widget.settings, target, [dataSource]: {} });
     };
 
-    const isResourceHidden = (path: string) => {
-        return widget?.settings?.[dataSource]?.[path].hidden;
+    const getResourceSettings = (path: string) => {
+        return widget?.settings?.[dataSource]?.[path];
     };
 
     const toggleResourceHidden = (path: string) => {
@@ -52,8 +77,9 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const resourceList = useMemo(
         () =>
-            safeObjectValues(data?.[dataSource]).map((resource, i: number) => {
-                const hidden = isResourceHidden(resource.path);
+            resourceData.map((resource, i: number) => {
+                const path = resource[pathKey];
+                const resourceSettings = getResourceSettings(path);
                 return (
                     <Flex
                         key={i}
@@ -62,12 +88,12 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                         <IconGripVertical className={classes.iconGrip} />
 
                         <TextInput
-                            value={resource.path}
+                            value={path}
                             readOnly
                         />
                         <NumberInput
-                            defaultValue={widget?.settings?.[dataSource]?.[resource.path]?.highlightStages?.yellow}
-                            onChange={(val: number | string) => modifyHighlightStage(resource.path, "yellow", val)}
+                            defaultValue={resourceSettings?.highlightStages?.yellow}
+                            onChange={(val: number | string) => modifyHighlightStage(path, "yellow", val)}
                             min={0}
                             max={100}
                             step={1}
@@ -75,8 +101,8 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                             className={classes.percentInput}
                         />
                         <NumberInput
-                            defaultValue={widget?.settings?.[dataSource]?.[resource.path]?.highlightStages?.red}
-                            onChange={(val: number | string) => modifyHighlightStage(resource.path, "red", val)}
+                            defaultValue={resourceSettings?.highlightStages?.red}
+                            onChange={(val: number | string) => modifyHighlightStage(path, "red", val)}
                             min={0}
                             max={100}
                             step={1}
@@ -86,16 +112,16 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
                         <Button
                             variant="outline"
-                            onClick={() => toggleResourceHidden(resource.path)}
-                            color={hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
+                            onClick={() => toggleResourceHidden(path)}
+                            color={resourceSettings.hidden ? "var(--background-color-3)" : "var(--background-color-0)"}
                             className={classes.toggleButton}
                         >
-                            {hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
+                            {resourceSettings.hidden ? <IconEyeOff size={24} /> : <IconEye size={24} />}
                         </Button>
                     </Flex>
                 );
             }),
-        [widget?.settings.target, widget?.settings?.[dataSource]]
+        [widget?.settings.target, widget?.settings?.[resourceKeyInData]]
     );
 
     return (

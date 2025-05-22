@@ -55,6 +55,7 @@ const Widget = forwardRef<HTMLDivElement, WidgetProps>(
                 >
                     {!data && config.dataSource ? (
                         <>
+                            <Text size="lg">No connection</Text>
                             <Text
                                 size="xs"
                                 w="200px"

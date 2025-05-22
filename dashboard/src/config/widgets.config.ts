@@ -45,11 +45,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         initialSettings: {
             target: null,
             automatic: true,
-            disks: undefined,
-            highlightStages: {
-                yellow: 75,
-                red: 90,
-            },
+            disks: {},
         },
         dataSource: "disks",
         isReferingToSingularResource: true,
@@ -107,11 +103,7 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         initialSettings: {
             target: null,
             automatic: true,
-            fileShares: undefined,
-            highlightStages: {
-                yellow: 75,
-                red: 90,
-            },
+            fileShares: {},
         },
         dataSource: "fileShares",
         isReferingToSingularResource: true,
