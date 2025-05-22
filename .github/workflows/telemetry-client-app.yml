@@ -14,15 +14,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure release commit is on telemetry-client branch
+      - name: Ensure release is created from telemetry-client branch
         run: |
-          COMMIT_SHA="${{ github.event.release.target_commitish }}"
-          BRANCHES=$(git branch -r --contains "$COMMIT_SHA")
-          echo "Branches containing release commit: $BRANCHES"
-          if [[ "$BRANCHES" != *"origin/telemetry-client"* ]]; then
-            echo "The release commit is not on the telemetry-client branch. Exiting."
-            exit 1
-          fi
+            TARGET=${{ github.event.release.target_commitish }}
+            COMMIT_SHA=$(git rev-parse "$TARGET")
+            
+            BRANCHES=$(git branch -r --contains "$COMMIT_SHA")
+            echo "Resolved commit SHA: $COMMIT_SHA"
+            echo "Branches containing this commit: $BRANCHES"
+            
+            if [[ "$BRANCHES" != *"origin/telemetry-client"* ]]; then
+              echo "The release is not based on the telemetry-client branch. Exiting."
+              exit 1
+            fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
