@@ -49,41 +49,43 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
 
 
 
-
-
-                int countErr = 0;
-
-                foreach (var kvp in systemDeviceInfos.SystemErrorsDictionary)
+                if (subber.errorCount > 0)
                 {
-                    var errorCount = kvp.Value.SystemErrorsPayloads?.Count ?? 0;
 
-                    if (errorCount == 0)
-                        continue;
+                    int countErr = 0;
 
-                    nr.errors.TryAdd(kvp.Key, kvp.Value);
-                    countErr += errorCount;
-                    if (countErr >= subber.errorCount) break;
+                    foreach (var kvp in systemDeviceInfos.SystemErrorsDictionary)
+                    {
+                        var errorCount = kvp.Value.SystemErrorsPayloads?.Count ?? 0;
+
+                        if (errorCount == 0)
+                            continue;
+
+                        nr.errors.TryAdd(kvp.Key, kvp.Value);
+                        countErr += errorCount;
+                        if (countErr >= subber.errorCount) break;
+                    }
                 }
 
 
-
-
-
-                int count = 0;
-
-                foreach (var kvp in systemDeviceInfos.SystemWarnings)
+                if (subber.warningCount > 0)
                 {
-                    var warningCount = kvp.Value.warnings?.Count ?? 0;
 
-                    if (warningCount == 0)
-                        continue;
+                    int count = 0;
 
-                    nr.warnings.TryAdd(kvp.Key, kvp.Value);
-                    count += warningCount;
+                    foreach (var kvp in systemDeviceInfos.SystemWarnings)
+                    {
+                        var warningCount = kvp.Value.warnings?.Count ?? 0;
 
-                    if (count >= subber.warningCount) break;
+                        if (warningCount == 0)
+                            continue;
+
+                        nr.warnings.TryAdd(kvp.Key, kvp.Value);
+                        count += warningCount;
+
+                        if (count >= subber.warningCount) break;
+                    }
                 }
-
 
                 nr.totalWarningCount = systemDeviceInfos.totalWarningCount;
                 nr.totalErrorCount = systemDeviceInfos.totalErrorCount;

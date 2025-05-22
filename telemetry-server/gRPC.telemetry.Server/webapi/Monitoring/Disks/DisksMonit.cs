@@ -52,6 +52,47 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
             }
 
 
+            if (subber.errorCount > 0)
+            {
+                int countErr = 0;
+
+                foreach (var kvp in diskDeviceInfos.DiskErrorsDictionary)
+                {
+                    var errorCount = kvp.Value.DiskErrorsPayloads?.Count ?? 0;
+
+                    if (errorCount == 0)
+                        continue;
+
+                    nr.errors.TryAdd(kvp.Key, kvp.Value);
+                    countErr += errorCount;
+                    if (countErr >= subber.errorCount) break;
+                }
+            }
+
+
+            if (subber.warningCount > 0)
+            {
+                int count = 0;
+
+                foreach (var kvp in diskDeviceInfos.DiskWarnings)
+                {
+                    var warningCount = kvp.Value.warnings?.Count ?? 0;
+
+                    if (warningCount == 0)
+                        continue;
+
+                    nr.warnings.TryAdd(kvp.Key, kvp.Value);
+                    count += warningCount;
+
+                    if (count >= subber.warningCount) break;
+                }
+            }
+
+
+
+            nr.totalErrorCount = diskDeviceInfos.totalErrorCount;
+            nr.totalWarningCount = diskDeviceInfos.totalWarningCount;
+
             return JsonSerializer.Serialize(nr, Utils.JsonOption);
         }
         

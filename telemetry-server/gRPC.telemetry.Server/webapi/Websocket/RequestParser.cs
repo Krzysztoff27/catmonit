@@ -127,6 +127,22 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                     }
                 case PayloadType.DiskErrors:
                     {
+                        DiskErrorInfo di = new DiskErrorInfo();
+
+                        di.deviceInfo = getDeviceInfoFromResponse(response);
+
+                        di.DiskErrorsPayloads = 
+                            (((List<DiskErrorsPayload>)response.Payload).Select(e => new DiskErrorsPayloadWithNormalTimestamp
+                        {
+                            Message = e.Message,
+                            Source = e.Source,
+                            Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).DateTime,
+                            MountPoint = e.MountPoint
+                        })
+                        .ToList());
+
+                        DisksInfo.Instance.AddOrUpdateErrors(di);
+
                         break;
                     }
                 default:
