@@ -9,3 +9,20 @@ tls:
     #Website
     - certFile: /etc/traefik/certs/dashboard.crt
       keyFile: /etc/traefik/certs/dashboard.key
+
+http:
+  services:
+    api-machines:
+      loadBalancer:
+        servers:
+          - url: "h2c://catmonit-telemetry-server:5001"
+        responseForwarding:
+          flushInterval: 0s
+        passHostHeader: true
+        serversTransport: custom-transport
+
+serversTransports:
+  custom-transport:
+    responseHeaderTimeout: 0s
+    idleConnTimeout: 0s
+    dialTimeout: 30s
