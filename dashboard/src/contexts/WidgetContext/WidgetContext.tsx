@@ -240,7 +240,7 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
         if (!isSingular) return data[source] ?? {};
 
         const target = widget?.settings?.target;
-        if (target) return data[source].monitoredDevices[target];
+        if (target) return data[source]?.monitoredDevices?.[target] ?? {};
         const index = autoRetrievalOrders[widget.type].findIndex((uuid: string) => uuid === widget.uuid);
         return safeObjectValues(data[source]?.autoDevices)[index];
     };
@@ -265,7 +265,6 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
             }) || [],
         [widgets]
     );
-
 
     const value = {
         widgets,
