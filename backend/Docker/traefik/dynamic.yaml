@@ -26,3 +26,5 @@ serversTransports:
     responseHeaderTimeout: 0s
     idleConnTimeout: 0s
     dialTimeout: 30s
+    respondingTimeouts:
+        readTimeout: 0s
