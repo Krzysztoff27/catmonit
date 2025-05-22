@@ -23,19 +23,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r telemetry-client/src/requirements.txt
+          pip install -r telemetry-client/src/windows/requirements.txt
           pip install pyinstaller
 
       - name: Build executable
-        working-directory: telemetry-client/src
+        working-directory: telemetry-client/src/windows
         run: pyinstaller service.spec
 
       - name: Prepare ZIP archive for release
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
           mkdir release
-          cp telemetry-client/src/dist/CatMonitTelemetryClient.exe release/
-          cp telemetry-client/src/installer/*.ps1 release/
+          cp telemetry-client/src/windows/dist/CatMonitTelemetryClient.exe release/
+          cp telemetry-client/src/windows/installer/*.ps1 release/
           cd release
           zip "../catmonit-${TAG_NAME}.zip" *
 
