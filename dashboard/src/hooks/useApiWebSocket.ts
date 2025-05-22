@@ -37,11 +37,8 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
             let auto = prev?.auto ?? 0;
             let devices = prev?.devices ?? [];
 
-            if (isNull(oldResourceUuid)) auto--;
-            else devices = removeOneFromArray(devices, oldResourceUuid);
-
-            if (isNull(newResourceUuid)) auto++;
-            else devices.push(newResourceUuid);
+            if (!isNull(oldResourceUuid)) devices = removeOneFromArray(devices, oldResourceUuid);
+            if (!isNull(newResourceUuid)) devices.push(newResourceUuid);
 
             return { ...prev, auto, devices } as WebSocketStart;
         });

@@ -29,24 +29,6 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
 
     const resourceData = data?.[resourceKeyInData] ?? [];
 
-    const updateSettings = () => {
-        let newResourceSettings = widget.settings?.[dataSource] ?? {};
-
-        resourceData.forEach((resource) => {
-            const path = resource[pathKey];
-            if (newResourceSettings[path]) return;
-            newResourceSettings[path] = { path, hidden: false, highlightStages: { yellow: 75, red: 90 } };
-        });
-
-        if (!isEqual(newResourceSettings, widget.settings?.[dataSource] ?? {}))
-            setWidgetSettings(index, { ...widget.settings, [dataSource]: newResourceSettings });
-    };
-
-    useEffect(() => {
-        updateSettings();
-    }, [data]);
-    updateSettings();
-
     const onDeviceChange = (target: string | null) => {
         if (!target) return;
         setWidgetSettings(index, { ...widget.settings, target, [dataSource]: {} });

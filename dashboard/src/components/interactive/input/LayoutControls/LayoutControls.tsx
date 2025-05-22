@@ -1,4 +1,4 @@
-import { Button, Combobox, Group, TextInput, useCombobox } from "@mantine/core";
+import { Button, Combobox, Group, ScrollArea, TextInput, useCombobox } from "@mantine/core";
 import { IconChevronDown, IconTrash } from "@tabler/icons-react";
 import { useEffect, useMemo } from "react";
 import classes from "./LayoutControls.module.css";
@@ -29,7 +29,7 @@ const LayoutControls = ({}): React.JSX.Element => {
 
     const combobox = useCombobox();
 
-    const options = useMemo(() => [...(layouts || []), { name: "+ Create new layout", id: "+" } as LayoutInfoInDatabase], [layouts]);
+    const options = useMemo(() => [{ name: "+ Create new layout", id: "+" } as LayoutInfoInDatabase, ...(layouts || [])], [layouts]);
 
     const comboboxOptions = useMemo(
         () =>
@@ -126,8 +126,15 @@ const LayoutControls = ({}): React.JSX.Element => {
                 />
             </Group>
 
-            <Combobox.Dropdown>
-                <Combobox.Options>{options.length === 0 ? <Combobox.Empty>Nothing found</Combobox.Empty> : comboboxOptions}</Combobox.Options>
+            <Combobox.Dropdown mah={300}>
+                <Combobox.Options>
+                    <ScrollArea.Autosize
+                        type="scroll"
+                        mah={200}
+                    >
+                        {options.length === 0 ? <Combobox.Empty>Nothing found</Combobox.Empty> : comboboxOptions}
+                    </ScrollArea.Autosize>
+                </Combobox.Options>
             </Combobox.Dropdown>
         </Combobox>
     );

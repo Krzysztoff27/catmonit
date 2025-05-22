@@ -81,10 +81,9 @@ export function WidgetProvider({ children }: WidgetProviderProps) {
                 };
             }
             if (!isNull(widget.settings.target)) {
-                return subscriptions[config.dataSource].devices.push(widget.settings.target);
-            }
+                subscriptions[config.dataSource].devices.push(widget.settings.target);
+            } else newAutoRetrievalOrders[widget.type].push(widget.uuid);
             subscriptions[config.dataSource].auto++;
-            newAutoRetrievalOrders[widget.type].push(widget.uuid);
         });
 
         setAutoRetrievalOrders(newAutoRetrievalOrders);

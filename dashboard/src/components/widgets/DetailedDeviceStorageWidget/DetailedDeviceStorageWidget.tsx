@@ -6,10 +6,34 @@ import DiskProgress from "../../display/DiskProgress/DiskProgress";
 import classes from "./DetailedDeviceStorageWidget.module.css";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
+import { useEffect } from "react";
+import { isEqual } from "lodash";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
-function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContentProps) {
+function DetailedDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
+    const { setWidgetSettings } = useWidgets();
     const disks: DiskInfo[] = data?.disksInfo ?? [];
+
+    const updateSettings = () => {
+        const resourceData = data?.disksInfo ?? [];
+        const oldResourceSettings = settings?.disks ?? {};
+        let newResourceSettings = {};
+
+        resourceData.forEach(({ mountPoint }) => {
+            if (oldResourceSettings[mountPoint]) return (newResourceSettings[mountPoint] = oldResourceSettings[mountPoint]);
+            newResourceSettings[mountPoint] = { path: mountPoint, hidden: false, highlightStages: { yellow: 75, red: 90 } };
+        });
+
+        if (!isEqual(newResourceSettings, oldResourceSettings)) {
+            setWidgetSettings(index, { ...settings, disks: newResourceSettings });
+        }
+    };
+
+    useEffect(() => {
+        updateSettings();
+    }, [data, settings.target]);
+    updateSettings();
 
     const prepareData = () => {
         if (!height || !disks) return disks ?? [];
@@ -20,7 +44,7 @@ function DetailedDeviceStorageWidget({ data, settings, ...props }: WidgetContent
             .map(({ path }) => path);
 
         const getDisk = (mountPoint: string) => disks.find((e) => e.mountPoint === mountPoint) as DiskInfo;
-        const disksData = visibleDisksPaths?.map?.(getDisk) ?? disks;
+        const disksData = visibleDisksPaths?.map?.(getDisk).filter((e) => e) ?? disks;
 
         if (settings.automatic) {
             return disksData.sort((a: DiskInfo, b: DiskInfo) => (a.usage / a.capacity < b.usage / b.capacity ? 1 : -1)).slice(0, numberOfSlots);

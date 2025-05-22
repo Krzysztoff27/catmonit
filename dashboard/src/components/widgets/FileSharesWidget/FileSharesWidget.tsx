@@ -6,11 +6,35 @@ import classes from "./FileSharesWidget.module.css";
 import DeviceTitleOneLine from "../../display/DeviceTitle/DeviceTitleOneLine";
 import { safeObjectValues } from "../../../utils/object";
 import { ShareInfo } from "../../../types/api.types";
+import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
+import { isEqual } from "lodash";
+import { useEffect } from "react";
 
-function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
+function FileSharesWidget({ index, data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
+    const { setWidgetSettings } = useWidgets();
 
     const fileShares: ShareInfo[] = data?.sharesInfo ?? [];
+
+    const updateSettings = () => {
+        const resourceData: ShareInfo[] = data?.sharesInfo ?? [];
+        const oldResourceSettings = settings?.fileShares ?? {};
+        let newResourceSettings = {};
+
+        resourceData.forEach(({ sharePath }) => {
+            if (oldResourceSettings[sharePath]) return (newResourceSettings[sharePath] = oldResourceSettings[sharePath]);
+            newResourceSettings[sharePath] = { path: sharePath, hidden: false, highlightStages: { yellow: 75, red: 90 } };
+        });
+
+        if (!isEqual(newResourceSettings, oldResourceSettings)) {
+            setWidgetSettings(index, { ...settings, fileShares: newResourceSettings });
+        }
+    };
+
+    useEffect(() => {
+        updateSettings();
+    }, [data, settings.target]);
+    updateSettings();
 
     const prepareData = () => {
         if (!height || !fileShares) return fileShares ?? [];
@@ -20,7 +44,7 @@ function FileSharesWidget({ data, settings, ...props }: WidgetContentProps) {
             .map(({ path }) => path);
 
         const getFileShare = (sharePath: string) => fileShares.find((e) => e.sharePath === sharePath) as ShareInfo;
-        const sharesData = visibleDisksPaths?.map?.(getFileShare) ?? fileShares;
+        const sharesData = visibleDisksPaths?.map?.(getFileShare).filter((e) => e) ?? fileShares;
 
         if (settings.automatic) {
             return sharesData.sort((a: ShareInfo, b: ShareInfo) => (a.usage / a.capacity < b.usage / b.capacity ? 1 : -1)).slice(0, numberOfSlots);
