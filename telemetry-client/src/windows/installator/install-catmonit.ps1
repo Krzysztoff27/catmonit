@@ -152,6 +152,7 @@ function Copy-Files {
     }
 
     Copy-Item -Path $global:selectedCAPath -Destination "$targetPath\catmonit-CA.pem" -Force
+    certutil -addstore -f "Root" "$global:selectedCAPath"
     Copy-Item -Path "$PSScriptRoot\*.exe" -Destination $targetPath -Force
     Copy-Item -Path "$PSScriptRoot\config.yaml" -Destination $targetPath -Force
 }
