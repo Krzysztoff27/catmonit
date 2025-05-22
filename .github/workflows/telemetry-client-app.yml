@@ -6,6 +6,8 @@ on:
 
 jobs:
   build:
+    if: github.event.release.target_commitish == 'telemetry-client'
+
     runs-on: windows-latest
 
     defaults:
@@ -16,17 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensure tags and history are available
-
-      - name: Verify release commit is on telemetry-client branch
-        run: |
-          $releaseSha = "${{ github.event.release.target_commitish }}"
-          git fetch origin telemetry-client
-          $mergeBase = git merge-base origin/telemetry-client $releaseSha
-          if ($mergeBase -ne $releaseSha) {
-            Write-Host "Release commit is not on telemetry-client branch. Exiting."
-            exit 1
-          }
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
