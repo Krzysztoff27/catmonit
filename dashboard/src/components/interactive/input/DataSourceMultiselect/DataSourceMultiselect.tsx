@@ -31,7 +31,7 @@ function DataSourceMultiselect({ index, widget, onChange }: DataSourceMultiselec
                 unselectable="off"
                 placeholder="Select data sources"
                 data={SELECT_DATA}
-                value={widget.settings.target}
+                value={widget.settings.sources}
                 onChange={changeSources}
             />
         </Stack>
