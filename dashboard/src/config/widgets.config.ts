@@ -1,4 +1,3 @@
-import { IconAlertSquareRounded, IconChartDonut, IconDatabase, IconFiles, IconInfoCircleFilled, IconNetwork } from "@tabler/icons-react";
 import AlertDrawer from "../components/drawers/AlertDrawer/AlertDrawer";
 import DeviceStatusDrawer from "../components/drawers/DeviceStatusDrawer/DeviceStatusDrawer";
 import OverallDeviceStorageDrawer from "../components/drawers/OverallDeviceStorageDrawer/OverallDeviceStorageDrawer";
@@ -10,6 +9,7 @@ import FileSharesWidget from "../components/widgets/FileSharesWidget/FileSharesW
 import NetworkThroughputWidget from "../components/widgets/NetworkThroughputWidget/NetworkThroughputWidget";
 import OverallDeviceStorageWidget from "../components/widgets/OverallDeviceStorageWidget/OverallDeviceStorageWidget";
 import { WidgetsConfig } from "../types/config.types";
+import SpacingWidget from "../components/widgets/SpacingWidget/SpacingWidget";
 
 export const GRID_SIZE_PX = 128;
 export const GRID_MARGIN_PX = 10;
@@ -17,7 +17,6 @@ export const GRID_MARGIN_PX = 10;
 const WIDGETS_CONFIG: WidgetsConfig = {
     ALERTS: {
         name: "alerts widget",
-        icon: IconAlertSquareRounded,
         content: AlertWidget,
         propertiesContent: AlertDrawer,
         limits: {
@@ -34,7 +33,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     OVERALL_DEVICE_STORAGE: {
         name: "overall device's disks",
         title: "Total storage",
-        icon: IconChartDonut,
         content: OverallDeviceStorageWidget,
         propertiesContent: OverallDeviceStorageDrawer,
         limits: {
@@ -54,7 +52,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     DETAILED_DEVICE_STORAGE: {
         name: "device's disks state",
         title: "Storage",
-        icon: IconDatabase,
         content: DetailedDeviceStorageWidget,
         propertiesContent: StorageResourcesDrawer,
         limits: {
@@ -75,7 +72,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     FILE_SHARES: {
         name: "file share widget",
         title: "Fileshares",
-        icon: IconFiles,
         content: FileSharesWidget,
         propertiesContent: StorageResourcesDrawer,
         limits: {
@@ -96,7 +92,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     DEVICE_STATUS: {
         name: "device status info",
         title: "Performance",
-        icon: IconInfoCircleFilled,
         content: DeviceStatusWidget,
         propertiesContent: DeviceStatusDrawer,
         limits: {
@@ -116,7 +111,6 @@ const WIDGETS_CONFIG: WidgetsConfig = {
     NETWORK_THROUGHPUT: {
         name: "network throughput",
         title: "Network throughput",
-        icon: IconNetwork,
         content: NetworkThroughputWidget,
         limits: {
             minH: 2,
@@ -128,6 +122,22 @@ const WIDGETS_CONFIG: WidgetsConfig = {
         image: "/images/widgets/network_throughput.png",
         dataSource: "network",
         isReferingToSingularResource: false,
+    },
+    SPACING_WIDGET: {
+        name: "Spacing for creating layouts",
+        content: SpacingWidget,
+        limits: {
+            minH: 1,
+            maxH: 8,
+            minW: 1,
+            maxW: 15,
+        },
+        initialSettings: {
+            target: null,
+        },
+        dataSource: "",
+        isReferingToSingularResource: false,
+        image: "/images/widgets/spacing.png",
     },
 };
 
