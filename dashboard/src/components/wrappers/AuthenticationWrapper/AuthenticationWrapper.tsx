@@ -11,7 +11,9 @@ const AuthenticationWrapper = (): React.JSX.Element => {
 
     if (loading) return <LoadingOverlay />;
     if (!error && user) return <Outlet />;
-    sendErrorNotification(error?.status);
+    if (error?.status && (error?.status === 401 || error?.status >= 500)) {
+        sendErrorNotification(error?.status);
+    }
     return <Navigate to={"/login"} />;
 };
 
