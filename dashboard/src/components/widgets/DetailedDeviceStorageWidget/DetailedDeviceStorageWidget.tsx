@@ -12,7 +12,8 @@ import { useWidgets } from "../../../contexts/WidgetContext/WidgetContext";
 
 function DetailedDeviceStorageWidget({ index, data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
-    const { setWidgetSettings } = useWidgets();
+    const { setWidgetSettings, getWidget } = useWidgets();
+    const widget = getWidget(index);
     const disks: DiskInfo[] = data?.disksInfo ?? [];
 
     const updateSettings = () => {
@@ -32,7 +33,11 @@ function DetailedDeviceStorageWidget({ index, data, settings, ...props }: Widget
 
     useEffect(() => {
         updateSettings();
-    }, [data, settings?.target]);
+    }, []);
+
+    useEffect(() => {
+        updateSettings();
+    }, [widget?.version, data, settings?.target]);
 
     const prepareData = () => {
         if (!height || !disks) return disks ?? [];

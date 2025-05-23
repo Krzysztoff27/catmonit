@@ -86,7 +86,6 @@ export default function useApiWebSocket(path: string): useApiWebSocketReturn {
     };
 
     useEffect(() => {
-        // console.log(subscription);
         if (!subscription) return;
         sendJsonMessage(subscription);
     }, [subscription]);

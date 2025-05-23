@@ -12,7 +12,8 @@ import { useEffect } from "react";
 
 function FileSharesWidget({ index, data, settings, ...props }: WidgetContentProps) {
     let { height, ref } = useElementSize();
-    const { setWidgetSettings } = useWidgets();
+    const { setWidgetSettings, getWidget } = useWidgets();
+    const widget = getWidget(index);
 
     const fileShares: ShareInfo[] = data?.sharesInfo ?? [];
 
@@ -33,7 +34,11 @@ function FileSharesWidget({ index, data, settings, ...props }: WidgetContentProp
 
     useEffect(() => {
         updateSettings();
-    }, [data, settings?.target]);
+    }, []);
+
+    useEffect(() => {
+        updateSettings();
+    }, [widget?.version, data, settings?.target]);
 
     const prepareData = () => {
         if (!height || !fileShares) return fileShares ?? [];
