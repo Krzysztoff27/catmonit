@@ -113,7 +113,6 @@ export function LayoutProvider({ children }) {
         // If we got here, fallback to the first layout
         const fallback = layouts[0];
 
-        console.log(fallback);
         setCurrent(fallback.id);
         const layout = await getLayout(fallback.id);
         if (layout) setCurrentLayout(layout);
@@ -127,7 +126,6 @@ export function LayoutProvider({ children }) {
 
     useEffect(() => {
         if (!loading && isFirstRender) {
-            console.log("a");
             initLayout(cookies.layoutId);
             setIsFirstRender(false);
         }
