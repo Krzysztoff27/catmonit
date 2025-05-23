@@ -17,7 +17,7 @@ namespace webapi.Monitoring
         public CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         public Task monitorTask;
 
-        public void sendSimpleMsg(WebSocket ws, string msg)
+        public static void sendSimpleMsg(WebSocket ws, string msg)
         {
             byte[] msgBytes = System.Text.Encoding.UTF8.GetBytes(msg);
             var bfr = new ArraySegment<byte>(msgBytes);

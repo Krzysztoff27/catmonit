@@ -100,7 +100,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
 
                         SystemUsagePayload pl = (SystemUsagePayload)response.Payload;
 
-                        di.systemInfo = new systemPayload { cpuUsagePercent = pl.CpuUsagePercent, ramTotalBytes = pl.RamTotalBytes, ramUsedBytes = pl.RamUsedBytes, pagefileTotalBytes = pl.PagefileTotalBytes, pagefileUsedBytes = pl.PagefileUsedBytes, lastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).DateTime };
+                        di.systemInfo = new systemPayload { cpuUsagePercent = pl.CpuUsagePercent, ramTotalBytes = pl.RamTotalBytes, ramUsedBytes = pl.RamUsedBytes, pagefileTotalBytes = pl.PagefileTotalBytes, pagefileUsedBytes = pl.PagefileUsedBytes, lastBootTimestamp = DateTimeOffset.FromUnixTimeSeconds((long)pl.LastBootTimestamp).UtcDateTime };
 
                         SystemInfo.Instance.AddOrUpdateDevice(di.deviceInfo.uuid, di);
 
@@ -117,7 +117,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                             {
                                 Message = e.Message,
                                 Source = e.Source,
-                                Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).DateTime
+                                Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).UtcDateTime
                             })
                         .ToList());
 
@@ -136,7 +136,7 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         {
                             Message = e.Message,
                             Source = e.Source,
-                            Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).DateTime,
+                            Timestamp = DateTimeOffset.FromUnixTimeSeconds(e.Timestamp).UtcDateTime,
                             MountPoint = e.MountPoint
                         })
                         .ToList());

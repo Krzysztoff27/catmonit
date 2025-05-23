@@ -28,7 +28,7 @@ namespace gRPC.telemetry.Server.webapi.Services
                         DeviceHelper.UpsertDevicesDB();
                     } catch (InternalServerError)
                     {
-                        Utils.assert(false);
+                        // ignore
                     }
 
                     var now = DateTime.UtcNow;

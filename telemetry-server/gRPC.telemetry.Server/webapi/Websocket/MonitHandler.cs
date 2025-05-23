@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text;
 using webapi.Helpers;
 using webapi.Monitoring;
+using Newtonsoft.Json;
 
 namespace gRPC.telemetry.Server.webapi.Websocket
 {
@@ -50,8 +51,16 @@ namespace gRPC.telemetry.Server.webapi.Websocket
                         onWebsocketClose(potentialSubscriber);
                         return;
                     }
+                    JsonDocument doc;
                     var messageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    using var doc = JsonDocument.Parse(messageJson);
+                    try { 
+                        doc = JsonDocument.Parse(messageJson);
+                    }
+                    catch (JsonReaderException e)
+                    {
+                        await potentialSubscriber.WebSocket.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid json format", CancellationToken.None);
+                        return;
+                    }
                     var root = doc.RootElement;
 
                     if (root.TryGetProperty("message", out var messageProp))

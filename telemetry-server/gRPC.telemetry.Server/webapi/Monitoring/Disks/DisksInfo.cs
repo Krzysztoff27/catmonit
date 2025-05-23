@@ -34,7 +34,7 @@ namespace gRPC.telemetry.Server.webapi.Monitoring.Network
                 return false;
 
             return Message == other.Message && Source == other.Source && Timestamp == other.Timestamp && MountPoint == other.MountPoint;
-        }
+        }   
         public override int GetHashCode()
         {
             return HashCode.Combine(Message, Source, Timestamp, MountPoint);
