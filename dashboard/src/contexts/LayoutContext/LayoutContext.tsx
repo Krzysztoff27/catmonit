@@ -23,17 +23,17 @@ const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({ children }) {
     const { loading, data: layouts, refresh } = useFetch("/layout/layouts");
-    const [cookies, setCookies] = useCookies(["layout_id"]);
+    const [cookies, setCookies] = useCookies(["layoutId"]);
     // the updates during create new layout created like 4 racing conditions
     // cookies only updated after next render
     // thats why useState that copies the cookies is needed
-    const [selectedLayoutId, setSelectedLayoutId] = useState<string | undefined>(cookies.layout_id);
+    const [selectedLayoutId, setSelectedLayoutId] = useState<string | undefined>(cookies.layoutId);
     const [currentLayout, setCurrentLayout] = useState<LayoutInDatabase | undefined>(undefined);
     const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
     const { sendRequest } = useApiRequests();
 
     const setCurrent = (id: string) => {
-        setCookies("layout_id", id, { path: "/" });
+        setCookies("layoutId", id, { path: "/" });
         setSelectedLayoutId(id);
     };
 
@@ -55,7 +55,7 @@ export function LayoutProvider({ children }) {
 
     const renameCurrentLayout = async (newName: string) => {
         if (currentLayout?.info.name === newName) return;
-        const res = await renameLayout(cookies.layout_id, newName);
+        const res = await renameLayout(cookies.layoutId, newName);
         refresh();
         return res;
     };
@@ -112,21 +112,26 @@ export function LayoutProvider({ children }) {
 
         // If we got here, fallback to the first layout
         const fallback = layouts[0];
+
+        console.log(fallback);
         setCurrent(fallback.id);
         const layout = await getLayout(fallback.id);
         if (layout) setCurrentLayout(layout);
     };
 
     useEffect(() => {
-        if (!selectedLayoutId && cookies.layout_id) {
-            setSelectedLayoutId(cookies.layout_id);
-
-            if (loading || !isFirstRender) return;
-
-            initLayout(cookies.layout_id);
-            setIsFirstRender(false);
+        if (!selectedLayoutId && cookies.layoutId) {
+            setSelectedLayoutId(cookies.layoutId);
         }
     }, []);
+
+    useEffect(() => {
+        if (!loading && isFirstRender) {
+            console.log("a");
+            initLayout(cookies.layoutId);
+            setIsFirstRender(false);
+        }
+    }, [loading]);
 
     useEffect(() => {
         if (loading || !layouts || isUndefined(selectedLayoutId)) return;
