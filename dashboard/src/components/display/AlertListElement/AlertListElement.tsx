@@ -2,7 +2,6 @@ import { ActionIcon, Box, Flex, Group, Paper } from "@mantine/core";
 import { IconAlertCircle, IconEyeOff } from "@tabler/icons-react";
 import DeviceTitle from "../DeviceTitle/DeviceTitle";
 import ScrollingText from "../ScrollingText/ScrollingText";
-import classes from "./AlertListElement.module.css";
 import { Alert, Device } from "../../../types/api.types";
 
 export interface AlertListElementProps {
