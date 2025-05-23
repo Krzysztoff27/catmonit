@@ -29,6 +29,7 @@ export function LayoutProvider({ children }) {
     // thats why useState that copies the cookies is needed
     const [selectedLayoutId, setSelectedLayoutId] = useState<string | undefined>(cookies.layout_id);
     const [currentLayout, setCurrentLayout] = useState<LayoutInDatabase | undefined>(undefined);
+    const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
     const { sendRequest } = useApiRequests();
 
     const setCurrent = (id: string) => {
@@ -95,37 +96,42 @@ export function LayoutProvider({ children }) {
         refresh();
     };
 
+    const initLayout = async (id) => {
+        if (isEmpty(layouts)) {
+            await createNewLayout();
+            return;
+        }
+
+        if (id) {
+            const layout = await getLayout(id);
+            if (layout) {
+                setCurrentLayout(layout);
+                return;
+            }
+        }
+
+        // If we got here, fallback to the first layout
+        const fallback = layouts[0];
+        setCurrent(fallback.id);
+        const layout = await getLayout(fallback.id);
+        if (layout) setCurrentLayout(layout);
+    };
+
     useEffect(() => {
         if (!selectedLayoutId && cookies.layout_id) {
             setSelectedLayoutId(cookies.layout_id);
+
+            if (loading || !isFirstRender) return;
+
+            initLayout(cookies.layout_id);
+            setIsFirstRender(false);
         }
     }, []);
 
     useEffect(() => {
         if (loading || !layouts || isUndefined(selectedLayoutId)) return;
 
-        const initLayout = async () => {
-            if (isEmpty(layouts)) {
-                await createNewLayout();
-                return;
-            }
-
-            if (selectedLayoutId) {
-                const layout = await getLayout(selectedLayoutId);
-                if (layout) {
-                    setCurrentLayout(layout);
-                    return;
-                }
-            }
-
-            // If we got here, fallback to the first layout
-            const fallback = layouts[0];
-            setCurrent(fallback.id);
-            const layout = await getLayout(fallback.id);
-            if (layout) setCurrentLayout(layout);
-        };
-
-        initLayout();
+        initLayout(selectedLayoutId);
     }, [loading, layouts, selectedLayoutId]);
 
     const value = {
