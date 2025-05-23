@@ -44,6 +44,7 @@ function AlertListElement({ alert, onRemove }: AlertListElementProps) {
                         maw="100%"
                         scroll
                         c={alert.isWarning ? "orange" : "red.6"}
+                        speed={70}
                     >
                         <IconAlertCircle
                             size={16}

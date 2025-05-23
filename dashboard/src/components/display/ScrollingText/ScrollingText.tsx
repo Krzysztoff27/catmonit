@@ -3,9 +3,8 @@ import classes from "./ScrollingText.module.css";
 import { useElementSize } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
-const SPEED_PIXELS_PER_SECOND = 60;
-
-const ScrollingText = ({ children, scroll = true, ...props }): React.JSX.Element => {
+// speed is in pixels per second
+const ScrollingText = ({ children, scroll = true, speed = 20, ...props }): React.JSX.Element => {
     const { width: containerWidth, ref: containerRef } = useElementSize();
     const { width: textWidth, ref: textRef } = useElementSize();
     const [shouldScroll, setShouldScroll] = useState(false);
@@ -23,7 +22,7 @@ const ScrollingText = ({ children, scroll = true, ...props }): React.JSX.Element
             <Box
                 className={`${classes.text} ${shouldScroll ? classes.scrolling : classes.notScrolling}`}
                 style={{
-                    animationDuration: `${textWidth / SPEED_PIXELS_PER_SECOND}s`,
+                    animationDuration: `${textWidth / speed}s`,
                 }}
             >
                 <div ref={textRef}>{children}</div>
