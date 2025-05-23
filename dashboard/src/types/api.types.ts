@@ -21,7 +21,6 @@ export interface SystemInfo {
     lastBootTimestamp: string;
 }
 
-
 export interface ShareInfo {
     sharePath: string;
     usage: number;
@@ -46,9 +45,23 @@ export interface WarningInfo {
     warnings: string[];
 }
 
-export interface ErrorInfo {
+export interface DisksErrorInfo {
     deviceInfo: DeviceInfo;
-    error: string[];
+    disksErrorsPayloads: {
+        message: string;
+        source: string;
+        timestamp: string;
+        mountPoint: string;
+    }[];
+}
+
+export interface SystemErrorInfo {
+    deviceInfo: DeviceInfo;
+    systemErrorsPayloads: {
+        message: string;
+        source: string;
+        timestamp: string;
+    }[];
 }
 
 export interface APIResponse {
@@ -56,7 +69,7 @@ export interface APIResponse {
     monitoredDevices: Record<string, Device | null>;
     autoDevices: Record<string, Device | null>;
     warnings?: Record<string, WarningInfo>;
-    errors?: Record<string, ErrorInfo>;
+    errors?: Record<string, SystemErrorInfo> | Record<string, DisksErrorInfo>;
 }
 
 export interface Alert {

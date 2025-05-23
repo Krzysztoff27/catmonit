@@ -25,7 +25,7 @@
 }
 
 .scrolling {
-    animation: scrollLeftRight 10s linear infinite;
+    animation: scrollLeftRight linear infinite;
 }
 
 .spacer {

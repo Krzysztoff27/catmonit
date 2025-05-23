@@ -44,7 +44,7 @@ function AlertListElement({ alert, onRemove }: AlertListElementProps) {
                     <ScrollingText
                         maw="100%"
                         scroll
-                        c={alert.isWarning ? "orange" : "red"}
+                        c={alert.isWarning ? "orange" : "red.6"}
                     >
                         <IconAlertCircle
                             size={16}
