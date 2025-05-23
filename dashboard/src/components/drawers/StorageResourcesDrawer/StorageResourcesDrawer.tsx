@@ -67,6 +67,7 @@ const StorageResourcesDrawer = ({ index }: WidgetPropertiesContentProps): React.
                         key={i}
                         className={classes.resourceRow}
                     >
+                        {/* dragging this needs implementation :< */}
                         <IconGripVertical className={classes.iconGrip} />
 
                         <TextInput
