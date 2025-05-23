@@ -50,7 +50,6 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
     }, [systemInfo?.lastBootTimestamp, uptimeNow]);
 
     const bootDate = getBootDate();
-    console.log(bootDate);
 
     let uptimeDisplay = "N/A";
     if (bootDate) {
