@@ -28,6 +28,10 @@
     animation: scrollLeftRight linear infinite;
 }
 
+.notScrolling {
+    filter: brightness(95%);
+}
+
 .spacer {
     display: inline-block;
     width: 40px;

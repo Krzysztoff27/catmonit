@@ -21,7 +21,7 @@ const ScrollingText = ({ children, scroll = true, ...props }): React.JSX.Element
             {...props}
         >
             <Box
-                className={`${classes.text} ${shouldScroll ? classes.scrolling : ""}`}
+                className={`${classes.text} ${shouldScroll ? classes.scrolling : classes.notScrolling}`}
                 style={{
                     animationDuration: `${textWidth / SPEED_PIXELS_PER_SECOND}s`,
                 }}

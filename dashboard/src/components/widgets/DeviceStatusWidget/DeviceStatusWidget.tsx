@@ -50,6 +50,7 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
     }, [systemInfo?.lastBootTimestamp, uptimeNow]);
 
     const bootDate = getBootDate();
+    console.log(bootDate);
 
     let uptimeDisplay = "N/A";
     if (bootDate) {
@@ -128,7 +129,7 @@ function DeviceStatusWidget({ index, data, settings, ...props }: WidgetContentPr
                                 >
                                     Uptime:
                                 </Text>
-                                <Text fz="sm">{bootDate ? `${timePassedRounded(bootDate)[0]} ${timePassedRounded(bootDate)[1]}` : "N/A"}</Text>
+                                <Text fz="sm">{uptimeDisplay}</Text>
                             </Group>
 
                             <Group gap={5}>
