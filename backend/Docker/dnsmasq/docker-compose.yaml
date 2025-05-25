@@ -1,0 +1,12 @@
+services:
+  dnsmasq:
+    image: jpillora/dnsmasq
+    container_name: catmonit-dns
+    restart: unless-stopped
+    ports:
+      - "5353:53/udp"
+      - "5353:53/tcp"
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
+    cap_add:
+      - NET_ADMIN

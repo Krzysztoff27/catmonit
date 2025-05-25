@@ -1,0 +1,30 @@
+tls:
+  certificates:
+    #API endpoint for telemetry data
+    - certFile: /etc/traefik/certs/api-machines.crt
+      keyFile: /etc/traefik/certs/api-machines.key
+    #API endpoint for web traffic
+    - certFile: /etc/traefik/certs/api-web.crt
+      keyFile: /etc/traefik/certs/api-web.key
+    #Website
+    - certFile: /etc/traefik/certs/dashboard.crt
+      keyFile: /etc/traefik/certs/dashboard.key
+
+http:
+  services:
+    api-machines:
+      loadBalancer:
+        servers:
+          - url: "h2c://catmonit-telemetry-server:5001"
+        responseForwarding:
+          flushInterval: 100ms
+        passHostHeader: true
+        serversTransport: custom-transport
+
+serversTransports:
+  custom-transport:
+    responseHeaderTimeout: 90s
+    idleConnTimeout: 90s
+    dialTimeout: 30s
+    respondingTimeouts:
+        readTimeout: 90s
