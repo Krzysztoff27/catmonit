@@ -1,3 +1,3 @@
 # catmonit
 
-## windows server monitoring
+## Catmonit is a WIP

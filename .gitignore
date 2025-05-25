@@ -24,10 +24,6 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
-
-## Docker
-#**/Dockerfile
-
 *.container
 
 ## Others
@@ -69,6 +65,12 @@ dist
 dist-ssr
 
 
+
 ## custom exclusionssl/
 ssl/
+
+=======
+## Local
+*.local
+*.local.*
 
