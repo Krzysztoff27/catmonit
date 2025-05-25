@@ -43,8 +43,7 @@ Thumbs.db
 build/
 dist/
 
-#*.spec
-=======
+##*.spec
 *.spec
 
 ## custom exclusionssl/
@@ -64,13 +63,6 @@ node_modules
 dist
 dist-ssr
 
-
-
-## custom exclusionssl/
-ssl/
-
-=======
 ## Local
 *.local
 *.local.*
-

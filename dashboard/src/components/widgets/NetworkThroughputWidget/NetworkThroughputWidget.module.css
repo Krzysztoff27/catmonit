@@ -1,0 +1,10 @@
+.title {
+    font-weight: 600;
+}
+
+.chart {
+    flex: 1;
+    max-height: calc(100% - 60px);
+    transform: translate(-12px, 12px);
+    padding-right: 24px;
+}

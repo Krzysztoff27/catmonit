@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.title {
+    margin-bottom: var(--mantine-spacing-xs) !important;
+    font-size: var(--mantine-font-size-md);
+    font-weight: var(--mantine-font-weight-600);
+}
+
+.selectOption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.deviceInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
+}
+
+.ipMask {
+    font-size: var(--mantine-font-size-sm);
+    color: var(--background-color-3);
+    font-family: var(--mantine-font-family-monospace);
+}

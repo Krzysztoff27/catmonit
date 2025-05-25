@@ -1,0 +1,38 @@
+.layoutGroup {
+    display: flex;
+    width: 100%;
+    max-width: 300px;
+}
+
+.button {
+    border: none !important;
+    background: transparent !important;
+    padding-left: var(--mantine-spacing-xs) !important;
+    padding-right: var(--mantine-spacing-xs) !important;
+}
+
+.textInput {
+    flex: 1;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    height: 36px;
+}
+
+.textInputInput:disabled {
+    background-color: var(--background-color-4) !important;
+    color: var(--mantine-color-dimmed) !important;
+}
+
+.textInputSection:last-of-type {
+    width: 72px !important;
+}
+
+.dropdownMenu {
+    background: var(--background-color-7) !important;
+}
+
+.option {
+    &:hover {
+        background: var(--background-color-6) !important;
+    }
+}

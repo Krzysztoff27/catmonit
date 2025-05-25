@@ -1,0 +1,31 @@
+.container {
+    gap: 0;
+    pointer-events: auto !important;
+    overflow: hidden;
+    align-items: center !important;
+    margin-top: var(--mantine-spacing-xs);
+}
+
+.droppable {
+    cursor: grab !important;
+    user-select: none;
+    background-color: var(--background-color-6);
+    z-index: 300;
+    width: 240px;
+    min-height: 100px;
+    image-rendering: crisp-edges;
+}
+
+.droppable * {
+    pointer-events: none;
+}
+
+.droppable:active {
+    cursor: grabbing !important;
+}
+
+.ghost {
+    top: 0;
+    left: 0;
+    position: fixed;
+}

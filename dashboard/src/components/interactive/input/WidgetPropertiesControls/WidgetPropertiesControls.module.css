@@ -1,0 +1,10 @@
+.grid {
+    font-size: var(--mantine-font-size-sm);
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--mantine-spacing-md);
+}
+
+.grid * {
+    padding-top: 0 !important;
+}

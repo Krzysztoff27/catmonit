@@ -1,0 +1,29 @@
+:root[data-mantine-color-scheme="dark"] {
+    --background-color-0: var(--mantine-color-dark-0);
+    --background-color-1: var(--mantine-color-dark-1);
+    --background-color-2: var(--mantine-color-dark-2);
+    --background-color-3: var(--mantine-color-dark-3);
+    --background-color-4: var(--mantine-color-dark-4);
+    --background-color-5: var(--mantine-color-dark-5);
+    --background-color-6: var(--mantine-color-dark-6);
+    --background-color-7: var(--mantine-color-dark-7);
+    --background-color-8: var(--mantine-color-dark-8);
+    --background-color-9: var(--mantine-color-dark-9);
+}
+
+:root[data-mantine-color-scheme="light"] {
+    --background-color-0: var(--mantine-color-gray-9);
+    --background-color-1: var(--mantine-color-gray-8);
+    --background-color-2: var(--mantine-color-gray-7);
+    --background-color-3: var(--mantine-color-gray-6);
+    --background-color-4: var(--mantine-color-gray-5);
+    --background-color-5: var(--mantine-color-gray-4);
+    --background-color-6: var(--mantine-color-gray-3);
+    --background-color-7: var(--mantine-color-gray-2);
+    --background-color-8: var(--mantine-color-gray-1);
+    --background-color-9: var(--mantine-color-gray-0);
+}
+
+:root, #root {
+    background-color: var(--background-color-9);
+}

@@ -1,0 +1,51 @@
+.container {
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    align-items: center;
+    font-size: var(--mantine-font-size-sm);
+
+    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+}
+
+.container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, Opera */
+}
+
+.text {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.text > * {
+    display: inline-block;
+}
+
+.scrolling {
+    animation: scrollLeftRight linear infinite;
+}
+
+.notScrolling {
+    filter: brightness(95%);
+}
+
+.spacer {
+    display: inline-block;
+    width: 40px;
+}
+
+@keyframes scrollLeftRight {
+    0% {
+        transform: translateX(0%);
+    }
+    10% {
+        transform: translateX(0%);
+    }
+    100% {
+        /* important to substract half of the spacer's width */
+        transform: translateX(calc(-50% - 20px));
+    }
+}
