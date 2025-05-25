@@ -1,0 +1,123 @@
+services:
+  traefik:
+    container_name: catmonit-proxy
+    restart: always
+    image: traefik:v3.0
+    command:
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
+
+      # Entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.grpcsecure.address=:444"
+      - "--entrypoints.apisecure.address=:445"
+
+      # TLS termination at Traefik
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.grpcsecure.http.tls=true"
+      - "--entrypoints.apisecure.http.tls=true"
+
+      # gRPC protocol enforcement
+      #- "--entrypoints.grpcsecure.transport.protocol=h2c"
+
+      # Providers
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+
+      # Dashboard (exposed via separate router)
+      - "--api.dashboard=true"
+    ports:
+      - "443:443"     # HTTPS for all domain-based routes
+      - "444:444"     # gRPC API for api-web
+      - "445:445"     # gRPC API for api-machines
+      - "80:80"       # For dashboard or fallback redirects
+      - "8080:8080"   # Internal dashboard API (not public facing)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/dynamic.yaml:/etc/traefik/dynamic/dynamic.yaml:ro"
+      - "./traefik/certs:/etc/traefik/certs:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+    networks:
+      - catmonit-network
+
+  database:
+    container_name: catmonit-db
+    restart: always
+    image: postgres
+    env_file:
+      - ./.env 
+    volumes:
+      - ./database/db:/var/lib/postgresql/data
+      - ./database/initdb:/docker-entrypoint-initdb.d/:ro
+    networks:
+        - catmonit-network
+
+  grpc.telemetry.server:
+    container_name: catmonit-telemetry-server
+    restart: always
+    image: "ghcr.io/krzysztoff27/catmonit-telemetry-server:latest"
+    env_file:
+      - ./.env
+    labels:
+    - "traefik.enable=true"
+
+    # ROUTER 1: API-MACHINES domain access on port 443
+    - "traefik.http.routers.api-machines.rule=Host(`api-machines.local`)"
+    - "traefik.http.routers.api-machines.entrypoints=websecure"
+    - "traefik.http.routers.api-machines.tls=true"
+    - "traefik.http.routers.api-machines.service=api-machines"
+    #- "traefik.http.services.api-machines.loadbalancer.server.port=5001"
+
+    # ROUTER 2: API-MACHINES IP access on port 445
+    - "traefik.http.routers.api-machines-ip.rule=Host(`10.10.51.3`)"
+    - "traefik.http.routers.api-machines-ip.entrypoints=apisecure"
+    - "traefik.http.routers.api-machines-ip.tls=true"
+    - "traefik.http.routers.api-machines-ip.service=api-machines"
+    - "traefik.http.services.api-machines.loadbalancer.server.scheme=h2c"
+
+    # ROUTER 3: API-WEB domain access on port 443
+    - "traefik.http.routers.api-web.rule=Host(`api-web.local`)"
+    - "traefik.http.routers.api-web.entrypoints=websecure"
+    - "traefik.http.routers.api-web.tls=true"
+    - "traefik.http.routers.api-web.service=api-web"
+    - "traefik.http.services.api-web.loadbalancer.server.port=5172"
+
+    # ROUTER 4: API-WEB IP access on port 444
+    - "traefik.http.routers.api-web-ip.rule=Host(`10.10.51.3`)"
+    - "traefik.http.routers.api-web-ip.entrypoints=grpcsecure"
+    - "traefik.http.routers.api-web-ip.tls=true"
+    - "traefik.http.routers.api-web-ip.service=api-web"
+    networks:
+      - catmonit-network
+
+  website:
+      container_name: catmonit-dashboard
+      restart: always
+      image: "ghcr.io/krzysztoff27/catmonit-dashboard:latest"
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.website.rule=Host(`dashboard.local`)"
+        - "traefik.http.routers.website.entrypoints=websecure"
+        - "traefik.http.routers.website.tls=true"
+        - "traefik.http.routers.website.service=website"
+        - "traefik.http.services.website.loadbalancer.server.port=3000"
+
+        - "traefik.http.routers.website-ip.rule=Host(`10.10.51.3`)"
+        - "traefik.http.routers.website-ip.entrypoints=websecure"
+        - "traefik.http.routers.website-ip.tls=true"
+        - "traefik.http.routers.website-ip.service=website"
+      networks:
+        - catmonit-network
+
+networks:
+  catmonit-network:
+    name: catmonit-network
+    external: false
