@@ -33,7 +33,6 @@ project.fragment.lock.json
 artifacts/
 
 docker-compose.override.yml
-
 *.container
 
 ## Others
@@ -74,4 +73,3 @@ dist-ssr
 ## Local
 *.local
 *.local.*
-
