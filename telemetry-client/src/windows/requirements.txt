@@ -1,0 +1,6 @@
+﻿grpcio
+grpcio-tools
+pydantic
+psutil
+PyYAML
+pywin32

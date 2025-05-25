@@ -1,18 +1,10 @@
-## Editor directories and files
+## Ignore Visual Studio temporary files, build results, and
+## user-specific files
 .vs/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 ## Build results
 [Bb]in/
@@ -32,7 +24,6 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
-docker-compose.override.yml
 *.container
 
 ## Others
@@ -51,6 +42,9 @@ Thumbs.db
 ## pyinstaller build results
 build/
 dist/
+
+#*.spec
+=======
 *.spec
 
 ## custom exclusionssl/
@@ -70,6 +64,13 @@ node_modules
 dist
 dist-ssr
 
+
+
+## custom exclusionssl/
+ssl/
+
+=======
 ## Local
 *.local
 *.local.*
+
