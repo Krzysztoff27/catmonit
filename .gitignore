@@ -24,10 +24,10 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+
 ## Docker
-docker-compose.override.yml
 #**/Dockerfile
-**/docker-compose*.yml
+
 *.container
 
 ## Others
@@ -46,7 +46,28 @@ Thumbs.db
 ## pyinstaller build results
 build/
 dist/
+
 #*.spec
+=======
+*.spec
+
+## custom exclusionssl/
+ssl/
+
+## Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+## Node JS
+node_modules
+dist
+dist-ssr
+
 
 ## custom exclusionssl/
 ssl/
